@@ -1,0 +1,17 @@
+{
+  "name": "stella",
+  "private": true,
+  "description": "Stella — a React-first, Tauri-optimized UI kit. @stella/terra (base) + @stella/vidrio (aesthetic expansion).",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present run build",
+    "dev": "pnpm -r --if-present run dev",
+    "lint": "pnpm -r --if-present run lint",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "test": "pnpm -r --if-present run test",
+    "clean": "pnpm -r --if-present run clean"
+  }
+}
