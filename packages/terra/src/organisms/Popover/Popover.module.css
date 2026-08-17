@@ -1,0 +1,33 @@
+/**
+ * ============================================================================
+ *    Popover — non-modal anchored panel.
+ *    Visual surface is entirely Island(tone="overlay") — same background/
+ *    border/radius/shadow tokens as Dialog's panel, so it reads as "the
+ *    same kind of floating thing" rather than a separate visual language.
+ *    Island itself is deliberately layout-agnostic (see its own docblock:
+ *    "no built-in flex/layout behavior") — it only sets `display: flex`
+ *    for its own sizing needs, with no `flex-direction`, so it defaults
+ *    to a row. Every Island consumer that wants a stacked panel has to
+ *    say so itself: Dialog does (builds its own `.panel` class, doesn't
+ *    use Island at all), Menu does (`.menu`'s `flex-direction: column`).
+ *    This sheet does too, below — Popover's content is a vertical stack,
+ *    left-aligned, with a default gap between children.
+ *    ============================================================================
+ *
+ * @format
+ */
+
+.panel {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--stella-space-2);
+
+	padding: var(--stella-space-4);
+	min-width: 200px;
+	max-width: min(360px, calc(100vw - var(--stella-space-8)));
+	outline: none;
+
+	/* Shared with Menu — see tokens.css's `stella-overlay-pop` keyframes. */
+	animation: var(--stella-overlay-pop-animation);
+}

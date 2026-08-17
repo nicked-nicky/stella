@@ -1,0 +1,31 @@
+/**
+ * ============================================================================
+ *    Drag region — shared by WindowChrome and EmptyWindowChrome.
+ *    Two runtimes, two different mechanisms, and Terra doesn't get to
+ *    assume which one wraps it (see stella-cross-platform-direction —
+ *    this kit is runtime-agnostic, not Tauri-only):
+ *
+ *    - Electron reads the CSS property below (`-webkit-app-region`).
+ *      Blink treats the whole `drag` region as one draggable rectangle,
+ *      including descendants, *unless* a descendant is explicitly
+ *      marked `no-drag` — omit that and every button/island inside
+ *      becomes un-clickable (the classic Electron title-bar gotcha).
+ *    - Tauri reads the `data-tauri-drag-region` DOM attribute instead
+ *      (applied in WindowChrome.tsx/EmptyWindowChrome.tsx directly,
+ *      not here — attributes aren't CSS). Its drag check only fires on
+ *      the exact mousedown target, so `.noDrag` is a no-op for Tauri,
+ *      but harmless — applying both classes unconditionally is what
+ *      makes one component correct in either shell instead of needing
+ *      a runtime branch.
+ *    ============================================================================
+ *
+ * @format
+ */
+
+.dragRegion {
+	-webkit-app-region: drag;
+}
+
+.noDrag {
+	-webkit-app-region: no-drag;
+}

@@ -1,0 +1,157 @@
+/**
+ * ============================================================================
+ *    WindowChrome — 4-region title bar.
+ *    Deliberately four separately-bordered pills (brand, tabs, tools,
+ *    trailing systemTools+windowControls), not one continuous bar —
+ *    matches Island's own principle that nothing sits flush against the
+ *    window edge, applied to the title bar itself instead of just the
+ *    content below it. `.chrome` provides only a transparent flex strip
+ *    at the shared bar height; every visible surface (background,
+ *    border, radius) comes from the Islands floating inside it.
+ *    ============================================================================
+ *
+ * @format
+ */
+
+.chrome {
+	/* Shared by every region below so brand/tabs/tools/trailing all line
+     up as equal-height columns regardless of their own content (text
+     pill vs. button pill vs. arbitrary freeform content). Value comes
+     from whichever `.size-*` class WindowChrome.tsx applies alongside
+     this one (see below) — never set directly here, so there's exactly
+     one place (the size-class block) that knows how a size token turns
+     into a bar height. */
+	display: flex;
+	align-items: center;
+	gap: var(--stella-space-3);
+
+	/* No background and no bottom seam: the bar is a transparent strip
+     and every visible surface belongs to the pills floating inside it.
+     Both reference apps do exactly this — Ray's `.menu` and
+     color-cart's `<header>` each carry only `display: flex` and a gap,
+     letting the app canvas show through between the islands. A seam
+     here would draw a line across a title bar that is supposed to read
+     as separate floating objects. */
+	background-color: transparent;
+	flex-shrink: 0;
+	height: var(--chrome-region-height);
+
+	/* Matches native title bars: double-clicking to maximize (or just
+     dragging) shouldn't leave a text-selection highlight behind. */
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+/* ============================================================================
+   SIZE — one of these is always applied alongside `.chrome` (WindowChrome
+   defaults its `size` prop to 'md'), same `size-${size}` class pattern
+   Button/ButtonIsland already use. Each sets `--chrome-region-height` from
+   the matching `--stella-size-*` control token plus its border, exactly
+   how `--stella-bar-height` itself is built in tokens.css (one control
+   plus its borders on both edges) — so a `size="lg"` bar and the `lg`
+   button island inside it agree by construction, not by both happening
+   to read the same fixed constant. Reading `--stella-border-width` here
+   also means the bar height still responds to the border-thickness theme
+   setting, same as before. No `xl` step: WindowChrome's `size` is typed
+   as `ButtonSize` ('xs'|'sm'|'md'|'lg'), matching every button-bearing
+   region it actually sizes — Button itself has no `xl` size to cascade
+   into (see Button.module.css). */
+.size-xs {
+	--chrome-region-height: var(--stella-size-xs);
+}
+
+.size-sm {
+	--chrome-region-height: var(--stella-size-sm);
+}
+
+.size-md {
+	--chrome-region-height: var(--stella-size-md);
+}
+
+.size-lg {
+	--chrome-region-height: var(--stella-size-lg);
+}
+
+.brand {
+	flex-shrink: 0;
+	height: var(--chrome-region-height);
+	padding: 0 var(--stella-space-3);
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.25em;
+	height: 1.25em;
+	flex-shrink: 0;
+}
+
+/* Always present and always `flex: 1` (the "free space" region 2 grows
+   into), whether or not `tabs` is actually passed — height is fixed to
+   match the other three regions even while empty, so the bar's height
+   never shifts based on whether tabs content is present. */
+.tabsRegion {
+	flex: 1;
+	min-width: 0;
+	height: var(--chrome-region-height);
+	display: flex;
+	align-items: center;
+}
+
+/* Wraps whatever `tabs` actually is — deliberately a plain box, not an
+   Island: `tabs` should render as-is (a search Input, a future
+   TabView, plain text), not get force-fitted into the pill look the
+   other regions have. Only exists (and only opts its content out of
+   the drag region) when `tabs` has content — see `.tabsRegion` above
+   for why empty space stays draggable instead. Sizing `tabs` itself
+   (e.g. an `Input size="lg"` to match a `size="lg"` WindowChrome) is
+   the caller's job — WindowChrome only threads `size` into the regions
+   it renders itself (tools/systemTools/windowControls), not into
+   arbitrary freeform content it doesn't control. */
+.tabsContent {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+	width: 100%;
+}
+
+/* Tools pill and the trailing systemTools+windowControls group both
+   need `flex-shrink: 0` — `.tabsRegion` above is the one designated
+   "give up space first" region (it already has `min-width: 0`), so
+   everything else should hold its size rather than compress the
+   window controls into overlapping buttons at narrow widths. `.tools`
+   also needs its own flex/height set explicitly (it's a plain div, not
+   `FlexContainer`); `.trailing` already gets `display: flex` +
+   `align-items: center` from its own `align="center"` prop — inline
+   style always wins over these classes anyway, so only `height` is
+   added here to avoid a dead, always-overridden duplicate. */
+.tools {
+	flex-shrink: 0;
+	height: var(--chrome-region-height);
+	display: flex;
+	align-items: center;
+}
+
+.trailing {
+	flex-shrink: 0;
+	height: var(--chrome-region-height);
+}
+
+/* Island never declares its own `height` (it's meant to hug its
+   content — see Island.module.css), so this always wins regardless of
+   selector specificity: the tools/systemTools/WindowControls pills
+   (`.tools`'s and `.trailing`'s only direct children) get pinned to
+   the exact same height as `.brand`/`.tabsRegion`, not just centered
+   inside a taller wrapper with slack above/below. box-sizing:
+   border-box on Island means the border is included, so this
+   content-box works out to exactly one `--stella-size-*` Button either
+   way — now doubly true since `size` cascades into every button island
+   WindowChrome renders (see WindowChrome.tsx), so there's no longer
+   even a same-height-different-size mismatch to paper over here, just
+   belt-and-suspenders against a caller overriding a child's size
+   explicitly. */
+.tools > *,
+.trailing > * {
+	height: var(--chrome-region-height);
+}

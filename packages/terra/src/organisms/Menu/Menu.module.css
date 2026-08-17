@@ -1,0 +1,109 @@
+/**
+ * ============================================================================
+ *    Menu — anchored action list (dropdown or context menu).
+ *    Same visual trick as ButtonIsland/ButtonIsland.module.css: the
+ *    panel is the only thing that owns rounding (Island's own radius +
+ *    its `clip` overflow:hidden), items are zero-radius and flush
+ *    against the panel edges and each other (no padding on `.menu`, no
+ *    gap between items) so the panel's corner clip is what makes the
+ *    *group* read as rounded — items themselves are square.
+ *
+ *    An automatic hairline separates adjacent items (`.item + .item`,
+ *    reserved via a transparent `border-top` on every item and colored
+ *    in only where an item sibling precedes another) — same trick as
+ *    ButtonIsland's `.group > button + button`, one shade quieter
+ *    (`--stella-border-subtle` vs `--stella-border-default`) since it's
+ *    a row boundary inside one group, not an actual break. `Menu.Separator`
+ *    (the `Divider` atom) is reserved for a real group break.
+ *    ============================================================================
+ *
+ * @format
+ */
+
+.menu {
+	min-width: 180px;
+	max-width: min(320px, calc(100vw - var(--stella-space-8)));
+	outline: none;
+
+	display: flex;
+	flex-direction: column;
+
+	/* Shared with Popover — see tokens.css's `stella-overlay-pop` keyframes. */
+	animation: var(--stella-overlay-pop-animation);
+}
+
+.item {
+	display: flex;
+	align-items: center;
+	gap: var(--stella-space-2);
+	width: 100%;
+
+	padding: var(--stella-space-2) var(--stella-space-3);
+	border: none;
+	border-top: var(--stella-border-width) solid transparent;
+	border-radius: 0;
+	background-color: transparent;
+	color: var(--stella-text-primary);
+
+	font-family: var(--stella-font-ui);
+	font-size: var(--stella-text-body);
+	text-align: left;
+	cursor: pointer;
+	user-select: none;
+	-webkit-user-select: none;
+
+	transition: background-color var(--stella-motion-fast) var(--stella-easing-out),
+		color var(--stella-motion-fast) var(--stella-easing-out);
+}
+
+.item + .item {
+	border-top-color: var(--stella-border-subtle);
+}
+
+/* Translucent state layer, not an opaque fill — composites over the
+   panel's own surface whatever tone that happens to be. See the STATE
+   LAYERS section in tokens.css. */
+.item:hover:not(:disabled),
+.item:focus-visible {
+	background-color: var(--stella-state-hover);
+}
+
+.item:active:not(:disabled) {
+	background-color: var(--stella-state-active);
+}
+
+.item:focus-visible {
+	outline: 2px solid var(--stella-focus-ring);
+	outline-offset: -2px;
+}
+
+.item:disabled {
+	color: var(--stella-text-disabled);
+	cursor: not-allowed;
+}
+
+/* Persistent "selected" mark — the top rung of the same state-layer
+   ladder Button's `active` uses, so a selected menu item and a
+   selected Button are literally the same token. */
+.item[data-active],
+.item[data-active]:hover:not(:disabled) {
+	background-color: var(--stella-state-selected);
+}
+
+.item[data-destructive] {
+	color: var(--stella-error-text);
+}
+
+.itemIcon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 1.25em;
+	height: 1.25em;
+}
+
+.itemLabel {
+	flex: 1;
+	min-width: 0;
+}

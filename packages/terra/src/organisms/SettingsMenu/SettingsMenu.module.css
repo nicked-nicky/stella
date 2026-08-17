@@ -1,0 +1,84 @@
+/**
+ * SettingsMenu Component Styles
+ *
+ * Nav sidebar only — field rows lean entirely on Text/Divider/Input/
+ * Switch/Radio/Button/ButtonIsland's own styles, no CSS needed here for
+ * those. The nav
+ * itself deliberately isn't built from the Button atom: category items
+ * are flat, individually-pill-shaped buttons with no wrapping Island —
+ * closer to color-cart's SettingsNavItem than a ButtonIsland toolbar.
+ * Active is just "hover, but sticky" (a persistent --stella-state-selected
+ * layer + full-strength text), not a solid accent fill — keeps the list
+ * quiet next to the louder Button variants used elsewhere.
+ *
+ * @format
+ */
+
+.navItem {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	display: flex;
+	align-items: center;
+	gap: var(--stella-space-2);
+	width: 100%;
+
+	padding: var(--stella-space-2) var(--stella-space-3);
+	border: none;
+	border-radius: var(--stella-radius-pill);
+	background-color: transparent;
+	color: var(--stella-text-tertiary);
+
+	font-family: var(--stella-font-ui);
+	font-size: var(--stella-text-body);
+	text-align: left;
+	cursor: pointer;
+	user-select: none;
+	-webkit-user-select: none;
+
+	transition: background-color var(--stella-motion-fast) var(--stella-easing-out),
+		color var(--stella-motion-fast) var(--stella-easing-out);
+}
+
+.navItem:hover {
+	background-color: var(--stella-state-hover);
+	color: var(--stella-text-secondary);
+}
+
+/* Press feedback — the icon inside squeezes on click; the row chrome
+   stays put (no whole-row scale). */
+.navItem:active .navIcon {
+	transform: scale(0.85);
+}
+
+.navItem:focus-visible {
+	outline: 2px solid var(--stella-focus-ring);
+	outline-offset: 2px;
+}
+
+/* The quiet selection signal — a translucent state layer, deliberately
+   softer than the solid --stella-border-default fill Button/Menu.Item
+   use for `active`. A nav list wants "this row is current", not the
+   louder "this control is pinned on". */
+.navItemActive,
+.navItemActive:hover {
+	background-color: var(--stella-state-selected);
+	color: var(--stella-text-primary);
+}
+
+/* Row rules between fields, one shade quieter than a default Divider —
+   color-cart's `divide-border/60`. These separate rows inside a single
+   category, not sections from each other, so they should read as the
+   faintest thing on the panel. */
+.rowDivider {
+	background-color: var(--stella-border-subtle);
+}
+
+.navIcon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	/* Springy press squeeze (see the :active rule above) */
+	transition: transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
