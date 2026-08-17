@@ -1,0 +1,60 @@
+# Changelog
+
+All notable changes to Stella are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning will follow [Semantic Versioning](https://semver.org/) once a package is actually published (both `@stella/terra` and `@stella/vidrio` are pre-release, `0.0.1`, workspace-only today).
+
+## [Unreleased]
+
+### Added
+
+- Initial atomic component set for `@stella/terra`: 13 atoms (Avatar, Badge, Button, Checkbox, Divider, Icon, Input, Island, Radio, Separator, Spinner, Switch, Text), the `FlexContainer` layout primitive, `ButtonIsland` and `Notification` molecules, and `Dialog` and `SettingsMenu` organisms.
+- Theme engine (`ThemeManager` / `ThemeProvider` / `useTheme`) with four independently configurable axes, each backed by CSS custom properties: color scheme (`light`/`dark`/`system`), corner radius (`sharp`/`default`/`round`), spacing density (`compact`/`default`/`comfortable`), and border width (`none`/`thin`/`default`/`thick`) — `none` is a genuine borderless mode, every hairline in Terra reads the same token.
+- `OverlayProvider` — shared portal, DOM-order stacking, and Escape-key scoping (only the topmost layer responds) for `Dialog` and future overlay-type components.
+- `NotificationProvider` / `useNotifications` — toast queueing, pause-on-hover auto-dismiss, `aria-live` announcement.
+- Automatic hairline separators between adjacent buttons inside a `ButtonIsland` (GTK/libadwaita's "linked" button-group convention) — no manual separator needed for the common case. `ButtonIsland.Separator` (the standalone `Separator` atom) remains for an explicit sub-cluster break.
+- Fade-out exit animations for `Dialog` (backdrop + panel) and `Notification` toasts before unmount, respecting `prefers-reduced-motion`.
+- `@stella/vidrio` package scaffold — depends on `@stella/terra` via `workspace:*`; no components built on top yet.
+
+- State-layer tokens (`--stella-state-hover` / `-active` / `-selected`) — translucent overlays of the foreground color rather than opaque surface tones, so one definition composites correctly over any surface (libadwaita's model). Replaces `--stella-surface-hover`.
+- `--stella-rim` — libadwaita's hairline top highlight, composed alongside the drop shadow on floating surfaces (`Island tone="overlay"`, `Dialog`, `Notification`).
+- `--stella-easing-in` — the accelerate curve, for exit animations.
+- Letter-spacing tokens for every type-scale entry (`--stella-text-*-ls`), plus `text-wrap: balance` on the two largest sizes and `font-variant-numeric: tabular-nums` on `mono`.
+- `sidebar` tone on `Island`, giving the existing `--stella-surface-sidebar` token a reachable component API.
+- `.prettierrc` and `format` / `format:check` scripts.
+- `docs/` — `DEVELOPMENT.md` (authoring guide) and `WIKI.md` (architecture reference).
+
+### Fixed
+
+- **`Button` had no visible focus ring.** It set `outline: 0` on `:focus-visible`, making it the only interactive component in the kit with no keyboard focus indicator — a direct contradiction of both its own docblock and the project's accessibility principle. Now draws an inset ring (`outline-offset: -2px`), matching `Menu.Item`, so it stays visible inside a clipping `Island`.
+- **`--stella-easing-out` was an accelerating curve** (`cubic-bezier(0.4, 0, 1, 1)` — Material's *accelerate*) despite its name, so nearly every transition in the kit sped up as it finished. Corrected to `cubic-bezier(0, 0, 0.2, 1)`; the old value now lives on as `--stella-easing-in` and is applied to exit animations.
+- **`Input`'s error state set `outline-color` with no `outline-style`**, so the declaration painted nothing. `Input` now has a real 2px focus ring like every other control instead of signalling focus by border color alone.
+- **`--stella-surface-hover` and `--stella-surface-muted` resolved to the same value in both themes**, so hovering anything on a muted surface produced no visible change. Fixed structurally by the state-layer tokens.
+- **Shadows were ~10% black in both themes**, effectively invisible against dark surfaces — every overlay, popover, menu and dialog was floating with no perceptible elevation in the default theme. Shadow *color* is now theme-aware (`--stella-shadow-color`) while geometry stays fixed.
+- **No `color-scheme` declaration**, so native scrollbars, text selection, and form-control chrome stayed light in dark mode.
+- `Switch`'s checked-hover state used a magic `filter: brightness(1.1)`; now a state layer, which also collapsed two rules into one.
+- Formatting drift across stylesheets (9 files tab-indented, 14 space-indented, mixed quote styles).
+
+### Changed
+
+- **`WindowChrome` lost its bottom seam** — a transparent strip now, matching Ray's `.menu` and color-cart's `<header>`, with the app canvas showing through between the four floating regions. `ButtonIsland` and `Menu` keep their automatic per-pair hairline (`button + button` / `.item + .item`); `ButtonIsland.Separator` and `Menu.Separator` remain for genuine cluster breaks. `SettingsMenu`'s between-row rules dropped to `--stella-border-subtle`, matching color-cart's `divide-border/60`.
+- **`ButtonIsland` children now fill the island's interior height** — Ray's `.menu-button { height: 100% }`. `Button`'s `--stella-size-*` became a `min-height`, the inner row defaults to `align="stretch"`, and the `Island` gets `alignItems: stretch`. Fixes title-bar clusters of different `size` rendering at different heights: a `size="sm"` `WindowControls` and a `size="md"` `systemTools` group sitting side by side in `WindowChrome` now line up instead of one floating centred with dead space above and below it.
+- **Surfaces are a real elevation ladder** rather than one tone reused. `--stella-surface-header` (toolbars, `ButtonIsland`, title-bar pills, `Input`) now sits a step *proud* of `--stella-surface-card` in dark, following Ray's `body → container → group` layering — previously the two were identical, which made a `ButtonIsland` invisible on a card. `--stella-surface-muted` became a recessed well at canvas level, and the light canvas darkened to `#f0f0f0` so white panels read as raised (color-cart's model).
+- **`Button` carries no surface of its own.** It is transparent and borrows the wrapping `ButtonIsland`'s tone, exactly as Ray's `.menu-button` borrows `.menu-button-group`. Interaction is now purely the state-layer ladder, and the label starts at `--stella-text-secondary` and brightens to full strength on hover — color-cart's quiet-until-touched treatment.
+- **`Button`'s `variant` prop is gone**, along with the `ButtonVariant` type. It had exactly one possible value (`'filled'`) and therefore could not vary — dead configuration. Mark the current pick with `active` as before.
+- `Button`'s `active` state and `Menu.Item`'s `[data-active]` now both use `--stella-state-selected` instead of a `--stella-border-default` fill, so a selected button, a selected menu item and a current `SettingsMenu` row are all literally the same token. State-layer alphas were re-tuned into a clearly stepped hover → press → selected ladder, mirroring Ray's `#414151 → #4c4c5c → #575767`.
+- `Input` reads `--stella-surface-header` instead of raw palette steps, so a standalone field and a button group beside it are the same class of object.
+- **`WindowChrome` is a transparent strip** at the new `--stella-bar-height` token, with no background and no bottom seam — the app canvas shows through between the four floating regions, matching Ray's `.menu` and color-cart's `<header>`.
+- `ApplicationExample` restructured to Ray's root layout: the app is inset from the window edge, and the sidebar and viewport are independent bordered `Island`s separated by a gap rather than one container split by an internal border.
+- **Light/dark now resolves through CSS `light-dark()` driven by `color-scheme`**, replacing the duplicated `@media (prefers-color-scheme: light) { :root:not([data-theme]) }` + `:root[data-theme='light']` block pair. Every theme-dependent alias is declared once; the per-component light-override blocks in `Button`, `Input`, and `Badge` are gone entirely. Sets a Baseline 2024 browser floor (Chrome 123+, Safari 17.5+, Firefox 120+, WebKitGTK 2.44+).
+- `Avatar` sizes now read the shared `--stella-size-*` control scale instead of five bespoke pixel values, so an Avatar lines up with a Button or Input of the same size token. Initials scale from the same token by ratio rather than five hardcoded font sizes.
+- Fixed-size controls (`Checkbox`, `Radio`, `Switch`, `Icon`, `Spinner`, `Avatar`) now document *why* they don't scale with density — they're pointer targets and pixel-grid artwork, so `density` tightens the space between them, not the controls themselves.
+- `SettingsMenu`'s active nav row uses `--stella-state-selected` (the quiet "current row" signal) rather than the same token as hover.
+
+- `Notification` toast redesigned as a compact pill — status carried by icon color rather than a colored left border — and repositioned from top-right to bottom-center.
+- `Button`'s `active` state background now reuses `--stella-border-default` (the same token the surrounding `Island`'s border is drawn in) instead of a fixed neutral tone, so it tracks light/dark theme correctly and reads as "picked" by matching the group's own chrome.
+- `Dialog.Header` padding reduced for a visually thinner header.
+
+### Removed
+
+- Runtime accent-color switching (`ThemeManager.setAccent`, `--stella-accent-*` tokens, `AccentColor`). Terra uses a single neutral color scheme; color is reserved for exactly five status meanings (success / info / warning / error / debug), defined as alias token triplets and consumed by `Badge` and `Notification`.
+- `Button`'s status-colored variants (`success` / `info` / `warning` / `destructive` / `debug`) — `filled` is the only variant now.
+- Unused duplicate token source (`design-tokens.ts`) — `styles/tokens.css` is the single source of truth for design tokens.
