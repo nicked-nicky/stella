@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "Stella — Vidrio. Aesthetic superset of Terra: frosted glass, dynamic lighting, textures, dynamic borders.",
+  "license": "MIT",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -16,5 +17,10 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.3.3"
   }
 }
