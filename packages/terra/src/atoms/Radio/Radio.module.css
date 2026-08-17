@@ -1,0 +1,119 @@
+/**
+ * Radio Component Styles
+ * Same visually-transparent-native-input pattern as Checkbox.
+ *
+ * Single neutral color scheme: "checked" inverts to
+ * --stella-selected-bg/--stella-selected-content rather than picking a
+ * color — no accent hue.
+ */
+
+.wrapper {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	position: relative;
+	display: inline-flex;
+	flex-shrink: 0;
+}
+
+/* Fixed pixel sizes, deliberately NOT density-scaled — a radio is a
+   pointer target. Same reasoning as Checkbox and COMPONENT SIZING in
+   tokens.css. */
+.size-sm {
+	width: 16px;
+	height: 16px;
+}
+
+.size-md {
+	width: 20px;
+	height: 20px;
+}
+
+.input {
+	position: absolute;
+	inset: 0;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+	width: 100%;
+	height: 100%;
+}
+
+.input:disabled {
+	cursor: not-allowed;
+}
+
+.dot {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+
+	border: var(--stella-border-width) solid var(--stella-border-default);
+	border-radius: var(--stella-radius-full);
+	background-color: var(--stella-surface-card);
+	transition: background-color var(--stella-motion-fast) var(--stella-easing-out),
+		border-color var(--stella-motion-fast) var(--stella-easing-out),
+		transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
+
+.dot::after {
+	content: '';
+	width: 40%;
+	height: 40%;
+	border-radius: var(--stella-radius-full);
+	background-color: var(--stella-selected-content);
+	opacity: 0;
+	transform: scale(0.4);
+	transition: opacity var(--stella-motion-instant) var(--stella-easing-out),
+		transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
+
+.input:checked + .dot {
+	background-color: var(--stella-selected-bg);
+	border-color: var(--stella-selected-bg);
+}
+
+.input:checked + .dot::after {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.input:hover:not(:disabled) + .dot {
+	border-color: var(--stella-text-secondary);
+}
+
+.input:focus-visible + .dot {
+	outline: 2px solid var(--stella-focus-ring);
+	outline-offset: 2px;
+}
+
+.input:disabled + .dot {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* ============================================================================
+   LABEL LAYOUT (when `label` prop is used)
+   ============================================================================ */
+
+.label {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--stella-space-2);
+	cursor: pointer;
+	font-family: var(--stella-font-ui);
+	font-size: var(--stella-text-body);
+	color: var(--stella-text-primary);
+}
+
+.label:has(.input:disabled) {
+	cursor: not-allowed;
+	color: var(--stella-text-disabled);
+}
+
+.labelText {
+	line-height: 1.4;
+}

@@ -1,0 +1,77 @@
+/**
+ * Island Component Styles
+ *
+ * The container identity Stella's reference apps (Ray IDE, color-cart)
+ * both build around: nothing sits flush against the window edge or
+ * another region — every top-level area is its own bordered, elevated
+ * box with a gap around it. Two shapes cover every case observed there:
+ *
+ * - `panel`  — big-but-not-full radius (--stella-radius-panel, 16px by
+ *   default). Sidebars, modals, cards, viewports — block-level, fills
+ *   its container the way a normal <div> would (Ray's
+ *   .full-size-container behaves the same way).
+ * - `pill`   — fully round (--stella-radius-pill). Toolbar/button-group
+ *   clusters — see Ray's `.menu-button-group`, color-cart's `Island`.
+ *   Sized to its content, not its container (Ray's .menu-button-group
+ *   is `display: inline-flex` for exactly this reason) — a toolbar
+ *   island should hug its buttons, not stretch to fill a flex row.
+ */
+
+.island {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	box-sizing: border-box;
+	align-items: center;
+	background-color: var(--stella-surface-card);
+	border: var(--stella-border-width) solid var(--stella-border-default);
+	color: var(--stella-text-primary);
+}
+
+.clip {
+	overflow: hidden;
+}
+
+/* ============================================================================
+   SHAPE
+   ============================================================================ */
+
+.shape-panel {
+	display: flex;
+	border-radius: var(--stella-radius-panel);
+}
+
+.shape-pill {
+	display: inline-flex;
+	border-radius: var(--stella-radius-pill);
+}
+
+/* ============================================================================
+   TONE — which surface alias this Island reads its background from
+   ============================================================================ */
+
+.tone-card {
+	background-color: var(--stella-surface-card);
+}
+
+.tone-sidebar {
+	background-color: var(--stella-surface-sidebar);
+}
+
+.tone-header {
+	background-color: var(--stella-surface-header);
+}
+
+.tone-muted {
+	background-color: var(--stella-surface-muted);
+}
+
+/* The floating tier. Two shadow layers, not one: the drop shadow puts
+   it above the page, and --stella-rim adds libadwaita's hairline top
+   highlight — the cue that a surface is catching light from above,
+   which is what makes a floating panel read as a physical object
+   rather than a flat rectangle. See ELEVATION in tokens.css. */
+.tone-overlay {
+	background-color: var(--stella-surface-overlay);
+	box-shadow: var(--stella-rim), var(--stella-shadow-lg);
+}

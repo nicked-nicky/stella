@@ -1,0 +1,152 @@
+/**
+ * Checkbox Component Styles
+ *
+ * The native <input type="checkbox"> is kept in the DOM and interactive
+ * (not display:none) but visually hidden — this preserves focus, keyboard
+ * activation, and screen reader behavior. A sibling <span> is styled to
+ * look like the box, driven entirely by the input's :checked/:indeterminate/
+ * :disabled/:focus-visible state via CSS selectors — zero JS for visuals.
+ *
+ * Single neutral color scheme: "checked" inverts to
+ * --stella-selected-bg/--stella-selected-content (text-primary on
+ * surface-window) rather than picking a color — no accent hue.
+ */
+
+.wrapper {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	position: relative;
+	display: inline-flex;
+	flex-shrink: 0;
+}
+
+/* Fixed pixel sizes, deliberately NOT density-scaled. A checkbox is a
+   pointer target: `density: compact` should tighten the space between
+   rows, not shrink the hit area below what's comfortable to click.
+   Same reasoning as COMPONENT SIZING in tokens.css. */
+.size-sm {
+	width: 16px;
+	height: 16px;
+}
+
+.size-md {
+	width: 20px;
+	height: 20px;
+}
+
+/* Native input — occupies the full box, fully transparent, still focusable */
+.input {
+	position: absolute;
+	inset: 0;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+	width: 100%;
+	height: 100%;
+}
+
+.input:disabled {
+	cursor: not-allowed;
+}
+
+/* Visual box */
+.box {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+
+	border: var(--stella-border-width) solid var(--stella-border-default);
+	border-radius: var(--stella-radius-xs);
+	background-color: var(--stella-surface-card);
+	transition: background-color var(--stella-motion-fast) var(--stella-easing-out),
+		border-color var(--stella-motion-fast) var(--stella-easing-out),
+		transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
+
+.checkIcon,
+.indeterminateIcon {
+	width: 80%;
+	height: 80%;
+	color: var(--stella-selected-content);
+	opacity: 0;
+	transform: scale(0.6);
+	transition: opacity var(--stella-motion-instant) var(--stella-easing-out),
+		transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
+
+.indeterminateIcon {
+	position: absolute;
+}
+
+/* Checked */
+.input:checked + .box {
+	background-color: var(--stella-selected-bg);
+	border-color: var(--stella-selected-bg);
+}
+
+.input:checked + .box .checkIcon {
+	opacity: 1;
+	transform: scale(1);
+}
+
+/* Indeterminate */
+.input:indeterminate + .box {
+	background-color: var(--stella-selected-bg);
+	border-color: var(--stella-selected-bg);
+}
+
+.input:indeterminate + .box .indeterminateIcon {
+	opacity: 1;
+	transform: scale(1);
+}
+
+/* Hover (not disabled) */
+.input:hover:not(:disabled) + .box {
+	border-color: var(--stella-text-secondary);
+}
+
+/* Press feedback — the inner check mark squeezes on click; the box
+   chrome stays put (no whole-box scale). */
+.input:active:not(:disabled) + .box .checkIcon,
+.input:active:not(:disabled) + .box .indeterminateIcon {
+	transform: scale(0.8);
+}
+
+/* Focus ring */
+.input:focus-visible + .box {
+	outline: 2px solid var(--stella-focus-ring);
+	outline-offset: 2px;
+}
+
+/* Disabled */
+.input:disabled + .box {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* ============================================================================
+   LABEL LAYOUT (when `label` prop is used)
+   ============================================================================ */
+
+.label {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--stella-space-2);
+	cursor: pointer;
+	font-family: var(--stella-font-ui);
+	font-size: var(--stella-text-body);
+	color: var(--stella-text-primary);
+}
+
+.label:has(.input:disabled) {
+	cursor: not-allowed;
+	color: var(--stella-text-disabled);
+}
+
+.labelText {
+	line-height: 1.4;
+}

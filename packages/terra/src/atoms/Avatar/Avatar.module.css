@@ -1,0 +1,81 @@
+/**
+ * Avatar Component Styles
+ *
+ * Sizes read the shared --stella-size-* control scale rather than a
+ * bespoke set of pixel values, so an Avatar lines up with a Button or
+ * Input of the same size token when they sit in the same row — which is
+ * the common case (a user row, a toolbar, a comment header).
+ *
+ * Initials scale from the same token via a fixed ratio instead of five
+ * hardcoded font sizes, so the two can never drift apart.
+ *
+ * Like every other control, these are pointer/recognition targets and
+ * deliberately do NOT scale with density — see COMPONENT SIZING in
+ * tokens.css.
+ *
+ * @format
+ */
+
+.avatar {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	overflow: hidden;
+
+	border: var(--stella-border-width) solid var(--stella-border-default);
+	border-radius: var(--stella-radius-full);
+	background-color: var(--stella-surface-muted);
+	color: var(--stella-text-secondary);
+}
+
+.size-xs {
+	width: var(--stella-size-xs);
+	height: var(--stella-size-xs);
+	font-size: calc(var(--stella-size-xs) * 0.38);
+}
+
+.size-sm {
+	width: var(--stella-size-sm);
+	height: var(--stella-size-sm);
+	font-size: calc(var(--stella-size-sm) * 0.36);
+}
+
+.size-md {
+	width: var(--stella-size-md);
+	height: var(--stella-size-md);
+	font-size: calc(var(--stella-size-md) * 0.36);
+}
+
+.size-lg {
+	width: var(--stella-size-lg);
+	height: var(--stella-size-lg);
+	font-size: calc(var(--stella-size-lg) * 0.34);
+}
+
+.size-xl {
+	width: var(--stella-size-xl);
+	height: var(--stella-size-xl);
+	font-size: calc(var(--stella-size-xl) * 0.34);
+}
+
+.image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.initials {
+	font-family: var(--stella-font-ui);
+	font-weight: 600;
+	text-transform: uppercase;
+	line-height: 1;
+}
+
+.fallbackIcon {
+	width: 65%;
+	height: 65%;
+}

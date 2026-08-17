@@ -1,0 +1,67 @@
+/**
+ * Badge Component Styles
+ *
+ * Reads only three custom properties, set inline by Badge.tsx per
+ * color+variant combination. No per-color CSS classes needed — new
+ * colors are a JS-only change.
+ *
+ * @format
+ */
+
+.badge {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	display: inline-flex;
+	align-items: center;
+	gap: var(--stella-space-1);
+
+	height: 20px;
+	padding: 0 var(--stella-space-2);
+
+	font-family: var(--stella-font-ui);
+	font-size: var(--stella-text-caption-strong);
+	font-weight: var(--stella-text-caption-strong-weight);
+	letter-spacing: var(--stella-text-caption-strong-ls);
+	line-height: 1;
+	white-space: nowrap;
+
+	border-radius: var(--stella-radius-pill);
+	border: var(--stella-border-width) solid var(--badge-border, transparent);
+	background-color: var(
+		--badge-bg,
+		light-dark(var(--stella-neutral-100), var(--stella-neutral-700))
+	);
+	color: var(
+		--badge-text,
+		light-dark(var(--stella-neutral-700), var(--stella-neutral-100))
+	);
+}
+
+/* ============================================================================
+   neutral + tinted/outline — the one pair of combinations Badge.tsx
+   deliberately leaves unset (see the docblock on resolveColorVars): they
+   need genuinely different raw-palette steps per scheme, which a single
+   inline var() reference can't express. These attribute rules are the
+   only source of truth for them, resolved with `light-dark()` — one
+   declaration each, no duplicated media query / [data-theme] blocks.
+   (`filled` and the status colors don't need this — their alias tokens
+   are already theme-aware.)
+   ============================================================================ */
+
+.badge[data-color="neutral"][data-variant="tinted"] {
+	background-color: light-dark(
+		var(--stella-neutral-100),
+		var(--stella-neutral-700)
+	);
+	color: light-dark(var(--stella-neutral-700), var(--stella-neutral-100));
+}
+
+.badge[data-color="neutral"][data-variant="outline"] {
+	background-color: transparent;
+	color: light-dark(var(--stella-neutral-700), var(--stella-neutral-400));
+	border-color: light-dark(
+		var(--stella-neutral-300),
+		var(--stella-neutral-600)
+	);
+}

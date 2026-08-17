@@ -1,0 +1,200 @@
+/**
+ * Input Component Styles
+ *
+ * The wrapper <span> carries the visual box (border/bg/focus-ring) so
+ * leading/trailing icons can sit inside the same bordered field as the
+ * text — the actual <input> is borderless/transparent and just fills
+ * the remaining space.
+ *
+ * The `.default` field carries its own surface (`--stella-surface-header`)
+ * because an Input is normally standalone — unlike Button, which owns no
+ * surface and borrows its wrapping Island's tone. It gets the pill radius
+ * the button groups use, so a standalone entry sits naturally beside a
+ * segmented group. Hover/press are the shared state-layer tokens, the
+ * same ladder every interactive control in the kit uses. The `filled`
+ * variant is the ghost entry for embedding into toolbars/panels.
+ *
+ * @format
+ */
+
+.wrapper {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	display: inline-flex;
+	align-items: center;
+	gap: var(--stella-space-2);
+	width: 100%;
+
+	font-family: var(--stella-font-ui);
+	border: var(--stella-border-width) solid transparent;
+	border-radius: var(--stella-radius-pill);
+
+	/* Declared up front (transparent) so the focus ring below is a pure
+     color swap with no layout shift — same "reserve the slot" trick the
+     hairline separators use in ButtonIsland/Menu. */
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+
+	transition:
+		background-color var(--stella-motion-fast) var(--stella-easing-out),
+		border-color var(--stella-motion-fast) var(--stella-easing-out),
+		outline-color var(--stella-motion-fast) var(--stella-easing-out),
+		box-shadow var(--stella-motion-fast) var(--stella-easing-out),
+		transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
+
+/* ============================================================================
+   VARIANT: DEFAULT — sits on the same `header` control tier a
+   ButtonIsland does, so a standalone field and a button group beside it
+   read as the same class of object. Unlike Button (which is
+   transparent and borrows its Island's surface), an Input is normally
+   standalone, so it carries the surface itself.
+
+   Hover/press are state layers painted over that surface with
+   `background-image` — `background-color` is already spoken for, and
+   layering keeps the two independent.
+   ============================================================================ */
+
+.default {
+	background-color: var(--stella-surface-header);
+	border-color: var(--stella-border-default);
+	box-shadow: var(--stella-shadow-xs);
+}
+
+.default:hover:not(.disabled) {
+	background-image: linear-gradient(
+		var(--stella-state-hover),
+		var(--stella-state-hover)
+	);
+}
+
+/* Press feedback — the icon inside squeezes on click; the field chrome
+   stays put (no whole-field scale). */
+.default:active:not(.disabled) {
+	background-image: linear-gradient(
+		var(--stella-state-active),
+		var(--stella-state-active)
+	);
+}
+
+.default:active:not(.disabled) .icon {
+	transform: scale(0.85);
+}
+
+/* ============================================================================
+   FOCUS — a real 2px ring, matching every other interactive control in
+   the kit (Checkbox, Radio, Switch, Button, Menu.Item) rather than
+   signalling focus with a border-color change alone. Inset, because the
+   field's own pill border sits on the border box and an outset ring
+   would read as a detached second outline around it.
+   ============================================================================ */
+
+.wrapper:focus-within {
+	outline-color: var(--stella-focus-ring);
+	border-color: var(--stella-focus-ring);
+}
+
+/* ============================================================================
+   VARIANT: FILLED (ghost entry) — borderless, window-tinted field for
+   embedding into toolbars/panels where you don't want a box; "lifts"
+   to the card fill while focused. Uses theme-aware surface aliases, so
+   no per-theme branching is needed.
+   ============================================================================ */
+
+.filled {
+	background-color: var(--stella-surface-window);
+	border-color: transparent;
+	box-shadow: none;
+}
+
+.filled:focus-within {
+	background-color: var(--stella-surface-card);
+}
+
+/* ============================================================================
+   SIZING
+   ============================================================================ */
+
+/* `min-height`, not `height` — same as Button — so the field can stretch
+   taller inside a flex row (e.g. a toolbar/tab region) rather than being
+   locked to its token size. The inner input stretches to match via
+   `align-self: stretch` (see `.input`). */
+.size-sm {
+	min-height: var(--stella-size-sm);
+	padding: 0 var(--stella-space-2);
+	font-size: var(--stella-text-caption);
+}
+
+.size-md {
+	min-height: var(--stella-size-md);
+	padding: 0 var(--stella-space-3);
+	font-size: var(--stella-text-body);
+}
+
+.size-lg {
+	min-height: var(--stella-size-lg);
+	padding: 0 var(--stella-space-4);
+	font-size: var(--stella-text-body);
+}
+
+/* ============================================================================
+   STATE: ERROR
+   ============================================================================ */
+
+.error {
+	border-color: var(--stella-error-border);
+}
+
+/* Anchored to .wrapper so the red signal out-ranks the generic focus
+   ring above (both are `.wrapper:focus-within`-level, so the extra
+   `.error` class is what decides it). */
+.wrapper.error:focus-within {
+	border-color: var(--stella-error-border-strong);
+	outline-color: var(--stella-error-border-strong);
+}
+
+/* ============================================================================
+   STATE: DISABLED
+   ============================================================================ */
+
+.disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+/* ============================================================================
+   INNER INPUT
+   ============================================================================ */
+
+.input {
+	flex: 1;
+	min-width: 0;
+	align-self: stretch;
+
+	font: inherit;
+	color: var(--stella-text-primary);
+	background-color: transparent;
+	border: none;
+	outline: none;
+}
+
+.input::placeholder {
+	color: var(--stella-text-tertiary);
+}
+
+.input:disabled {
+	cursor: not-allowed;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.25em;
+	height: 1.25em;
+	flex-shrink: 0;
+	color: var(--stella-text-secondary);
+	/* Springy press squeeze (see the :active rule above) */
+	transition: transform var(--stella-motion-fast) var(--stella-easing-spring);
+}

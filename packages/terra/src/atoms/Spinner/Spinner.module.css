@@ -1,0 +1,55 @@
+/**
+ * Spinner Component Styles
+ * Single source of the spin animation — Button's loading state
+ * consumes this component rather than duplicating the keyframes.
+ */
+
+.spinner {
+	display: inline-block;
+	flex-shrink: 0;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: stella-spin var(--stella-motion-slow) linear infinite,
+		var(--stella-appear-animation);
+}
+
+.size-xs {
+	width: 12px;
+	height: 12px;
+	border-width: 1.5px;
+}
+
+.size-sm {
+	width: 16px;
+	height: 16px;
+	border-width: 2px;
+}
+
+.size-md {
+	width: 1em;
+	height: 1em;
+	border-width: 2px;
+}
+
+.size-lg {
+	width: 24px;
+	height: 24px;
+	border-width: 2.5px;
+}
+
+@keyframes stella-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* Under prefers-reduced-motion the motion tokens collapse to ~zero (see
+   tokens.css), which would turn the spin into a strobe. Loading state is
+   essential feedback, so keep it — just at a calm, slow speed. The
+   appear fade is dropped entirely (instant reveal). */
+@media (prefers-reduced-motion: reduce) {
+	.spinner {
+		animation: stella-spin 1.5s linear infinite;
+	}
+}

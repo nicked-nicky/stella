@@ -1,0 +1,124 @@
+/**
+ * Text Component Styles
+ * One class per entry in the type scale defined in styles/tokens.css.
+ *
+ * Each variant pulls all four of its properties from tokens — size,
+ * line height, weight, and letter-spacing. Tracking is part of the
+ * scale rather than an afterthought: large text set at default
+ * tracking reads loose and small UI text reads cramped, so display and
+ * title sizes tighten while captions open up slightly.
+ */
+
+.text {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	font-family: var(--stella-font-ui);
+	margin: 0;
+}
+
+/* `text-wrap: balance` on the two largest sizes only — it evens out
+   line lengths so a heading never leaves one orphaned word on its last
+   line. Deliberately not applied to body copy: the algorithm is capped
+   at a handful of lines and is meant for short display text. */
+.display {
+	font-size: var(--stella-text-display);
+	line-height: var(--stella-text-display-lh);
+	font-weight: var(--stella-text-display-weight);
+	letter-spacing: var(--stella-text-display-ls);
+	text-wrap: balance;
+}
+
+.title-1 {
+	font-size: var(--stella-text-title-1);
+	line-height: var(--stella-text-title-1-lh);
+	font-weight: var(--stella-text-title-1-weight);
+	letter-spacing: var(--stella-text-title-1-ls);
+	text-wrap: balance;
+}
+
+.title-2 {
+	font-size: var(--stella-text-title-2);
+	line-height: var(--stella-text-title-2-lh);
+	font-weight: var(--stella-text-title-2-weight);
+	letter-spacing: var(--stella-text-title-2-ls);
+}
+
+.title-3 {
+	font-size: var(--stella-text-title-3);
+	line-height: var(--stella-text-title-3-lh);
+	font-weight: var(--stella-text-title-3-weight);
+	letter-spacing: var(--stella-text-title-3-ls);
+}
+
+.body {
+	font-size: var(--stella-text-body);
+	line-height: var(--stella-text-body-lh);
+	font-weight: var(--stella-text-body-weight);
+	letter-spacing: var(--stella-text-body-ls);
+}
+
+.body-strong {
+	font-size: var(--stella-text-body-strong);
+	line-height: var(--stella-text-body-strong-lh);
+	font-weight: var(--stella-text-body-strong-weight);
+	letter-spacing: var(--stella-text-body-strong-ls);
+}
+
+.caption {
+	font-size: var(--stella-text-caption);
+	line-height: var(--stella-text-caption-lh);
+	font-weight: var(--stella-text-caption-weight);
+	letter-spacing: var(--stella-text-caption-ls);
+}
+
+.caption-strong {
+	font-size: var(--stella-text-caption-strong);
+	line-height: var(--stella-text-caption-strong-lh);
+	font-weight: var(--stella-text-caption-strong-weight);
+	letter-spacing: var(--stella-text-caption-strong-ls);
+}
+
+/* Tabular figures — digits share one advance width, so a value that
+   updates in place (a counter, a timestamp, a file size) doesn't make
+   the text around it shift. */
+.mono {
+	font-family: var(--stella-font-mono);
+	font-size: var(--stella-text-mono);
+	line-height: var(--stella-text-mono-lh);
+	font-weight: var(--stella-text-mono-weight);
+	letter-spacing: var(--stella-text-mono-ls);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+   COLOR
+   ============================================================================ */
+
+.color-primary {
+	color: var(--stella-text-primary);
+}
+
+.color-secondary {
+	color: var(--stella-text-secondary);
+}
+
+.color-tertiary {
+	color: var(--stella-text-tertiary);
+}
+
+.color-disabled {
+	color: var(--stella-text-disabled);
+}
+
+/* ============================================================================
+   TRUNCATE
+   ============================================================================ */
+
+.truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	display: block;
+	max-width: 100%;
+}

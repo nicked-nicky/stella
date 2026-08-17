@@ -1,0 +1,102 @@
+/**
+ * Switch Component Styles
+ * GTK4/libadwaita-style pill toggle with sliding thumb.
+ *
+ * Single neutral color scheme: "on" is a lighter/more prominent gray
+ * than "off" (--stella-switch-track-on vs --stella-switch-track) —
+ * exactly how Ray's own .toggle-switch-on works (var(--bg-active), a
+ * plain neutral gray, not a color). No accent hue.
+ */
+
+.switch {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+	box-sizing: border-box;
+	padding: 2px;
+
+	border: var(--stella-border-width) solid var(--stella-border-default);
+	border-radius: var(--stella-radius-pill);
+	background-color: var(--stella-switch-track);
+	cursor: pointer;
+
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+
+	transition: background-color var(--stella-motion-fast) var(--stella-easing-out);
+}
+
+/* Hover (not disabled) — Ray's .toggle-switch:hover lightens the track.
+   Applied as a translucent state layer painted over whichever track
+   color is current (`background-image` composites above
+   `background-color`), so one rule covers both the off and on states
+   instead of needing a separate checked-hover rule with a magic
+   `filter: brightness()` on top. See STATE LAYERS in tokens.css. */
+.switch:hover:not(:disabled) {
+	background-image: linear-gradient(
+		var(--stella-state-hover),
+		var(--stella-state-hover)
+	);
+}
+
+.switch:focus-visible {
+	outline: 2px solid var(--stella-focus-ring);
+}
+
+.switch:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.switch.checked {
+	background-color: var(--stella-switch-track-on);
+}
+
+/* Sizes: width x height, thumb scales to match. Fixed pixels,
+   deliberately NOT density-scaled — a switch is a pointer target, and
+   the thumb-travel arithmetic below depends on these being definite
+   values. See COMPONENT SIZING in tokens.css. */
+.size-sm {
+	width: 32px;
+	height: 18px;
+}
+
+.size-md {
+	width: 40px;
+	height: 22px;
+}
+
+/* Always white regardless of theme — a toggle's thumb reads as a
+   physical knob (same convention as GTK4/libadwaita, iOS, Android),
+   not as themed content, so it doesn't invert with the theme the way
+   the track does. Token is --stella-text-on-fill since that's
+   semantically "the color that always contrasts against a solid
+   fill" — happens to be #ffffff in both themes, but stays
+   token-driven rather than a bare hex. */
+.thumb {
+	display: block;
+	height: 100%;
+	aspect-ratio: 1;
+	border-radius: var(--stella-radius-full);
+	background-color: var(--stella-text-on-fill);
+	box-shadow: var(--stella-shadow-xs);
+	transition: transform var(--stella-motion-base) var(--stella-easing-spring);
+}
+
+/* Thumb travel = track content width - thumb width.
+   With box-sizing: border-box the switch is W×H including border (1px)
+   + padding (2px) each side, so content = W-2b-2p wide by H-2b-2p tall.
+   The thumb is square and sized to the content height (H-2b-2p), so
+   travel = (W-2b-2p) - (H-2b-2p) = W - H. Clean: the border/padding
+   cancel out, so the offset is simply width minus height. */
+.size-sm.checked .thumb {
+	transform: translateX(calc(32px - 18px));
+}
+
+.size-md.checked .thumb {
+	transform: translateX(calc(40px - 22px));
+}

@@ -1,0 +1,23 @@
+/**
+ * Divider Component Styles
+ */
+
+.divider {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	flex-shrink: 0;
+	background-color: var(--stella-border-default);
+	border: none;
+}
+
+.horizontal {
+	width: 100%;
+	height: var(--stella-border-width);
+}
+
+.vertical {
+	width: var(--stella-border-width);
+	height: 100%;
+	align-self: stretch;
+}
