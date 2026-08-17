@@ -1,0 +1,33 @@
+/**
+ * ============================================================================
+ *    Tooltip — hover/focus label.
+ *    Deliberately its own small surface, not a reuse of Island: GTK
+ *    tooltips read as a distinct, low-chrome chip (tighter padding,
+ *    caption-sized type, no elevation drama) rather than another
+ *    floating "panel" like Popover/Menu/Dialog.
+ *    ============================================================================
+ *
+ * @format
+ */
+
+.tooltip {
+	max-width: 260px;
+	padding: var(--stella-space-1) var(--stella-space-2);
+
+	background-color: var(--stella-surface-overlay);
+	border: var(--stella-border-width) solid var(--stella-border-default);
+	border-radius: var(--stella-radius-sm);
+	box-shadow: var(--stella-shadow-sm);
+
+	color: var(--stella-text-primary);
+	font-family: var(--stella-font-ui);
+	font-size: var(--stella-text-caption);
+	line-height: var(--stella-text-caption-lh);
+
+	/* Purely informational — never intercepts the pointer, so a fast
+	   mouse pass toward the trigger's neighbor never gets caught on it. */
+	pointer-events: none;
+
+	/* Shared mount fade — see tokens.css's `stella-appear` keyframes. */
+	animation: var(--stella-appear-animation);
+}

@@ -1,0 +1,30 @@
+/**
+ * ButtonIsland Component Styles
+ *
+ * Buttons sit flush with zero gap; an automatic hairline separates
+ * adjacent buttons via the `.group > button + button` sibling rule
+ * below, so no manual `Separator` is needed for the common case —
+ * GTK/libadwaita's "linked" button-group convention.
+ *
+ * `ButtonIsland.Separator` remains for an explicit sub-cluster break —
+ * where the automatic per-pair hairline isn't enough (e.g. grouping a
+ * formatting cluster away from a settings button).
+ *
+ * @format
+ */
+
+.group > button + button {
+	border-left-color: var(--stella-border-default);
+}
+
+/* Single-button mode — see ButtonIslandBase's `isSingleButton` check.
+   Main-axis growth only. Cross-axis fill (every button growing to the
+   island's interior height, Ray's `.menu-button { height: 100% }`) is
+   handled by the `align="stretch"` default on the inner FlexContainer
+   plus `alignItems: stretch` on the Island itself — see ButtonIsland.tsx.
+   That pair is what keeps a `size="sm"` cluster (WindowControls) and a
+   `size="md"` cluster (systemTools) the same height side by side in a
+   title bar. */
+.stretchButton {
+	flex: 1;
+}

@@ -1,0 +1,148 @@
+/**
+ * Notification Component Styles
+ *
+ * Compact pill toast (ported from color-cart's `Toast`/`ToastStack`) —
+ * content-hugging rounded-full chrome rather than a wide left-accented
+ * card. Status is carried by the icon color alone (the same status
+ * alias tokens Badge/Input already use — no new colors introduced;
+ * these 5 hues are the only place color appears anywhere in Stella),
+ * not by a colored border, matching color-cart's neutral-bordered pill
+ * with a tinted icon.
+ */
+
+.notification {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--stella-space-2);
+
+	max-width: 360px;
+	padding: var(--stella-space-2) var(--stella-space-2) var(--stella-space-2) var(--stella-space-4);
+
+	background-color: var(--stella-surface-overlay);
+	border: var(--stella-border-width) solid var(--stella-border-default);
+	border-radius: var(--stella-radius-pill);
+	box-shadow: var(--stella-rim), var(--stella-shadow-lg);
+
+	font-family: var(--stella-font-ui);
+
+	/* Slide-up + fade entrance — same idea as color-cart's Toast (animejs
+	 * translateY + opacity, ~220ms outQuad) reimplemented as a plain CSS
+	 * keyframe so Terra takes on zero animation dependency, but flipped
+	 * to rise from below since the stack now anchors to the bottom
+	 * center instead of the top right. */
+	animation: stella-notification-enter var(--stella-motion-base) var(--stella-easing-expo) both;
+}
+
+@keyframes stella-notification-enter {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Exit — NotificationProvider keeps a dismissed toast mounted for
+ * EXIT_DURATION_MS (matches --stella-motion-fast) so this has time to
+ * actually play before it's removed from the `items` array. Sinks back
+ * down the way it rose in, mirrored. Compound `.notification.closing`
+ * selector (not standalone `.closing`) guarantees this wins over
+ * `.notification`'s own `animation` regardless of stylesheet order,
+ * same pattern as Button's `.button.active`. `pointer-events: none`
+ * stops a hover during the fade from re-pausing a toast that's already
+ * on its way out.
+ */
+.notification.closing {
+	animation: stella-notification-exit var(--stella-motion-fast) var(--stella-easing-in) both;
+	pointer-events: none;
+}
+
+@keyframes stella-notification-exit {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	to {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+}
+
+.icon {
+	display: inline-flex;
+	flex-shrink: 0;
+}
+
+.info .icon {
+	color: var(--stella-info-text);
+}
+
+.success .icon {
+	color: var(--stella-success-text);
+}
+
+.warning .icon {
+	color: var(--stella-warning-text);
+}
+
+.error .icon {
+	color: var(--stella-error-text);
+}
+
+.debug .icon {
+	color: var(--stella-debug-text);
+}
+
+.message {
+	font-size: var(--stella-text-caption);
+	line-height: var(--stella-text-caption-lh);
+	color: var(--stella-text-primary);
+}
+
+.dismiss {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+
+	background: transparent;
+	border: none;
+	border-radius: var(--stella-radius-full);
+	color: var(--stella-text-secondary);
+	cursor: pointer;
+
+	transition: background-color var(--stella-motion-fast) var(--stella-easing-out);
+}
+
+.dismiss svg {
+	width: 12px;
+	height: 12px;
+	/* Springy press squeeze (see the :active rule below) */
+	transition: transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
+
+.dismiss:hover {
+	background-color: var(--stella-state-hover);
+}
+
+.dismiss:active {
+	background-color: var(--stella-state-active);
+}
+
+/* Press feedback — the × glyph squeezes on click; the button chrome
+   stays put (no whole-button scale). */
+.dismiss:active svg {
+	transform: scale(0.8);
+}
+
+.dismiss:focus-visible {
+	outline: 2px solid var(--stella-focus-ring);
+	outline-offset: 2px;
+}
