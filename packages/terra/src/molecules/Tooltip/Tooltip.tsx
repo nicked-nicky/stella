@@ -109,10 +109,20 @@ export function Tooltip({
 
   if (!isValidElement(children)) return children;
 
-  const childProps = children.props as Record<string, unknown>;
+  // `children` is typed as ReactElement (props: unknown), so cloneElement
+  // resolves its props parameter to `Partial<unknown> & Attributes`,
+  // which accepts neither `ref` nor arbitrary handlers. Narrowing the
+  // element's prop type here is what makes the clone below typecheck —
+  // the runtime behaviour is unchanged.
+  const child = children as React.ReactElement<Record<string, unknown>> & {
+    // React 18 keeps `ref` on the element rather than in props (React 19
+    // moves it into props); read it from where this React actually puts it.
+    ref?: React.Ref<HTMLElement>;
+  };
+  const childProps = child.props as Record<string, unknown>;
 
-  const trigger = cloneElement(children, {
-    ref: mergeRefs(anchorRef, (children as { ref?: React.Ref<HTMLElement> }).ref),
+  const trigger = cloneElement(child, {
+    ref: mergeRefs(anchorRef, child.ref),
     onMouseEnter: composeHandlers(childProps.onMouseEnter as (e: React.MouseEvent) => void, show),
     onMouseLeave: composeHandlers(childProps.onMouseLeave as (e: React.MouseEvent) => void, hide),
     onFocus: composeHandlers(childProps.onFocus as (e: React.FocusEvent) => void, show),

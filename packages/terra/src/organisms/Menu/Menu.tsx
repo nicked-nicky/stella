@@ -116,7 +116,7 @@ export function Menu({
     timer: undefined,
   });
 
-  const { root, panelRef, style, requestClose } = useDismissableOverlay({
+  const { root, panelRef, panel, style, requestClose } = useDismissableOverlay({
     open,
     onClose,
     anchor,
@@ -133,7 +133,6 @@ export function Menu({
   );
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    const panel = panelRef.current;
     if (!panel) return;
     const items = Array.from(panel.querySelectorAll<HTMLElement>(ITEM_SELECTOR));
     if (items.length === 0) return;

@@ -11,7 +11,11 @@ import { FOCUSABLE_SELECTOR } from '../utils/dom';
 
 export interface UseDismissableOverlayOptions {
   open: boolean;
-  onClose?: () => void;
+  /** Explicitly `| undefined` rather than bare optional: the repo runs
+   * `exactOptionalPropertyTypes`, under which a caller forwarding its
+   * own optional `onClose` straight through would otherwise not
+   * typecheck. */
+  onClose?: (() => void) | undefined;
   anchor: Anchor | null;
   /** @default 'bottom-start' */
   placement?: Placement;
@@ -27,7 +31,11 @@ export interface UseDismissableOverlayOptions {
 
 export interface UseDismissableOverlayResult {
   root: HTMLElement | null;
-  panelRef: React.RefObject<HTMLDivElement | null>;
+  /** Callback ref — attach with `ref={panelRef}`. See
+   * `useAnchorPosition`'s `panelRef` for why it isn't a ref object. */
+  panelRef: (node: HTMLDivElement | null) => void;
+  /** The attached panel element, or null before it mounts. */
+  panel: HTMLDivElement | null;
   style: React.CSSProperties;
   placement: Placement;
   /** Close, optionally restoring focus to whatever was focused before
@@ -96,7 +104,7 @@ export function useDismissableOverlay({
   const handleOutsideClose = useCallback(() => requestClose(false), [requestClose]);
 
   const { root } = useOverlayLayer({ open, onClose: handleEscapeClose });
-  const { panelRef, style, placement: resolvedPlacement } = useAnchorPosition({
+  const { panelRef, panel, style, placement: resolvedPlacement } = useAnchorPosition({
     open,
     anchor,
     placement,
@@ -105,18 +113,21 @@ export function useDismissableOverlay({
   });
 
   useClickOutside(
-    [panelRef, anchor instanceof HTMLElement ? anchor : null],
+    [panel, anchor instanceof HTMLElement ? anchor : null],
     handleOutsideClose,
     open
   );
 
+  // Keyed on the panel as well as `open`: the panel can mount a commit
+  // after the overlay opens (the portal root arrives via a passive
+  // effect), and focus has to follow the node, not the flag. The
+  // cleanup's focus-restore is guarded on `open` so re-running for a
+  // late-arriving panel doesn't yank focus back mid-open.
   useEffect(() => {
-    if (!open) return;
+    if (!open || !panel) return;
     previouslyFocused.current = document.activeElement as HTMLElement | null;
     restoreFocus.current = true;
     const raf = requestAnimationFrame(() => {
-      const panel = panelRef.current;
-      if (!panel) return;
       const first = panel.querySelector<HTMLElement>(initialFocusSelector);
       (first ?? panel).focus();
     });
@@ -125,7 +136,7 @@ export function useDismissableOverlay({
       if (restoreFocus.current) previouslyFocused.current?.focus?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, panel]);
 
-  return { root, panelRef, style, placement: resolvedPlacement, requestClose };
+  return { root, panelRef, panel, style, placement: resolvedPlacement, requestClose };
 }

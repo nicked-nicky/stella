@@ -23,8 +23,23 @@ export interface UseAnchorPositionOptions {
 }
 
 export interface UseAnchorPositionResult {
-  /** Attach to the floating panel's root element. */
-  panelRef: React.RefObject<HTMLDivElement | null>;
+  /**
+   * Attach to the floating panel's root element (`ref={panelRef}`).
+   *
+   * A callback ref rather than a `RefObject`, deliberately: measurement
+   * has to be driven by the node *actually attaching*, not by an
+   * unrelated dependency happening to change afterwards. With a plain
+   * ref object the layout effect below could run before the panel
+   * mounted, bail out, and then never re-run — leaving the panel stuck
+   * at `visibility: hidden` forever. That's reachable in real use: an
+   * overlay rendered `open` on first mount inside a freshly-mounted
+   * `OverlayProvider` doesn't get its portal root until a passive
+   * effect has run, which is a commit *later* than the anchor arriving.
+   */
+  panelRef: (node: HTMLDivElement | null) => void;
+  /** The attached panel element, or null before it mounts. Read this
+   * instead of a ref when you need the node during render. */
+  panel: HTMLDivElement | null;
   /** Spread onto the panel: `position: fixed` plus the resolved
    * coordinates, or hidden-at-origin before the first measurement (so
    * there's no flash at the top-left corner on mount). */
@@ -76,12 +91,22 @@ export function useAnchorPosition({
   offset = 8,
   padding = 8,
 }: UseAnchorPositionOptions): UseAnchorPositionResult {
-  const panelRef = useRef<HTMLDivElement>(null);
+  // Both, and they are not redundant: `panel` (state) drives the
+  // measurement effect so it re-runs the moment the node attaches;
+  // `panelRef` (the object) is what consumers read during an event
+  // handler, where a render-time snapshot could be stale.
+  const [panel, setPanel] = useState<HTMLDivElement | null>(null);
+  const panelElementRef = useRef<HTMLDivElement | null>(null);
+  const setPanelRef = useCallback((node: HTMLDivElement | null) => {
+    panelElementRef.current = node;
+    setPanel(node);
+  }, []);
+
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
   const [resolvedPlacement, setResolvedPlacement] = useState<Placement>(placement);
 
   const recompute = useCallback(() => {
-    const panel = panelRef.current;
+    const panel = panelElementRef.current;
     if (!anchor || !panel) return;
     const anchorRect = anchor.getBoundingClientRect();
     const panelRect = panel.getBoundingClientRect();
@@ -99,15 +124,17 @@ export function useAnchorPosition({
     setResolvedPlacement(result.placement);
   }, [anchor, placement, offset, padding]);
 
-  // Measure + place before paint, every time the panel opens (or the
-  // anchor/placement/offset/padding change while it's open).
+  // Measure + place before paint, every time the panel opens or the
+  // panel node attaches (or the anchor/placement/offset/padding change
+  // while it's open). `panel` in the deps is what makes the
+  // panel-mounts-late case correct — see `panelRef`'s docs above.
   useLayoutEffect(() => {
     if (!open) {
       setCoords(null);
       return;
     }
     recompute();
-  }, [open, recompute]);
+  }, [open, panel, recompute]);
 
   // Anything that can move the anchor or change the viewport.
   useEffect(() => {
@@ -122,17 +149,15 @@ export function useAnchorPosition({
 
   // Anything that changes the panel's own size (content, item count).
   useEffect(() => {
-    if (!open || typeof ResizeObserver === 'undefined') return;
-    const panel = panelRef.current;
-    if (!panel) return;
+    if (!open || !panel || typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(recompute);
     observer.observe(panel);
     return () => observer.disconnect();
-  }, [open, recompute]);
+  }, [open, panel, recompute]);
 
   const style: React.CSSProperties = coords
     ? { position: 'fixed', top: coords.top, left: coords.left }
     : { position: 'fixed', top: 0, left: 0, visibility: 'hidden' };
 
-  return { panelRef, style, placement: resolvedPlacement };
+  return { panelRef: setPanelRef, panel, style, placement: resolvedPlacement };
 }

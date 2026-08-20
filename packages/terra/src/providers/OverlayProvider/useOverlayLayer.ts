@@ -8,8 +8,11 @@ import { useOverlayContext } from './OverlayProvider';
 interface UseOverlayLayerOptions {
   /** Whether this overlay is currently open. */
   open: boolean;
-  /** Called when Escape is pressed while this layer is topmost. */
-  onClose?: () => void;
+  /** Called when Escape is pressed while this layer is topmost.
+   * Explicitly `| undefined` so callers running under
+   * `exactOptionalPropertyTypes` can forward their own optional
+   * `onClose` straight through. */
+  onClose?: (() => void) | undefined;
   /**
    * @default true
    */

@@ -35,7 +35,10 @@ export interface WindowControlsProps {
   controls: WindowControlsHandlers;
   /** @default 'sm' */
   size?: ButtonSize;
-  className?: string;
+  /** Explicitly `| undefined` so a parent (WindowChrome) can forward its
+   * own optional `className` straight through under
+   * `exactOptionalPropertyTypes`. */
+  className?: string | undefined;
 }
 
 // ============================================================================
