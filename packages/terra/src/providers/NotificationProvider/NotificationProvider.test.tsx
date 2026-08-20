@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NotificationProvider, useNotifications } from './NotificationProvider';
 
@@ -37,6 +37,22 @@ function renderProvider() {
 async function advance(ms: number) {
   await act(async () => {
     vi.advanceTimersByTime(ms);
+  });
+}
+
+/**
+ * user-event under fake timers.
+ *
+ * Both options are required and for different reasons: `advanceTimers`
+ * lets user-event drive vitest's clock, and `delay: null` stops it
+ * awaiting real time between steps — without that, every interaction
+ * hangs until the test times out, because nothing is advancing the fake
+ * clock while it waits.
+ */
+function setupUser() {
+  return userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime,
+    delay: null,
   });
 }
 
@@ -176,7 +192,7 @@ describe('NotificationProvider', () => {
 
   describe('pause on hover', () => {
     it('suspends the auto-dismiss countdown while hovered', async () => {
-      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      const user = setupUser();
       renderProvider();
       await act(async () => {
         notify.info('Hover me', { duration: 1000 });
@@ -189,7 +205,7 @@ describe('NotificationProvider', () => {
     });
 
     it('restarts the countdown on unhover', async () => {
-      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      const user = setupUser();
       renderProvider();
       await act(async () => {
         notify.info('Hover me', { duration: 1000 });
@@ -207,7 +223,7 @@ describe('NotificationProvider', () => {
 
   describe('manual dismiss', () => {
     it('the dismiss button removes the toast', async () => {
-      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      const user = setupUser();
       renderProvider();
       await act(async () => {
         notify.info('Close me');
@@ -273,22 +289,22 @@ describe('NotificationProvider', () => {
   });
 
   describe('portal lifecycle', () => {
-    it('mounts its own root, separate from the overlay portal', async () => {
+    // No waitFor here on purpose: RTL's render flushes effects inside
+    // act, so the portal root exists by the time render returns. waitFor
+    // would poll on a clock that fake timers have frozen, and simply
+    // hang until the test times out.
+    it('mounts its own root, separate from the overlay portal', () => {
       renderProvider();
-      await waitFor(() =>
-        expect(
-          document.querySelector('[data-stella-notification-root]')
-        ).not.toBeNull()
-      );
+      expect(
+        document.querySelector('[data-stella-notification-root]')
+      ).not.toBeNull();
     });
 
-    it('removes its root on unmount', async () => {
+    it('removes its root on unmount', () => {
       const { unmount } = renderProvider();
-      await waitFor(() =>
-        expect(
-          document.querySelector('[data-stella-notification-root]')
-        ).not.toBeNull()
-      );
+      expect(
+        document.querySelector('[data-stella-notification-root]')
+      ).not.toBeNull();
       unmount();
       expect(
         document.querySelector('[data-stella-notification-root]')

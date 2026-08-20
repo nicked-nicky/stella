@@ -108,8 +108,9 @@ test.describe('drag region', () => {
       .getByRole('button', { name: 'Close' })
       .evaluate((el) => {
         // Walk up to whichever ancestor declares the region, the same way
-        // the host runtime's hit-testing does.
-        let node: HTMLElement | null = el;
+        // the host runtime's hit-testing does. Typed as Element because
+        // parentElement can climb into non-HTML (SVG) elements.
+        let node: Element | null = el;
         while (node) {
           const value = getComputedStyle(node)
             .getPropertyValue('-webkit-app-region')

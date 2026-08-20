@@ -12,7 +12,14 @@ import { Menu } from './Menu';
 // browser supply this for free, so if the handler regresses the menu
 // still looks fine and is simply unusable by keyboard.
 
-/** Menu with a real trigger element to anchor against. */
+/**
+ * Menu with a real trigger element to anchor against.
+ *
+ * Starts closed and is opened by clicking the trigger, which is how a
+ * dropdown is actually used. An earlier version of this harness rendered
+ * `open` on first mount; that exercised a path real apps don't take and
+ * masked every assertion behind an unrelated mount-ordering problem.
+ */
 function MenuHarness({
   onClose,
   children,
@@ -21,18 +28,40 @@ function MenuHarness({
   children: ReactNode;
 }) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const close = () => {
     setOpen(false);
     onClose?.();
   };
   return (
     <OverlayProvider>
-      <button ref={setAnchor}>Trigger</button>
+      <button ref={setAnchor} onClick={() => setOpen(true)}>
+        Trigger
+      </button>
       <Menu open={open} onClose={close} anchor={anchor}>
         {children}
       </Menu>
     </OverlayProvider>
+  );
+}
+
+/**
+ * Renders the harness, opens the menu as a user would, and waits for the
+ * open-focus to land on the first item — after which the menu is in the
+ * steady state every test below assumes.
+ */
+async function renderOpenMenu(children: ReactNode, onClose?: () => void) {
+  const user = userEvent.setup();
+  render(<MenuHarness {...(onClose ? { onClose } : {})}>{children}</MenuHarness>);
+  await user.click(screen.getByRole('button', { name: 'Trigger' }));
+  await screen.findByRole('menu');
+  return user;
+}
+
+/** Waits for the open-focus to settle on a named item. */
+async function waitForFocus(name: string) {
+  await waitFor(() =>
+    expect(screen.getByRole('menuitem', { name })).toHaveFocus()
   );
 }
 
@@ -46,47 +75,37 @@ function defaultItems() {
   );
 }
 
-/** Waits for the open-focus rAF to land on the first item. */
-async function waitForMenuReady() {
-  const menu = await screen.findByRole('menu');
-  await waitFor(() =>
-    expect(screen.getByRole('menuitem', { name: 'Copy' })).toHaveFocus()
-  );
-  return menu;
-}
-
 describe('Menu — structure and ARIA', () => {
   it('renders role="menu" containing role="menuitem" children', async () => {
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    const menu = await screen.findByRole('menu');
+    await renderOpenMenu(defaultItems());
+    const menu = screen.getByRole('menu');
     expect(within(menu).getAllByRole('menuitem')).toHaveLength(3);
   });
 
   it('takes items out of the natural tab order (roving focus, not tab-through)', async () => {
     // WAI-ARIA menus are a single tab stop; arrow keys move within.
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await screen.findByRole('menu');
+    await renderOpenMenu(defaultItems());
     screen.getAllByRole('menuitem').forEach((item) => {
       expect(item).toHaveAttribute('tabindex', '-1');
     });
   });
 
   it('auto-inserts a hairline separator between adjacent items', async () => {
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    const menu = await screen.findByRole('menu');
+    await renderOpenMenu(defaultItems());
+    const menu = screen.getByRole('menu');
     // Three items → two gaps between them.
     expect(within(menu).getAllByRole('separator')).toHaveLength(2);
   });
 
   it('does not stack a second hairline next to an explicit Menu.Separator', async () => {
-    render(
-      <MenuHarness>
+    await renderOpenMenu(
+      <>
         <Menu.Item>Copy</Menu.Item>
         <Menu.Separator />
         <Menu.Item>Delete</Menu.Item>
-      </MenuHarness>
+      </>
     );
-    const menu = await screen.findByRole('menu');
+    const menu = screen.getByRole('menu');
     expect(within(menu).getAllByRole('separator')).toHaveLength(1);
   });
 
@@ -100,27 +119,36 @@ describe('Menu — structure and ARIA', () => {
     );
     expect(screen.queryByRole('menu')).toBeNull();
   });
+
+  it('becomes visible on open rather than staying hidden behind its own measurement', async () => {
+    // Regression test: the panel starts at visibility:hidden until
+    // useAnchorPosition has measured it. If that measurement never runs,
+    // the menu is in the DOM but permanently invisible — and invisible to
+    // assistive tech, which is why every ByRole query would fail.
+    await renderOpenMenu(defaultItems());
+    const menu = screen.getByRole('menu');
+    const positioner = menu.parentElement!;
+    expect(positioner.style.visibility).not.toBe('hidden');
+  });
 });
 
 describe('Menu — keyboard navigation', () => {
   it('focuses the first item on open', async () => {
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    await renderOpenMenu(defaultItems());
+    await waitForFocus('Copy');
   });
 
   it('ArrowDown moves focus to the next item', async () => {
-    const user = userEvent.setup();
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems());
+    await waitForFocus('Copy');
 
     await user.keyboard('{ArrowDown}');
     expect(screen.getByRole('menuitem', { name: 'Paste' })).toHaveFocus();
   });
 
   it('ArrowUp moves focus to the previous item', async () => {
-    const user = userEvent.setup();
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems());
+    await waitForFocus('Copy');
 
     await user.keyboard('{ArrowDown}{ArrowDown}');
     expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveFocus();
@@ -129,27 +157,24 @@ describe('Menu — keyboard navigation', () => {
   });
 
   it('ArrowDown wraps from the last item to the first', async () => {
-    const user = userEvent.setup();
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems());
+    await waitForFocus('Copy');
 
     await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}');
     expect(screen.getByRole('menuitem', { name: 'Copy' })).toHaveFocus();
   });
 
   it('ArrowUp wraps from the first item to the last', async () => {
-    const user = userEvent.setup();
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems());
+    await waitForFocus('Copy');
 
     await user.keyboard('{ArrowUp}');
     expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveFocus();
   });
 
   it('Home and End jump to the ends', async () => {
-    const user = userEvent.setup();
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems());
+    await waitForFocus('Copy');
 
     await user.keyboard('{End}');
     expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveFocus();
@@ -158,15 +183,14 @@ describe('Menu — keyboard navigation', () => {
   });
 
   it('skips disabled items when navigating', async () => {
-    const user = userEvent.setup();
-    render(
-      <MenuHarness>
+    const user = await renderOpenMenu(
+      <>
         <Menu.Item>Copy</Menu.Item>
         <Menu.Item disabled>Paste</Menu.Item>
         <Menu.Item>Delete</Menu.Item>
-      </MenuHarness>
+      </>
     );
-    await waitForMenuReady();
+    await waitForFocus('Copy');
 
     await user.keyboard('{ArrowDown}');
     expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveFocus();
@@ -175,49 +199,43 @@ describe('Menu — keyboard navigation', () => {
 
 describe('Menu — typeahead', () => {
   it('typing a letter jumps to the first item starting with it', async () => {
-    const user = userEvent.setup();
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems());
+    await waitForFocus('Copy');
 
     await user.keyboard('d');
     expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveFocus();
   });
 
   it('is case-insensitive', async () => {
-    const user = userEvent.setup();
-    render(<MenuHarness>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems());
+    await waitForFocus('Copy');
 
     await user.keyboard('P');
     expect(screen.getByRole('menuitem', { name: 'Paste' })).toHaveFocus();
   });
 
   it('accumulates consecutive letters to disambiguate', async () => {
-    const user = userEvent.setup();
-    render(
-      <MenuHarness>
+    const user = await renderOpenMenu(
+      <>
         <Menu.Item>Save</Menu.Item>
         <Menu.Item>Select all</Menu.Item>
-      </MenuHarness>
+      </>
     );
-    await waitFor(() =>
-      expect(screen.getByRole('menuitem', { name: 'Save' })).toHaveFocus()
-    );
+    await waitForFocus('Save');
 
     await user.keyboard('se');
     expect(screen.getByRole('menuitem', { name: 'Select all' })).toHaveFocus();
   });
 
   it('ignores whitespace so Space stays available for activation', async () => {
-    const user = userEvent.setup();
     const onSelect = vi.fn();
-    render(
-      <MenuHarness>
+    const user = await renderOpenMenu(
+      <>
         <Menu.Item onSelect={onSelect}>Copy</Menu.Item>
         <Menu.Item>Paste</Menu.Item>
-      </MenuHarness>
+      </>
     );
-    await waitForMenuReady();
+    await waitForFocus('Copy');
 
     await user.keyboard(' ');
     expect(onSelect).toHaveBeenCalledTimes(1);
@@ -226,46 +244,43 @@ describe('Menu — typeahead', () => {
 
 describe('Menu — dismissal', () => {
   it('Escape closes the menu', async () => {
-    const user = userEvent.setup();
     const onClose = vi.fn();
-    render(<MenuHarness onClose={onClose}>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems(), onClose);
+    await waitForFocus('Copy');
 
     await user.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('Tab closes the menu rather than tabbing through its items', async () => {
-    const user = userEvent.setup();
     const onClose = vi.fn();
-    render(<MenuHarness onClose={onClose}>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems(), onClose);
+    await waitForFocus('Copy');
 
     await user.tab();
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('an outside click closes the menu', async () => {
-    const user = userEvent.setup();
     const onClose = vi.fn();
-    render(<MenuHarness onClose={onClose}>{defaultItems()}</MenuHarness>);
-    await waitForMenuReady();
+    const user = await renderOpenMenu(defaultItems(), onClose);
+    await waitForFocus('Copy');
 
     await user.click(document.body);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('selecting an item fires onSelect and closes', async () => {
-    const user = userEvent.setup();
     const onSelect = vi.fn();
     const onClose = vi.fn();
-    render(
-      <MenuHarness onClose={onClose}>
+    const user = await renderOpenMenu(
+      <>
         <Menu.Item onSelect={onSelect}>Copy</Menu.Item>
         <Menu.Item>Paste</Menu.Item>
-      </MenuHarness>
+      </>,
+      onClose
     );
-    await waitForMenuReady();
+    await waitForFocus('Copy');
 
     await user.click(screen.getByRole('menuitem', { name: 'Copy' }));
     expect(onSelect).toHaveBeenCalledTimes(1);
@@ -273,20 +288,18 @@ describe('Menu — dismissal', () => {
   });
 
   it('closeOnSelect={false} keeps the menu open after a selection', async () => {
-    const user = userEvent.setup();
     const onSelect = vi.fn();
     const onClose = vi.fn();
-    render(
-      <MenuHarness onClose={onClose}>
+    const user = await renderOpenMenu(
+      <>
         <Menu.Item onSelect={onSelect} closeOnSelect={false}>
           Toggle
         </Menu.Item>
         <Menu.Item>Paste</Menu.Item>
-      </MenuHarness>
+      </>,
+      onClose
     );
-    await waitFor(() =>
-      expect(screen.getByRole('menuitem', { name: 'Toggle' })).toHaveFocus()
-    );
+    await waitForFocus('Toggle');
 
     await user.click(screen.getByRole('menuitem', { name: 'Toggle' }));
     expect(onSelect).toHaveBeenCalledTimes(1);
@@ -294,17 +307,16 @@ describe('Menu — dismissal', () => {
   });
 
   it('a disabled item does not fire onSelect', async () => {
-    const user = userEvent.setup();
     const onSelect = vi.fn();
-    render(
-      <MenuHarness>
+    const user = await renderOpenMenu(
+      <>
         <Menu.Item>Copy</Menu.Item>
         <Menu.Item disabled onSelect={onSelect}>
           Paste
         </Menu.Item>
-      </MenuHarness>
+      </>
     );
-    await waitForMenuReady();
+    await waitForFocus('Copy');
 
     await user.click(screen.getByRole('menuitem', { name: 'Paste' }));
     expect(onSelect).not.toHaveBeenCalled();
