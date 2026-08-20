@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OverlayProvider } from '../../providers/OverlayProvider';
@@ -12,7 +12,7 @@ import { Dialog } from './Dialog';
 // third-party focus-trap dependency, per Terra's bundle-size bar), so
 // they're worth asserting directly.
 
-function renderDialog(ui: React.ReactNode) {
+function renderDialog(ui: ReactNode) {
   return render(<OverlayProvider>{ui}</OverlayProvider>);
 }
 

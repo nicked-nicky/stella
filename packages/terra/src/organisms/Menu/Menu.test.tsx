@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OverlayProvider } from '../../providers/OverlayProvider';
@@ -18,7 +18,7 @@ function MenuHarness({
   children,
 }: {
   onClose?: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(true);
