@@ -1,0 +1,11 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "api-docs",
+  "name": "@stella/terra API",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeProtected": true,
+  "readme": "none",
+  "categorizeByGroup": true
+}

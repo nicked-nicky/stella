@@ -1,0 +1,22 @@
+{
+  // Typecheck-everything config: the components *plus* the test files,
+  // the Playwright helpers, and the config files themselves — none of
+  // which the build config (tsconfig.json) looks at, since they must not
+  // end up in dist/.
+  //
+  // `noEmit` and no rootDir, so files outside src/ (playwright/) are
+  // allowed here in a way they can't be during a build.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": [
+    "src",
+    "playwright",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "playwright-ct.config.ts"
+  ]
+}

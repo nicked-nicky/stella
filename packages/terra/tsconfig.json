@@ -1,8 +1,14 @@
 {
+  // Build config — what actually gets compiled into dist/ and published.
+  // Tests are excluded deliberately: they'd otherwise be emitted as
+  // .test.js alongside the components and drag vitest/@playwright types
+  // into a consumer's type resolution. Type *checking* of the tests is a
+  // separate concern, handled by tsconfig.typecheck.json.
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.ct.tsx"]
 }
