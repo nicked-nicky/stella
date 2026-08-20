@@ -1,0 +1,75 @@
+name: CI
+
+# Runs the same four checks the WIKI's development loop describes, so
+# "it works on my machine" and "it passes CI" mean the same thing. Until
+# this existed every check was manual, which is why the test
+# devDependencies could sit in package.json unlockfiled and unrun.
+on:
+  push:
+    branches: [main, alpha]
+  pull_request:
+
+# A new push to the same branch makes the previous run irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # --frozen-lockfile makes a stale lockfile a build failure rather
+      # than something that silently resolves differently in CI.
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests (Vitest)
+        run: pnpm test
+
+      # Cached separately from node_modules — browser binaries are large
+      # and change only when Playwright itself does.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter @stella/terra exec playwright install --with-deps chromium
+
+      - name: Component tests (Playwright)
+        run: pnpm --filter @stella/terra test:ct
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: packages/terra/playwright-report/
+          retention-days: 7
+
+      # Last, not first: a build that succeeds while the tests fail tells
+      # you nothing useful, and this also proves the publishConfig
+      # dist/ entrypoints actually get produced.
+      - name: Build
+        run: pnpm build
