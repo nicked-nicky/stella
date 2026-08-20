@@ -17,6 +17,7 @@ import { ButtonIsland } from "../../molecules/ButtonIsland";
 import { Text } from "../../atoms/Text";
 import { getExitDelay } from "../../utils/motion";
 import { FOCUSABLE_SELECTOR } from "../../utils/dom";
+import { CloseIcon } from "../../utils/icons";
 import styles from "./Dialog.module.css";
 
 /** Matches --stella-motion-fast — see Dialog.module.css's exit keyframes. */
@@ -382,29 +383,6 @@ function DialogFooter({
 }
 
 DialogFooter.displayName = "Dialog.Footer";
-
-// ============================================================================
-// INTERNAL
-// ============================================================================
-
-function CloseIcon() {
-	return (
-		<svg
-			viewBox="0 0 16 16"
-			width="16"
-			height="16"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			aria-hidden="true">
-			<path
-				d="M4 4l8 8M12 4l-8 8"
-				stroke="currentColor"
-				strokeWidth="1.5"
-				strokeLinecap="round"
-			/>
-		</svg>
-	);
-}
 
 Dialog.Header = DialogHeader;
 Dialog.Title = DialogTitle;

@@ -11,7 +11,6 @@ export { Switch, type SwitchProps, type SwitchSize } from './atoms/Switch';
 export { Spinner, type SpinnerProps, type SpinnerSize } from './atoms/Spinner';
 export { Avatar, type AvatarProps, type AvatarSize } from './atoms/Avatar';
 export { Divider, type DividerProps, type DividerOrientation } from './atoms/Divider';
-export { Separator, type SeparatorProps } from './atoms/Separator';
 export { Input, type InputProps, type InputVariant, type InputSize } from './atoms/Input';
 export { Icon, type IconProps, type IconSize } from './atoms/Icon';
 export {
@@ -79,12 +78,7 @@ export {
 } from './organisms/SettingsMenu';
 export { Popover, type PopoverProps } from './organisms/Popover';
 export { Menu, type MenuProps, type MenuItemProps } from './organisms/Menu';
-export {
-  WindowChrome,
-  type WindowChromeProps,
-  EmptyWindowChrome,
-  type EmptyWindowChromeProps,
-} from './organisms/WindowChrome';
+export { WindowChrome, type WindowChromeProps } from './organisms/WindowChrome';
 
 /**
  * Hooks — the building blocks Tooltip/Popover/Menu are made of, also

@@ -57,19 +57,27 @@
    region it actually sizes — Button itself has no `xl` size to cascade
    into (see Button.module.css). */
 .size-xs {
-	--chrome-region-height: var(--stella-size-xs);
+	--chrome-region-height: calc(
+		var(--stella-size-xs) + (2 * var(--stella-border-width))
+	);
 }
 
 .size-sm {
-	--chrome-region-height: var(--stella-size-sm);
+	--chrome-region-height: calc(
+		var(--stella-size-sm) + (2 * var(--stella-border-width))
+	);
 }
 
 .size-md {
-	--chrome-region-height: var(--stella-size-md);
+	--chrome-region-height: calc(
+		var(--stella-size-md) + (2 * var(--stella-border-width))
+	);
 }
 
 .size-lg {
-	--chrome-region-height: var(--stella-size-lg);
+	--chrome-region-height: calc(
+		var(--stella-size-lg) + (2 * var(--stella-border-width))
+	);
 }
 
 .brand {
@@ -79,12 +87,7 @@
 }
 
 .icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 1.25em;
-	height: 1.25em;
-	flex-shrink: 0;
+	composes: icon from '../../styles/shared/controlIcon.module.css';
 }
 
 /* Always present and always `flex: 1` (the "free space" region 2 grows
@@ -114,6 +117,16 @@
 	align-items: center;
 	min-width: 0;
 	width: 100%;
+}
+
+/* Empty-mode `children` wrapper — the free/growable region in a
+   WindowChrome rendered with no structured slots (see WindowChrome.tsx's
+   "no icon/title/tabs/tools/systemTools" branch). Byte-identical layout
+   to `.tabsRegion` above (same role: the one region that grows and gives
+   up space first), so it composes from it instead of repeating the four
+   declarations under a second name. */
+.content {
+	composes: tabsRegion;
 }
 
 /* Tools pill and the trailing systemTools+windowControls group both

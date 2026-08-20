@@ -1,0 +1,19 @@
+/**
+ * Shared "1.25em control icon" block — the fixed square, centered,
+ * non-shrinking icon slot used inside a control (Button, Input,
+ * WindowChrome's brand icon). Previously copy-pasted identically into
+ * each of those three stylesheets; press-squeeze transitions and colors
+ * stay local since they differ per consumer (Button/Input animate a
+ * spring squeeze on `:active`, WindowChrome's brand icon does not).
+ *
+ * @format
+ */
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.25em;
+	height: 1.25em;
+	flex-shrink: 0;
+}

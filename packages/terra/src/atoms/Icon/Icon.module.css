@@ -24,16 +24,16 @@
 }
 
 .size-sm {
-	width: 16px;
-	height: 16px;
+	width: var(--stella-icon-size-sm);
+	height: var(--stella-icon-size-sm);
 }
 
 .size-md {
-	width: 20px;
-	height: 20px;
+	width: var(--stella-icon-size-md);
+	height: var(--stella-icon-size-md);
 }
 
 .size-lg {
-	width: 24px;
-	height: 24px;
+	width: var(--stella-icon-size-lg);
+	height: var(--stella-icon-size-lg);
 }

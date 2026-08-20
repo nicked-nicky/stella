@@ -20,7 +20,7 @@
 
 	background-color: var(--stella-surface-overlay);
 	border: var(--stella-border-width) solid var(--stella-border-default);
-	border-radius: var(--stella-radius-pill);
+	border-radius: var(--stella-radius-panel);
 	box-shadow: var(--stella-rim), var(--stella-shadow-lg);
 
 	font-family: var(--stella-font-ui);
@@ -114,7 +114,7 @@
 
 	background: transparent;
 	border: none;
-	border-radius: var(--stella-radius-full);
+	border-radius: var(--stella-radius-panel);
 	color: var(--stella-text-secondary);
 	cursor: pointer;
 

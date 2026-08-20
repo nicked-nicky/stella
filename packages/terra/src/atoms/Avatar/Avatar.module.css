@@ -27,7 +27,7 @@
 	overflow: hidden;
 
 	border: var(--stella-border-width) solid var(--stella-border-default);
-	border-radius: var(--stella-radius-full);
+	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-surface-muted);
 	color: var(--stella-text-secondary);
 }

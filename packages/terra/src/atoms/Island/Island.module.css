@@ -1,20 +1,13 @@
 /**
  * Island Component Styles
  *
- * The container identity Stella's reference apps (Ray IDE, color-cart)
- * both build around: nothing sits flush against the window edge or
- * another region — every top-level area is its own bordered, elevated
- * box with a gap around it. Two shapes cover every case observed there:
+ * The structural container every surface in Stella builds on. Two
+ * shapes, both reading the same `--stella-radius-panel` (shape is a
+ * layout distinction, not a rounding one):
+ * - `panel` — block-level, fills its container. Sidebars, modals, cards.
+ * - `pill`  — sized to its content. Toolbar/button-group clusters.
  *
- * - `panel`  — big-but-not-full radius (--stella-radius-panel, 16px by
- *   default). Sidebars, modals, cards, viewports — block-level, fills
- *   its container the way a normal <div> would (Ray's
- *   .full-size-container behaves the same way).
- * - `pill`   — fully round (--stella-radius-pill). Toolbar/button-group
- *   clusters — see Ray's `.menu-button-group`, color-cart's `Island`.
- *   Sized to its content, not its container (Ray's .menu-button-group
- *   is `display: inline-flex` for exactly this reason) — a toolbar
- *   island should hug its buttons, not stretch to fill a flex row.
+ * See WIKI.md's Architecture reference for more.
  */
 
 .island {
@@ -26,6 +19,13 @@
 	background-color: var(--stella-surface-card);
 	border: var(--stella-border-width) solid var(--stella-border-default);
 	color: var(--stella-text-primary);
+
+	/* Border-only transition — Island has no hover/press state of its
+	   own, but ButtonIsland reacts its outer border to a hovered/pressed
+	   Button child (see ButtonIsland.module.css's `:has()` rules), and
+	   that color swap should ease like every other state change in the
+	   kit rather than snap. */
+	transition: border-color var(--stella-motion-fast) var(--stella-easing-out);
 }
 
 .clip {
@@ -43,7 +43,7 @@
 
 .shape-pill {
 	display: inline-flex;
-	border-radius: var(--stella-radius-pill);
+	border-radius: var(--stella-radius-panel);
 }
 
 /* ============================================================================

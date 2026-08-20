@@ -20,7 +20,7 @@
 	padding: 2px;
 
 	border: var(--stella-border-width) solid var(--stella-border-default);
-	border-radius: var(--stella-radius-pill);
+	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-switch-track);
 	cursor: pointer;
 
@@ -28,19 +28,6 @@
 	outline-offset: 2px;
 
 	transition: background-color var(--stella-motion-fast) var(--stella-easing-out);
-}
-
-/* Hover (not disabled) — Ray's .toggle-switch:hover lightens the track.
-   Applied as a translucent state layer painted over whichever track
-   color is current (`background-image` composites above
-   `background-color`), so one rule covers both the off and on states
-   instead of needing a separate checked-hover rule with a magic
-   `filter: brightness()` on top. See STATE LAYERS in tokens.css. */
-.switch:hover:not(:disabled) {
-	background-image: linear-gradient(
-		var(--stella-state-hover),
-		var(--stella-state-hover)
-	);
 }
 
 .switch:focus-visible {
@@ -81,7 +68,7 @@
 	display: block;
 	height: 100%;
 	aspect-ratio: 1;
-	border-radius: var(--stella-radius-full);
+	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-text-on-fill);
 	box-shadow: var(--stella-shadow-xs);
 	transition: transform var(--stella-motion-base) var(--stella-easing-spring);

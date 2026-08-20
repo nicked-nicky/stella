@@ -9,6 +9,13 @@
 	flex-shrink: 0;
 	background-color: var(--stella-border-default);
 	border: none;
+
+	/* Divider has no hover/press state of its own, but a
+	   `ButtonIsland.Separator` reacts to a neighboring Button's
+	   hover/press (see ButtonIsland.module.css's SEPARATOR ESCALATION
+	   section) — this is what makes that color swap ease instead of
+	   snap. */
+	transition: background-color var(--stella-motion-fast) var(--stella-easing-out);
 }
 
 .horizontal {

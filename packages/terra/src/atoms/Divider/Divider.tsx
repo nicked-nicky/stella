@@ -19,21 +19,19 @@ interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
 // ============================================================================
 
 /**
- * Divider - visual separator between content groups.
+ * Divider - visual separator between content groups. The one hairline
+ * primitive in Terra — `Menu.Separator` and `ButtonIsland.Separator` are
+ * both this exact component, pinned to `horizontal`/`vertical`
+ * respectively as discoverable statics on their own components, not
+ * separate atoms. (There used to be a dedicated `Separator` atom for
+ * the button-group case; it was CSS-identical to `Divider` at
+ * `orientation="vertical"` after the border-width unification, so it
+ * was collapsed into this one component instead of two staying in sync
+ * by convention.)
  *
  * Uses `role="separator"` with `aria-orientation` rather than a native
  * `<hr>`, since `<hr>` has no accessible vertical form — this keeps both
  * orientations semantically correct for assistive tech.
- *
- * Note: `Divider` (vertical) and the `Separator` atom are CSS-identical
- * after the border-width unification — same stretch, width, height and
- * colour. That's intentional, not a missed collapse: `Separator` is the
- * button-group/toolbar-specialized name (exposed as `ButtonIsland.Separator`)
- * and `Divider` is the general content rule (`Menu.Separator` *is* this
- * atom). They're kept as two atoms for the distinct call-site vocabulary,
- * with the two staying visually in sync because they share the same
- * token-driven rules. Prefer `Separator` inside button groups and
- * `Divider` everywhere else.
  *
  * @example
  * ```tsx

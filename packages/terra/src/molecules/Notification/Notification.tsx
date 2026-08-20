@@ -1,4 +1,5 @@
 import React from 'react';
+import { CloseIcon } from '../../utils/icons';
 import styles from './Notification.module.css';
 
 // ============================================================================
@@ -84,14 +85,7 @@ export function Notification({
           onClick={onDismiss}
           aria-label="Dismiss notification"
         >
-          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M4 4L12 12M4 12L12 4"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
+          <CloseIcon />
         </button>
       )}
     </div>

@@ -1,20 +1,43 @@
 /**
  * ButtonIsland Component Styles
  *
- * Buttons sit flush with zero gap; an automatic hairline separates
- * adjacent buttons via the `.group > button + button` sibling rule
- * below, so no manual `Separator` is needed for the common case —
- * GTK/libadwaita's "linked" button-group convention.
- *
- * `ButtonIsland.Separator` remains for an explicit sub-cluster break —
- * where the automatic per-pair hairline isn't enough (e.g. grouping a
- * formatting cluster away from a settings button).
+ * Buttons sit flush, zero gap, no border of their own — the hairline
+ * between them is a real auto-inserted `Divider`, not a CSS trick. See
+ * WIKI.md's Architecture reference (Button/ButtonIsland border model).
  *
  * @format
  */
 
-.group > button + button {
-	border-left-color: var(--stella-border-default);
+/* ============================================================================
+   SEPARATOR ESCALATION — every Divider in the group (auto-inserted or
+   explicit, matched via `[role="separator"]`) brightens with a
+   hovered/pressed Button on either side: `+` for "near side," `:has()`
+   for "far side" (`+` alone only looks forward). See WIKI.md.
+   ============================================================================ */
+
+.group > button:hover:not(:disabled) + [role='separator'],
+.group > [role='separator']:has(+ button:hover:not(:disabled)) {
+	background-color: var(--stella-state-hover);
+}
+
+.group > button:active:not(:disabled) + [role='separator'],
+.group > [role='separator']:has(+ button:active:not(:disabled)) {
+	background-color: var(--stella-state-active);
+}
+
+/* ============================================================================
+   BORDER ESCALATION — the outer Island's border reacts to a Button
+   child's hover/press via `:has()` (same pattern as Checkbox's
+   `.label:has(.input:disabled)`) — no JS needed. Same tokens Button
+   escalates its own background/text through. See WIKI.md.
+   ============================================================================ */
+
+.root:has(.group > button:hover:not(:disabled)) {
+	border-color: var(--stella-state-hover);
+}
+
+.root:has(.group > button:active:not(:disabled)) {
+	border-color: var(--stella-state-active);
 }
 
 /* Single-button mode — see ButtonIslandBase's `isSingleButton` check.

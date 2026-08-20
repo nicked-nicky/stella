@@ -9,7 +9,7 @@
 	flex-shrink: 0;
 	border: 2px solid currentColor;
 	border-right-color: transparent;
-	border-radius: 50%;
+	border-radius: var(--stella-radius-panel);
 	animation: stella-spin var(--stella-motion-slow) linear infinite,
 		var(--stella-appear-animation);
 }
@@ -21,8 +21,8 @@
 }
 
 .size-sm {
-	width: 16px;
-	height: 16px;
+	width: var(--stella-icon-size-sm);
+	height: var(--stella-icon-size-sm);
 	border-width: 2px;
 }
 
@@ -33,8 +33,8 @@
 }
 
 .size-lg {
-	width: 24px;
-	height: 24px;
+	width: var(--stella-icon-size-lg);
+	height: var(--stella-icon-size-lg);
 	border-width: 2.5px;
 }
 

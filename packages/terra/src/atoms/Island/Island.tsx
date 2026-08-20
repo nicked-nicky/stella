@@ -11,8 +11,10 @@ type IslandElement = 'div' | 'section' | 'nav' | 'aside' | 'header' | 'footer';
 
 interface IslandProps extends React.HTMLAttributes<HTMLElement> {
   /**
-   * `panel` — big-but-not-full radius, for sidebars/modals/cards/viewports.
-   * `pill` — fully round, for toolbar/button-group clusters.
+   * Both shapes use the same rounding (`--stella-radius-panel`) — this
+   * only picks the layout: `panel` is block-level, for
+   * sidebars/modals/cards/viewports. `pill` sizes to its content, for
+   * toolbar/button-group clusters.
    * @default 'panel'
    */
   shape?: IslandShape;

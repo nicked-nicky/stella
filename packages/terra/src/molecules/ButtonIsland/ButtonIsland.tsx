@@ -5,7 +5,8 @@ import { FlexContainer } from '../../layout/FlexContainer';
 import type { FlexContainerProps } from '../../layout/FlexContainer';
 import { Button } from '../../atoms/Button';
 import type { ButtonSize } from '../../atoms/Button';
-import { Separator } from '../../atoms/Separator';
+import { Divider } from '../../atoms/Divider';
+import type { DividerProps } from '../../atoms/Divider';
 import styles from './ButtonIsland.module.css';
 
 // ============================================================================
@@ -30,45 +31,20 @@ interface ButtonIslandProps
 
 /**
  * ButtonIsland - a row of related actions rendered as one pill-shaped
- * toolbar cluster — Stella's version of Ray IDE's `.menu-button-group`
- * and color-cart's `Island` + button combination. This is the only
- * correct way to use `Button`: a Button carries neither a radius nor a
- * surface of its own (see Button.module.css), so every `Button` is
- * meant to live inside an Island — even a single standalone button.
- * The Island's `header` tone is the surface you actually see behind
- * each button, and its radius + clip is what rounds the group's ends.
+ * toolbar cluster. The only correct way to use `Button`: it carries no
+ * radius or surface of its own, so it's always meant to live inside an
+ * Island — even standalone. Composes `Island` (shape="pill") for chrome
+ * and `FlexContainer` for layout, with a `size` cascade so you set it
+ * once instead of on every `Button`.
  *
- * Composes `Island` (shape="pill", sized to its content rather than
- * stretching to fill its container — see Island.module.css) for the
- * visual chrome with `FlexContainer` for layout and a size-token
- * cascade so you set `size` once instead of repeating it on every
- * `Button`.
- *
- * Matches Ray's `.menu-button-group`: zero gap between children —
- * buttons sit flush, touching each other, the group's edges, and any
- * separator in between. An automatic hairline (`.group > button +
- * button`, reserved via `Button`'s own transparent border and colored
- * in only where a Button sibling precedes another) separates adjacent
- * buttons, so no manual separator is needed for the common case. Reach
- * for `ButtonIsland.Separator` when you want a stronger sub-cluster
- * break (it *is* the `Separator` atom — see `atoms/Separator`;
- * `Divider` is the more general content-rule primitive, not this).
- *
- * Only the group's own radius + `overflow: hidden` clip produce the
- * rounded ends.
- *
- * Only `Button` children get the size cascade — anything else (a
- * separator, plain text) is left alone.
- *
- * Children stretch to the island's full interior height (Ray's
- * `.menu-button { height: 100% }`), so an island given an explicit
- * height grows its buttons to match instead of leaving dead space above
- * and below them. Button's `--stella-size-*` acts as a `min-height`, so
- * a free-standing island still sizes itself to its tallest child.
- *
- * A lone `Button` child additionally grows along the main axis
- * (`flex: 1`), so giving a single-button Island an explicit width — or
- * `alignSelf: 'stretch'` in a flex parent — makes the button fill it.
+ * Buttons sit flush, zero gap; the hairline between adjacent ones is a
+ * real `Divider`, auto-inserted for you (an explicit
+ * `ButtonIsland.Separator` you place yourself is left alone, for a
+ * deliberate sub-cluster break instead of the automatic per-pair one).
+ * Only `Button` children get the size cascade. Children stretch to the
+ * island's full interior height; a lone `Button` child also grows along
+ * the main axis. See WIKI.md's Architecture reference for the full
+ * border/separator reasoning.
  *
  * @example
  * ```tsx
@@ -78,7 +54,7 @@ interface ButtonIslandProps
  *   <Button>Save</Button>
  * </ButtonIsland>
  *
- * // ButtonIsland.Separator for an explicit sub-cluster break
+ * // ButtonIsland.Separator for a deliberate sub-cluster break
  * <ButtonIsland size="sm">
  *   <Button iconOnly aria-label="Bold">B</Button>
  *   <Button iconOnly aria-label="Italic">I</Button>
@@ -111,7 +87,12 @@ const ButtonIslandBase = forwardRef<HTMLElement, ButtonIslandProps>(
     const onlyChild = childArray.length === 1 ? childArray[0] : undefined;
     const isSingleButton = isValidElement(onlyChild) && onlyChild.type === Button;
 
-    const sizedChildren = Children.map(children, (child) => {
+    // Built up by hand rather than `Children.map` — inserting the
+    // auto-hairline `Divider` between Button pairs means the output
+    // array is longer than the input, which `Children.map` (a 1:1
+    // transform) can't express.
+    const sizedChildren: React.ReactNode[] = [];
+    childArray.forEach((child, index) => {
       if (isValidElement(child) && child.type === Button) {
         const childProps = child.props as { size?: ButtonSize; className?: string };
         // Built up rather than spread as one literal: `className` is only
@@ -127,12 +108,26 @@ const ButtonIslandBase = forwardRef<HTMLElement, ButtonIslandProps>(
             .filter(Boolean)
             .join(' ');
         }
-        return cloneElement(
-          child as React.ReactElement<{ size?: ButtonSize; className?: string }>,
-          overrides
+        sizedChildren.push(
+          cloneElement(
+            child as React.ReactElement<{ size?: ButtonSize; className?: string }>,
+            overrides
+          )
         );
+
+        // Auto-hairline: a real Divider between this Button and the
+        // next, only when the next sibling is also a bare Button — an
+        // explicit ButtonIsland.Separator the caller already placed
+        // here shouldn't get a second one stacked next to it.
+        const next = childArray[index + 1];
+        if (isValidElement(next) && next.type === Button) {
+          sizedChildren.push(
+            <Divider key={`${child.key ?? index}-hairline`} orientation="vertical" />
+          );
+        }
+      } else {
+        sizedChildren.push(child);
       }
-      return child;
     });
 
     return (
@@ -141,6 +136,12 @@ const ButtonIslandBase = forwardRef<HTMLElement, ButtonIslandProps>(
         shape="pill"
         tone={tone}
         clip={clip}
+        // Internal hook only, not the consumer's `className` (that goes
+        // on the inner FlexContainer/`.group` — see above): lets
+        // ButtonIsland.module.css react this specific Island's border to
+        // a hovered/pressed Button child via `:has()`, scoped to
+        // ButtonIsland instead of leaking onto every Island in the kit.
+        className={styles.root}
         // `alignItems: stretch` overrides Island's own `center` so the
         // inner button row fills the island's interior height instead of
         // being centered at its content height. Without it the buttons'
@@ -172,17 +173,23 @@ ButtonIslandBase.displayName = 'ButtonIsland';
 // ============================================================================
 
 /**
- * ButtonIsland.Separator - re-exports the `Separator` atom as a
- * discoverable static on `ButtonIsland`, matching Ray IDE's dedicated
- * `Separator` atom for its `.menu-button-group` toolbar. Same component
- * either way — `import { Separator } from '@stella/terra'` works too.
+ * ButtonIsland.Separator - a `Divider` pinned to `orientation="vertical"`,
+ * discoverable as a static on `ButtonIsland` for Ray IDE's
+ * `.menu-button-group`-style toolbar breaks. Not a separate atom — same
+ * move `Menu.Separator` makes with `Divider` pinned to `horizontal`
+ * instead, so both statics stay visually in sync automatically rather
+ * than by two implementations happening to agree.
  */
+function ButtonIslandSeparator(props: Omit<DividerProps, 'orientation'>) {
+  return <Divider orientation="vertical" {...props} />;
+}
+
 type ButtonIslandComponent = typeof ButtonIslandBase & {
-  Separator: typeof Separator;
+  Separator: typeof ButtonIslandSeparator;
 };
 
 const ButtonIsland = ButtonIslandBase as ButtonIslandComponent;
-ButtonIsland.Separator = Separator;
+ButtonIsland.Separator = ButtonIslandSeparator;
 
 export { ButtonIsland };
 export type { ButtonIslandProps };

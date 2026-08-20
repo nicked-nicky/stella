@@ -1,9 +1,11 @@
 /**
  * Badge Component Styles
  *
- * Reads only three custom properties, set inline by Badge.tsx per
- * color+variant combination. No per-color CSS classes needed — new
- * colors are a JS-only change.
+ * Every color×variant combination (5 colors × 3 variants = 15) is a
+ * `[data-color][data-variant]` attribute rule below — Badge.tsx carries
+ * no color logic of its own, just the two attributes. Adding a new
+ * status color means adding its `-text`/`-bg`/`-border` alias triplet
+ * to tokens.css and one block of 3 rules here — no JS to touch.
  *
  * @format
  */
@@ -26,28 +28,22 @@
 	line-height: 1;
 	white-space: nowrap;
 
-	border-radius: var(--stella-radius-pill);
-	border: var(--stella-border-width) solid var(--badge-border, transparent);
-	background-color: var(
-		--badge-bg,
-		light-dark(var(--stella-neutral-100), var(--stella-neutral-700))
-	);
-	color: var(
-		--badge-text,
-		light-dark(var(--stella-neutral-700), var(--stella-neutral-100))
-	);
+	border-radius: var(--stella-radius-panel);
+	border: var(--stella-border-width) solid transparent;
 }
 
 /* ============================================================================
-   neutral + tinted/outline — the one pair of combinations Badge.tsx
-   deliberately leaves unset (see the docblock on resolveColorVars): they
-   need genuinely different raw-palette steps per scheme, which a single
-   inline var() reference can't express. These attribute rules are the
-   only source of truth for them, resolved with `light-dark()` — one
-   declaration each, no duplicated media query / [data-theme] blocks.
-   (`filled` and the status colors don't need this — their alias tokens
-   are already theme-aware.)
+   NEUTRAL — the default color. `tinted`/`outline` need genuinely
+   different raw-palette steps between light and dark (same reason
+   Button.module.css picks its fill steps with `light-dark()`) rather
+   than an alias triplet, since "neutral" has no status hue of its own
+   to hang `-text`/`-bg`/`-border` tokens off of.
    ============================================================================ */
+
+.badge[data-color="neutral"][data-variant="filled"] {
+	background-color: var(--stella-neutral-500);
+	color: var(--stella-text-on-fill);
+}
 
 .badge[data-color="neutral"][data-variant="tinted"] {
 	background-color: light-dark(
@@ -64,4 +60,94 @@
 		var(--stella-neutral-300),
 		var(--stella-neutral-600)
 	);
+}
+
+/* ============================================================================
+   STATUS COLORS — success/info/warning/error/debug. Each reads its own
+   `-text`/`-bg`/`-border` alias triplet from tokens.css (already
+   theme-correct via `light-dark()`, so no branching needed here).
+   `filled` is the one exception: a fixed, theme-invariant raw-palette
+   `-700` step with `--stella-text-on-fill` text — a "flag" that reads
+   the same regardless of scheme, deliberately bolder than `-bg` (see
+   tokens.css's STATUS section for why they're not the same step).
+   ============================================================================ */
+
+.badge[data-color="success"][data-variant="filled"] {
+	background-color: var(--stella-green-700);
+	color: var(--stella-text-on-fill);
+}
+
+.badge[data-color="success"][data-variant="tinted"] {
+	background-color: var(--stella-success-bg);
+	color: var(--stella-success-text);
+}
+
+.badge[data-color="success"][data-variant="outline"] {
+	background-color: transparent;
+	color: var(--stella-success-text);
+	border-color: var(--stella-success-border);
+}
+
+.badge[data-color="info"][data-variant="filled"] {
+	background-color: var(--stella-blue-700);
+	color: var(--stella-text-on-fill);
+}
+
+.badge[data-color="info"][data-variant="tinted"] {
+	background-color: var(--stella-info-bg);
+	color: var(--stella-info-text);
+}
+
+.badge[data-color="info"][data-variant="outline"] {
+	background-color: transparent;
+	color: var(--stella-info-text);
+	border-color: var(--stella-info-border);
+}
+
+.badge[data-color="warning"][data-variant="filled"] {
+	background-color: var(--stella-yellow-700);
+	color: var(--stella-text-on-fill);
+}
+
+.badge[data-color="warning"][data-variant="tinted"] {
+	background-color: var(--stella-warning-bg);
+	color: var(--stella-warning-text);
+}
+
+.badge[data-color="warning"][data-variant="outline"] {
+	background-color: transparent;
+	color: var(--stella-warning-text);
+	border-color: var(--stella-warning-border);
+}
+
+.badge[data-color="error"][data-variant="filled"] {
+	background-color: var(--stella-red-700);
+	color: var(--stella-text-on-fill);
+}
+
+.badge[data-color="error"][data-variant="tinted"] {
+	background-color: var(--stella-error-bg);
+	color: var(--stella-error-text);
+}
+
+.badge[data-color="error"][data-variant="outline"] {
+	background-color: transparent;
+	color: var(--stella-error-text);
+	border-color: var(--stella-error-border);
+}
+
+.badge[data-color="debug"][data-variant="filled"] {
+	background-color: var(--stella-slate-700);
+	color: var(--stella-text-on-fill);
+}
+
+.badge[data-color="debug"][data-variant="tinted"] {
+	background-color: var(--stella-debug-bg);
+	color: var(--stella-debug-text);
+}
+
+.badge[data-color="debug"][data-variant="outline"] {
+	background-color: transparent;
+	color: var(--stella-debug-text);
+	border-color: var(--stella-debug-border);
 }

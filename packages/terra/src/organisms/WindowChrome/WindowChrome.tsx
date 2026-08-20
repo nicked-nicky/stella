@@ -35,6 +35,16 @@ export interface WindowChromeProps {
    * performs them. See `WindowControlsHandlers`. */
   windowControls: WindowControlsHandlers;
   /**
+   * Freeform content, left of the window controls. Only rendered when
+   * every structured slot above (`icon`/`title`/`tabs`/`tools`/
+   * `systemTools`) is omitted — pass any of those and `children` is
+   * ignored in favor of the fixed 4-region grid. This is what makes an
+   * all-slots-omitted `WindowChrome` behave exactly like the old
+   * `EmptyWindowChrome`: a draggable strip, one freeform region, and
+   * `WindowControls` — no fixed grid.
+   */
+  children?: React.ReactNode;
+  /**
    * Sizing token — sets the bar height from the matching
    * `--stella-size-*` control token (same scale `Button`/`ButtonIsland`
    * use) and cascades into every region WindowChrome renders itself:
@@ -54,13 +64,19 @@ export interface WindowChromeProps {
 // ============================================================================
 
 /**
- * WindowChrome - custom title bar for a frameless desktop window. Four
- * fixed regions, controlled entirely through props rather than compound
- * children — unlike `Dialog`'s Header/Body/Footer, a title bar's
- * leading/center/trailing structure isn't something callers should be
- * free to reorder, so named slots give better type safety than
- * compound composition would here (`windowControls` is typed as the
- * IPC handler interface, `tools` as plain `ReactNode`, etc.):
+ * WindowChrome - custom title bar for a frameless desktop window. Two
+ * modes, chosen automatically by which props you pass — not a variant
+ * prop, because the two are mutually exclusive by construction (one
+ * fixed grid vs. one freeform region) and there's nothing to name:
+ *
+ * **Structured mode** (any of `icon`/`title`/`tabs`/`tools`/
+ * `systemTools` passed) — four fixed regions, controlled entirely
+ * through named slots rather than compound children: unlike `Dialog`'s
+ * Header/Body/Footer, a title bar's leading/center/trailing structure
+ * isn't something callers should be free to reorder, so named slots
+ * give better type safety than compound composition would here
+ * (`windowControls` is typed as the IPC handler interface, `tools` as
+ * plain `ReactNode`, etc.):
  *
  * 1. **Brand** — `icon` + `title`, a pill on the leading edge.
  * 2. **Tabs** — free/growable space. Renders whatever you pass
@@ -71,6 +87,15 @@ export interface WindowChromeProps {
  *    something's actually there, so empty space stays draggable.
  * 3. **Tools** — a quick-actions pill.
  * 4. **Trailing** — `systemTools` pill + `WindowControls` pill.
+ *
+ * **Empty mode** (none of those five passed) — just a draggable strip,
+ * one freeform `children` region, and `WindowControls`. For apps that
+ * don't want the fixed 4-region layout at all — a launcher, a
+ * single-view utility window, anything where "brand pill + tabs +
+ * tools + system tools" doesn't apply. This used to be a separate
+ * `EmptyWindowChrome` component; it's this same component now because
+ * the two modes render from one `if` rather than two files' worth of
+ * near-duplicate header/drag-region/WindowControls wiring.
  *
  * Renders no window chrome of its own beyond a transparent flex strip
  * at a height set by `size` (`--stella-bar-height`'s own formula —
@@ -89,10 +114,6 @@ export interface WindowChromeProps {
  * is explicitly marked `no-drag`, and double-clicking empty bar space
  * calls `windowControls.maximize` if provided (standard OS behavior).
  *
- * For an app that doesn't want the fixed 4-region layout at all — just
- * a draggable bar with window controls and fully custom content — use
- * `EmptyWindowChrome` instead.
- *
  * @example
  * ```tsx
  * <WindowChrome
@@ -109,6 +130,13 @@ export interface WindowChromeProps {
  *   }}
  * />
  * ```
+ *
+ * @example Empty mode — no structured slots, just freeform content
+ * ```tsx
+ * <WindowChrome windowControls={{ minimize, maximize, close, maximized }}>
+ *   <Text variant="body-strong">Quick Capture</Text>
+ * </WindowChrome>
+ * ```
  */
 export function WindowChrome({
   icon,
@@ -119,19 +147,44 @@ export function WindowChrome({
   windowControls,
   size = 'md',
   className,
+  children,
 }: WindowChromeProps) {
+  const headerClassName = [
+    styles.chrome,
+    styles[`size-${size}`],
+    dragStyles.dragRegion,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  // No structured slots at all — the old EmptyWindowChrome's entire
+  // body, folded in here: a draggable strip, one freeform `children`
+  // region, and WindowControls. No fixed 4-region grid.
+  if (!icon && !title && !tabs && !tools && !systemTools) {
+    return (
+      <header
+        data-tauri-drag-region=""
+        onDoubleClick={() => windowControls.maximize?.()}
+        className={headerClassName}
+      >
+        <div className={[styles.content, dragStyles.noDrag].join(' ')}>
+          {children}
+        </div>
+        <WindowControls
+          controls={windowControls}
+          size={size}
+          className={dragStyles.noDrag}
+        />
+      </header>
+    );
+  }
+
   return (
     <header
       data-tauri-drag-region=""
       onDoubleClick={() => windowControls.maximize?.()}
-      className={[
-        styles.chrome,
-        styles[`size-${size}`],
-        dragStyles.dragRegion,
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      className={headerClassName}
     >
       {(icon || title) && (
         <Island

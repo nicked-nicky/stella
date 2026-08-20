@@ -1,7 +1,8 @@
 /**
  * ============================================================================
- *    Drag region — shared by WindowChrome and EmptyWindowChrome.
- *    Two runtimes, two different mechanisms, and Terra doesn't get to
+ *    Drag region — shared by both of WindowChrome's render modes
+ *    (structured and empty). Two runtimes, two different mechanisms, and
+ *    Terra doesn't get to
  *    assume which one wraps it (see stella-cross-platform-direction —
  *    this kit is runtime-agnostic, not Tauri-only):
  *
@@ -11,8 +12,8 @@
  *      marked `no-drag` — omit that and every button/island inside
  *      becomes un-clickable (the classic Electron title-bar gotcha).
  *    - Tauri reads the `data-tauri-drag-region` DOM attribute instead
- *      (applied in WindowChrome.tsx/EmptyWindowChrome.tsx directly,
- *      not here — attributes aren't CSS). Its drag check only fires on
+ *      (applied in WindowChrome.tsx directly, not here — attributes
+ *      aren't CSS). Its drag check only fires on
  *      the exact mousedown target, so `.noDrag` is a no-op for Tauri,
  *      but harmless — applying both classes unconditionally is what
  *      makes one component correct in either shell instead of needing

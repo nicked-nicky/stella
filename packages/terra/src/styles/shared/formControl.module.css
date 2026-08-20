@@ -1,0 +1,78 @@
+/**
+ * Shared base for Checkbox/Radio.
+ *
+ * Both follow the same "hidden native input + custom visual indicator +
+ * label" pattern (see either component's own docblock) and, until now,
+ * copy-pasted the structural half of it byte-for-byte: the wrapper, the
+ * fixed sm/md hit-target sizes, the transparent-but-focusable native
+ * input, and the label/labelText layout.
+ *
+ * What stays local to each component is only the part that's actually
+ * different — the visual indicator itself (Checkbox's `.box` vs Radio's
+ * `.dot`), its border-radius, its checked-state fill/icon, and the
+ * hover/focus/disabled rules chained off `.input` + that indicator.
+ *
+ * @format
+ */
+
+.wrapper {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	position: relative;
+	display: inline-flex;
+	flex-shrink: 0;
+}
+
+/* Fixed pixel sizes, deliberately NOT density-scaled. A checkbox/radio is
+   a pointer target: `density: compact` should tighten the space between
+   rows, not shrink the hit area below what's comfortable to click. Same
+   reasoning as COMPONENT SIZING in tokens.css, and the same grid as the
+   Icon atom (see its ICON SIZE GRID tokens). */
+.size-sm {
+	width: var(--stella-icon-size-sm);
+	height: var(--stella-icon-size-sm);
+}
+
+.size-md {
+	width: var(--stella-icon-size-md);
+	height: var(--stella-icon-size-md);
+}
+
+/* Native input — occupies the full box, fully transparent, still focusable */
+.input {
+	position: absolute;
+	inset: 0;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+	width: 100%;
+	height: 100%;
+}
+
+.input:disabled {
+	cursor: not-allowed;
+}
+
+/* ============================================================================
+   LABEL LAYOUT (when `label` prop is used)
+   ============================================================================ */
+
+.label {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--stella-space-2);
+	cursor: pointer;
+	font-family: var(--stella-font-ui);
+	font-size: var(--stella-text-body);
+	color: var(--stella-text-primary);
+}
+
+.label:has(.input:disabled) {
+	cursor: not-allowed;
+	color: var(--stella-text-disabled);
+}
+
+.labelText {
+	line-height: 1.4;
+}

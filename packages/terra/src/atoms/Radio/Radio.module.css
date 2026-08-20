@@ -5,42 +5,26 @@
  * Single neutral color scheme: "checked" inverts to
  * --stella-selected-bg/--stella-selected-content rather than picking a
  * color — no accent hue.
+ *
+ * Wrapper/size/native-input/label plumbing shared with Checkbox lives in
+ * styles/shared/formControl.module.css — only the visual indicator
+ * (`.dot` here, `.box` in Checkbox) and its states are defined locally.
  */
 
 .wrapper {
-	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
-	animation: var(--stella-appear-animation);
-
-	position: relative;
-	display: inline-flex;
-	flex-shrink: 0;
+	composes: wrapper from '../../styles/shared/formControl.module.css';
 }
 
-/* Fixed pixel sizes, deliberately NOT density-scaled — a radio is a
-   pointer target. Same reasoning as Checkbox and COMPONENT SIZING in
-   tokens.css. */
 .size-sm {
-	width: 16px;
-	height: 16px;
+	composes: size-sm from '../../styles/shared/formControl.module.css';
 }
 
 .size-md {
-	width: 20px;
-	height: 20px;
+	composes: size-md from '../../styles/shared/formControl.module.css';
 }
 
 .input {
-	position: absolute;
-	inset: 0;
-	margin: 0;
-	opacity: 0;
-	cursor: pointer;
-	width: 100%;
-	height: 100%;
-}
-
-.input:disabled {
-	cursor: not-allowed;
+	composes: input from '../../styles/shared/formControl.module.css';
 }
 
 .dot {
@@ -52,7 +36,7 @@
 	pointer-events: none;
 
 	border: var(--stella-border-width) solid var(--stella-border-default);
-	border-radius: var(--stella-radius-full);
+	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-surface-card);
 	transition: background-color var(--stella-motion-fast) var(--stella-easing-out),
 		border-color var(--stella-motion-fast) var(--stella-easing-out),
@@ -63,7 +47,7 @@
 	content: '';
 	width: 40%;
 	height: 40%;
-	border-radius: var(--stella-radius-full);
+	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-selected-content);
 	opacity: 0;
 	transform: scale(0.4);
@@ -100,20 +84,9 @@
    ============================================================================ */
 
 .label {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--stella-space-2);
-	cursor: pointer;
-	font-family: var(--stella-font-ui);
-	font-size: var(--stella-text-body);
-	color: var(--stella-text-primary);
-}
-
-.label:has(.input:disabled) {
-	cursor: not-allowed;
-	color: var(--stella-text-disabled);
+	composes: label from '../../styles/shared/formControl.module.css';
 }
 
 .labelText {
-	line-height: 1.4;
+	composes: labelText from '../../styles/shared/formControl.module.css';
 }

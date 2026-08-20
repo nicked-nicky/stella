@@ -8,10 +8,11 @@
  *
  * The `.default` field carries its own surface (`--stella-surface-header`)
  * because an Input is normally standalone — unlike Button, which owns no
- * surface and borrows its wrapping Island's tone. It gets the pill radius
- * the button groups use, so a standalone entry sits naturally beside a
- * segmented group. Hover/press are the shared state-layer tokens, the
- * same ladder every interactive control in the kit uses. The `filled`
+ * surface and borrows its wrapping Island's tone. It gets the same
+ * `--stella-radius-panel` the button groups use, so a standalone entry
+ * sits naturally beside a segmented group. Hover/press are the shared
+ * state-layer tokens, the same ladder every interactive control in the
+ * kit uses. The `filled`
  * variant is the ghost entry for embedding into toolbars/panels.
  *
  * @format
@@ -28,7 +29,7 @@
 
 	font-family: var(--stella-font-ui);
 	border: var(--stella-border-width) solid transparent;
-	border-radius: var(--stella-radius-pill);
+	border-radius: var(--stella-radius-panel);
 
 	/* Declared up front (transparent) so the focus ring below is a pure
      color swap with no layout shift — same "reserve the slot" trick the
@@ -188,12 +189,7 @@
 }
 
 .icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 1.25em;
-	height: 1.25em;
-	flex-shrink: 0;
+	composes: icon from '../../styles/shared/controlIcon.module.css';
 	color: var(--stella-text-secondary);
 	/* Springy press squeeze (see the :active rule above) */
 	transition: transform var(--stella-motion-fast) var(--stella-easing-spring);

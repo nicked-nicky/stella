@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useRef } from 'react';
+import React, { Children, createContext, isValidElement, useContext, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useDismissableOverlay } from '../../hooks';
 import type { Anchor, Placement } from '../../hooks';
@@ -69,34 +69,21 @@ function useMenuContext(): MenuContextValue {
  * </Menu>
  * ```
  *
- * Visually the same trick as `ButtonIsland`: the panel (`Island`,
- * `clip` on by default) is the only thing that owns rounding, items
- * carry zero radius of their own and sit flush with no padding/gap
- * around them — the panel's own corner clip is what makes the *group*
- * read as rounded, same as `ButtonIsland`'s `Button`s. An automatic
- * hairline separates adjacent items (`.item + .item`, same reserved-
- * transparent-border trick as `ButtonIsland`'s `button + button`), one
- * shade quieter (`--stella-border-subtle`) since it's a row boundary,
- * not a break. `Menu.Separator` *is* the `Divider` atom, reserved for
- * an actual group break — the same move `ButtonIsland.Separator` makes
- * with `Separator`.
+ * Same visual pattern as `ButtonIsland`: the panel owns all the
+ * rounding, items are square and flush, and the hairline between them
+ * is a real auto-inserted `Divider` (`Menu.Separator` for a deliberate
+ * group break instead). See WIKI.md's Architecture reference.
  *
  * Same `useDismissableOverlay` as `Popover` for portal/stacking/Escape/
- * anchor-position/outside-click/focus-management. Adds WAI-ARIA menu
- * keyboard behavior on top: ↑/↓ moves focus between
- * items (wrapping), Home/End jump to the first/last, typing jumps to
- * the next item whose label starts with what's typed, and Tab closes
- * the menu (a roving-focus list, not a Tab-through list — matches
- * every native menu). Reads the item list straight from the DOM at
- * keydown time (`panel.querySelectorAll('[role="menuitem"]')`) rather
- * than maintaining a parallel registration context — items are always
- * real `<button>` elements in DOM order, so this is both simpler and
- * exactly correct.
+ * anchor-position/outside-click/focus-management, plus WAI-ARIA menu
+ * keyboard behavior: ↑/↓ moves focus (wrapping), Home/End jump to the
+ * ends, typing jumps to a matching label, Tab closes the menu. Reads
+ * the item list from the DOM at keydown time rather than a parallel
+ * registration context — items are always real `<button>`s in DOM
+ * order, so this is simpler and exactly correct.
  *
- * `Menu.Item`'s `active` prop (same "persistent selected state"
- * meaning as `Button`'s) is what a future `Select`/`Dropdown` would
- * build on: mark the current value's item `active`, everything else
- * about Menu already works for that case unchanged.
+ * `Menu.Item`'s `active` prop (same meaning as `Button`'s) is what a
+ * future `Select`/`Dropdown` would build on.
  *
  * @example
  * ```tsx
@@ -193,6 +180,32 @@ export function Menu({
 
   if (!open || !root) return null;
 
+  // Built up by hand rather than mapped 1:1 — inserting the auto-
+  // hairline `Divider` between Menu.Item pairs means the output array
+  // is longer than the input. Same approach as ButtonIsland.tsx's
+  // `sizedChildren`.
+  const itemArray = Children.toArray(children);
+  const content: React.ReactNode[] = [];
+  itemArray.forEach((child, index) => {
+    content.push(child);
+
+    // Auto-hairline: a real Divider between this item and the next,
+    // only when the next sibling is also a bare Menu.Item — an
+    // explicit Menu.Separator the caller already placed here shouldn't
+    // get a second one stacked next to it.
+    const next = itemArray[index + 1];
+    if (
+      isValidElement(child) &&
+      child.type === MenuItem &&
+      isValidElement(next) &&
+      next.type === MenuItem
+    ) {
+      content.push(
+        <Divider key={`${child.key ?? index}-hairline`} className={styles.autoSeparator} />
+      );
+    }
+  });
+
   return createPortal(
     <div ref={panelRef} style={style}>
       <Island
@@ -203,7 +216,7 @@ export function Menu({
         onKeyDown={handleKeyDown}
         className={[styles.menu, className].filter(Boolean).join(' ')}
       >
-        <MenuContext.Provider value={contextValue}>{children}</MenuContext.Provider>
+        <MenuContext.Provider value={contextValue}>{content}</MenuContext.Provider>
       </Island>
     </div>,
     root
@@ -287,13 +300,13 @@ function MenuItem({
 MenuItem.displayName = 'Menu.Item';
 
 // ============================================================================
-// SEPARATOR — reuses the Divider atom directly (same move ButtonIsland
-// makes with Separator: no bespoke separator implementation, just the
-// existing full-width horizontal-rule atom exposed as a discoverable
-// static). No custom color/inset needed — with `.menu` flush (zero
-// padding), Divider's own default full-bleed styling gives it a clearly
-// stronger line than the subtle per-item hairline above, so a real group
-// break still reads as one rather than blending into it.
+// SEPARATOR — reuses the Divider atom directly at its default
+// `horizontal` orientation, exposed as a discoverable static (same move
+// ButtonIsland.Separator makes, pinned to `vertical` instead). No custom
+// color/inset needed — with `.menu` flush (zero padding), Divider's own
+// default full-bleed styling gives it a clearly stronger line than the
+// subtle per-item hairline above, so a real group break still reads as
+// one rather than blending into it.
 // ============================================================================
 
 Menu.Item = MenuItem;

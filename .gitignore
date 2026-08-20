@@ -7,6 +7,10 @@ dist/
 .env.local
 coverage/
 storybook-static/
+api-docs/
+test-results/
+playwright-report/
+blob-report/
 *.log
 *.out
 terra-test/

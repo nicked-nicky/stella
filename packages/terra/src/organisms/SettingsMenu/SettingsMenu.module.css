@@ -25,7 +25,7 @@
 
 	padding: var(--stella-space-2) var(--stella-space-3);
 	border: none;
-	border-radius: var(--stella-radius-pill);
+	border-radius: var(--stella-radius-panel);
 	background-color: transparent;
 	color: var(--stella-text-tertiary);
 

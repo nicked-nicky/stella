@@ -1,21 +1,10 @@
 /**
- * ============================================================================
- *    Menu — anchored action list (dropdown or context menu).
- *    Same visual trick as ButtonIsland/ButtonIsland.module.css: the
- *    panel is the only thing that owns rounding (Island's own radius +
- *    its `clip` overflow:hidden), items are zero-radius and flush
- *    against the panel edges and each other (no padding on `.menu`, no
- *    gap between items) so the panel's corner clip is what makes the
- *    *group* read as rounded — items themselves are square.
- *
- *    An automatic hairline separates adjacent items (`.item + .item`,
- *    reserved via a transparent `border-top` on every item and colored
- *    in only where an item sibling precedes another) — same trick as
- *    ButtonIsland's `.group > button + button`, one shade quieter
- *    (`--stella-border-subtle` vs `--stella-border-default`) since it's
- *    a row boundary inside one group, not an actual break. `Menu.Separator`
- *    (the `Divider` atom) is reserved for a real group break.
- *    ============================================================================
+ * Menu — anchored action list (dropdown or context menu). Same
+ * ButtonIsland pattern: the panel owns all the rounding, items are
+ * square and flush, and the hairline between them is a real
+ * auto-inserted `Divider` (dimmed via `.autoSeparator` — one shade
+ * quieter than an explicit `Menu.Separator`'s louder default). See
+ * WIKI.md's Architecture reference for the full reasoning.
  *
  * @format
  */
@@ -40,7 +29,6 @@
 
 	padding: var(--stella-space-2) var(--stella-space-3);
 	border: none;
-	border-top: var(--stella-border-width) solid transparent;
 	border-radius: 0;
 	background-color: transparent;
 	color: var(--stella-text-primary);
@@ -56,8 +44,31 @@
 		color var(--stella-motion-fast) var(--stella-easing-out);
 }
 
-.item + .item {
-	border-top-color: var(--stella-border-subtle);
+/* Auto-inserted per-item hairline (Menu.tsx) — one shade quieter than
+   an explicit `Menu.Separator`'s own default, since it's a row
+   boundary inside one group, not an actual break. */
+.autoSeparator {
+	background-color: var(--stella-border-subtle);
+}
+
+/* ============================================================================
+   SEPARATOR ESCALATION — same idea as ButtonIsland's: any Divider in
+   the group (auto-inserted or an explicit `Menu.Separator`, matched via
+   `[role="separator"]` — Divider's own accessible role) brightens right
+   along with a hovered/pressed item on either side of it, the same two
+   tokens the item's own background-layer ladder uses. `+` covers
+   "hovered on the near side," `:has()` covers "hovered on the far side"
+   (`+` alone only looks forward).
+   ============================================================================ */
+
+.menu > .item:hover:not(:disabled) + [role='separator'],
+.menu > [role='separator']:has(+ .item:hover:not(:disabled)) {
+	background-color: var(--stella-state-hover);
+}
+
+.menu > .item:active:not(:disabled) + [role='separator'],
+.menu > [role='separator']:has(+ .item:active:not(:disabled)) {
+	background-color: var(--stella-state-active);
 }
 
 /* Translucent state layer, not an opaque fill — composites over the

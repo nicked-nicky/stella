@@ -5,10 +5,12 @@
 export type ColorScheme = 'light' | 'dark' | 'system';
 
 /**
- * Rounding preset — scales every `--stella-radius-*` step together via
- * `--stella-radius-scale` (see tokens.css). `-full`/`-pill` stay
- * unscaled on purpose: a pill is always fully round regardless of this
- * setting.
+ * Rounding preset — scales `--stella-radius-panel`, the single radius
+ * every component in Terra reads, via `--stella-radius-scale` (see
+ * tokens.css). Because it's the one value everything shares, this
+ * preset now visibly reshapes the whole kit at once — avatars, switch
+ * thumbs, and radio dots included, not just panels/dialogs — rather
+ * than the small set of container radii it used to touch.
  */
 export type RadiusStyle = 'sharp' | 'default' | 'round';
 
@@ -28,7 +30,7 @@ export type Density = 'compact' | 'default' | 'comfortable';
  * than a fraction of a base value.
  *
  * `none` writes `0px` — every hairline in Terra (Island, Button,
- * Badge, Checkbox, Radio, Switch, Dialog, Separator, ...) reads the
+ * Badge, Checkbox, Radio, Switch, Dialog, Divider, ...) reads the
  * same token, so this is a genuine borderless mode, not just a thinner
  * one. Components that lean on their border for shape legibility
  * against the background (an unchecked Checkbox, say) fall back on
@@ -214,10 +216,11 @@ export class ThemeManager {
   }
 
   /**
-   * Writes the multiplier tokens.css's radius steps are all defined in
-   * terms of (`--stella-radius-xs: calc(4px * var(--stella-radius-scale))`,
-   * etc.) — one property write, every component's radius updates with
-   * zero re-renders.
+   * Writes the multiplier `--stella-radius-panel` (and every component's
+   * `border-radius`, which all read that one token) is defined in terms
+   * of — `--stella-radius-panel: calc(16px * var(--stella-radius-scale))`
+   * — one property write, every component's radius updates with zero
+   * re-renders.
    */
   private applyRadius(radius: RadiusStyle): void {
     this.root.style.setProperty('--stella-radius-scale', RADIUS_SCALE[radius]);
@@ -231,8 +234,8 @@ export class ThemeManager {
   /**
    * Writes --stella-border-width directly (no scale multiplier — see
    * BorderWidthStyle's docblock). Every hairline in Terra (Island,
-   * Button, Badge, Checkbox, Radio, Switch, Divider, Separator, ...)
-   * reads this one token, so this one write re-thicknesses all of them.
+   * Button, Badge, Checkbox, Radio, Switch, Divider, ...) reads this
+   * one token, so this one write re-thicknesses all of them.
    */
   private applyBorderWidth(borderWidth: BorderWidthStyle): void {
     this.root.style.setProperty('--stella-border-width', BORDER_WIDTH[borderWidth]);

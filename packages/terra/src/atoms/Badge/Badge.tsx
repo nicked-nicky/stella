@@ -26,83 +26,22 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode;
 }
 
-/** Raw palette hue backing each status color, for the `filled` variant's
- * solid step (see resolveColorVars below). */
-const STATUS_HUE: Record<Exclude<BadgeColor, 'neutral'>, string> = {
-  success: 'green',
-  info: 'blue',
-  warning: 'yellow',
-  error: 'red',
-  debug: 'slate',
-};
-
-// ============================================================================
-// COLOR RESOLUTION
-// ============================================================================
-
-/**
- * Maps color + variant to CSS custom properties. Badge.module.css only
- * ever reads --badge-bg / --badge-text / --badge-border — adding a new
- * color here requires zero new CSS.
- *
- * `neutral` + `tinted`/`outline` is the one combination this function
- * deliberately leaves unset (returns `{}`) — it needs genuinely
- * different raw-palette steps between light and dark (same reason
- * Button.module.css picks its fill steps with `light-dark()`), which a
- * single inline var() reference can't express.
- * Badge.module.css's `[data-color='neutral'][data-variant]` attribute
- * rules own that case instead, resolving per scheme with `light-dark()`
- * — CSS drives it, not a re-render.
- */
-function resolveColorVars(
-  color: BadgeColor,
-  variant: BadgeVariant
-): React.CSSProperties {
-  // Status colors already have bg/text/border alias triplets defined —
-  // reuse them directly for `tinted` and derive filled/outline from them.
-  // These are already theme-correct (the alias tokens themselves flip
-  // with light/dark), so no gap here.
-  if (color !== 'neutral') {
-    const bg = `var(--stella-${color}-bg)`;
-    const text = `var(--stella-${color}-text)`;
-    const border = `var(--stella-${color}-border)`;
-
-    if (variant === 'tinted') {
-      return { '--badge-bg': bg, '--badge-text': text, '--badge-border': 'transparent' } as React.CSSProperties;
-    }
-    if (variant === 'outline') {
-      return { '--badge-bg': 'transparent', '--badge-text': text, '--badge-border': border } as React.CSSProperties;
-    }
-    // filled: use the -700 step of the underlying hue for solid contrast
-    const hue = STATUS_HUE[color];
-    return {
-      '--badge-bg': `var(--stella-${hue}-700)`,
-      '--badge-text': 'var(--stella-text-on-fill)',
-      '--badge-border': 'transparent',
-    } as React.CSSProperties;
-  }
-
-  // neutral, filled: a single mid-tone step reads fine against white
-  // text in either theme — no branching needed.
-  if (variant === 'filled') {
-    return {
-      '--badge-bg': 'var(--stella-neutral-500)',
-      '--badge-text': 'var(--stella-text-on-fill)',
-      '--badge-border': 'transparent',
-    } as React.CSSProperties;
-  }
-
-  // neutral, tinted / outline: handled by Badge.module.css's
-  // [data-color='neutral'][data-variant] rules — see the docblock above.
-  return {};
-}
-
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
 /**
  * Badge - compact status/label indicator. Non-interactive.
+ *
+ * Purely a `data-color`/`data-variant` attribute carrier — all 15
+ * color×variant combinations are resolved by Badge.module.css's
+ * `[data-color][data-variant]` rules, reading straight off each status
+ * hue's `-text`/`-bg`/`-border` alias triplet in tokens.css. Adding a
+ * new color is a CSS-only change (new alias triplet + one rule block),
+ * not a JS one — there used to be a `resolveColorVars` function doing
+ * this in JS via inline custom properties; it's gone because attribute
+ * selectors do the same job with zero re-renders and no JS/CSS boundary
+ * to keep in sync.
  *
  * @example
  * ```tsx
@@ -116,18 +55,14 @@ export function Badge({
   variant = 'tinted',
   color = 'neutral',
   className,
-  style,
   children,
   ...props
 }: BadgeProps) {
-  const colorVars = resolveColorVars(color, variant);
-
   return (
     <span
       className={[styles.badge, className].filter(Boolean).join(' ')}
       data-color={color}
       data-variant={variant}
-      style={{ ...colorVars, ...style }}
       {...props}
     >
       {children}

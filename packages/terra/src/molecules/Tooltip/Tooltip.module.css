@@ -16,7 +16,7 @@
 
 	background-color: var(--stella-surface-overlay);
 	border: var(--stella-border-width) solid var(--stella-border-default);
-	border-radius: var(--stella-radius-sm);
+	border-radius: var(--stella-radius-panel);
 	box-shadow: var(--stella-shadow-sm);
 
 	color: var(--stella-text-primary);

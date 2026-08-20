@@ -291,30 +291,58 @@
 	);
 
 	/* Status — the only 5 places color appears in Stella. Each hue
-     contributes a `-text` step, consumed by Notification's icon. Only
-     `error` additionally contributes `-border`/`-border-strong`, used by
-     Input's invalid state (soft border at rest, strong border+outline
-     once it's also focused — see Input.module.css's `.wrapper.error`
-     and `.wrapper.error:focus-within`). The `-bg` form and the other
-     hues' `-border` forms are deliberately absent: Badge resolves its
-     fill/border inline (a JS-only change) and no other component paints
-     a status surface. */
+     contributes `-text` (Notification's icon, Badge's tinted/outline
+     text), `-bg` (Badge's tinted fill), and `-border` (Badge's outline
+     ring; `error` additionally has `-border-strong`, used by Input's
+     invalid state — soft border at rest, strong border+outline once
+     it's also focused, see Input.module.css's `.wrapper.error` and
+     `.wrapper.error:focus-within`). Badge itself is pure CSS — see
+     Badge.module.css's `[data-color][data-variant]` rules — these three
+     per-hue steps are its entire palette, no per-badge JS resolution.
+
+     `-bg` is deliberately a step DARKER in dark mode than `filled`'s
+     fixed `-700` raw-palette fill (see Badge.module.css's
+     `[data-variant="filled"]` rules), so a tinted badge reads as
+     visibly softer than a filled one even in dark mode instead of the
+     two colliding on the same value. */
 	--stella-success-text: light-dark(
 		var(--stella-green-800),
 		var(--stella-green-200)
+	);
+	--stella-success-bg: light-dark(
+		var(--stella-green-100),
+		var(--stella-green-900)
+	);
+	--stella-success-border: light-dark(
+		var(--stella-green-200),
+		var(--stella-green-700)
 	);
 
 	--stella-info-text: light-dark(
 		var(--stella-blue-800),
 		var(--stella-blue-200)
 	);
+	--stella-info-bg: light-dark(var(--stella-blue-100), var(--stella-blue-900));
+	--stella-info-border: light-dark(
+		var(--stella-blue-200),
+		var(--stella-blue-700)
+	);
 
 	--stella-warning-text: light-dark(
 		var(--stella-yellow-800),
 		var(--stella-yellow-200)
 	);
+	--stella-warning-bg: light-dark(
+		var(--stella-yellow-100),
+		var(--stella-yellow-900)
+	);
+	--stella-warning-border: light-dark(
+		var(--stella-yellow-200),
+		var(--stella-yellow-700)
+	);
 
 	--stella-error-text: light-dark(var(--stella-red-800), var(--stella-red-200));
+	--stella-error-bg: light-dark(var(--stella-red-100), var(--stella-red-900));
 	--stella-error-border: light-dark(
 		var(--stella-red-200),
 		var(--stella-red-700)
@@ -332,33 +360,26 @@
 		var(--stella-slate-700),
 		var(--stella-slate-300)
 	);
+	--stella-debug-bg: light-dark(
+		var(--stella-slate-100),
+		var(--stella-slate-900)
+	);
+	--stella-debug-border: light-dark(
+		var(--stella-slate-200),
+		var(--stella-slate-700)
+	);
 
 	/* ========================================================================
-     STATE LAYERS — hover / press / selected.
-
-     Translucent overlays of the foreground color, NOT opaque surface
-     tones. This is libadwaita's model, and it matters for a reason that
-     bit the previous approach: a fixed opaque hover color bakes in an
-     assumption about what sits underneath it. The old
-     --stella-surface-hover resolved to the same value as
-     --stella-surface-muted, so hovering anything on a muted surface
-     produced no visible change at all.
-
-     A translucent layer composites over whatever is actually beneath —
-     card, muted island, overlay, toolbar, a status-tinted row — so one
-     definition is correct everywhere, and every new surface tone gets
-     working hover states for free instead of needing its own paired
-     hover token.
-
-     Alphas are tuned per scheme rather than shared: a dark UI needs a
-     lighter touch to read the same, since white-on-dark lifts faster
-     than black-on-light sinks.
-
-     The three steps mirror Ray's own hover → active → selected ladder
-     (#414151 → #4c4c5c → #575767 over a #363646 group): each is a
-     clear step up from the last, so a pressed control is visibly
-     firmer than a hovered one and a pinned control reads as "on" at a
-     glance without needing a different fill color.
+     STATE LAYERS — hover / press / selected escalation ladder, each a
+     clear step firmer than the last. See WIKI.md's Architecture
+     reference for the full reasoning, including the border-color
+     collision history: --stella-state-hover needs to stay a real step
+     above --stella-border-default (currently neutral-200/700) or any
+     border-color escalation reading it (ButtonIsland/Menu's separator,
+     Island's outer border via :has()) goes invisible on hover — same
+     value in, same value out. Current hover value below is back at
+     neutral-200/700, identical to --stella-border-default again; flag
+     before relying on the separator/border hover effect looking right.
      ======================================================================== */
 
 	--stella-state-hover: light-dark(
@@ -366,8 +387,8 @@
 		var(--stella-neutral-700)
 	);
 	--stella-state-active: light-dark(
-		var(--stella-neutral-200),
-		var(--stella-neutral-700)
+		var(--stella-neutral-300),
+		var(--stella-neutral-600)
 	);
 	--stella-state-selected: light-dark(
 		var(--stella-neutral-200),
@@ -459,38 +480,31 @@
 
 	/* ========================================================================
      BORDER RADIUS
-     `--stella-radius-scale` is ThemeManager.setRadius()'s hook — same
-     multiplier pattern as spacing above. `-full` stays unscaled: a true
-     circle (avatar, radio dot, switch thumb) is a circle no matter the
-     rounding setting.
+     One rounding value for every component in the kit — `--stella-radius-
+     panel`, scaled by `--stella-radius-scale` (ThemeManager.setRadius()'s
+     hook, same multiplier pattern as spacing above). Buttons, badges,
+     avatars, switches, dialogs, tooltips — everything reaches for this
+     single alias rather than picking a tier.
 
-     `-pill` is the "roundest a rectangle gets": a full pill at default
-     (1×) and round (1.5×), but at sharp (0.5×) the `2*scale-1` arm
-     collapses to 0, letting `-lg` win — so pills visibly square off
-     into rounded rectangles. (At scale ≥ 1 the scaled `-full` term
-     stays ≥ 9999px and max() keeps the true pill.)
+     There's no separate "true circle" step anymore either: avatars,
+     radio dots, and switch thumbs all use `-panel` too, so on their
+     small footprint the radius simply clamps to the shorter side (CSS
+     scales down corner radii that would otherwise overlap) — which is
+     what still makes them read as round, without a dedicated `-full`
+     token to maintain.
 
-     `-panel` / `-pill` are the two container tiers Ray/color-cart both
-     use: a big-but-not-full radius for floating panels (sidebars,
-     modals, cards) and the pill radius for toolbar/button-group
-     "islands". Reach for these two aliases when building a container,
-     not the raw xs–xl steps directly.
+     `--stella-radius-md` is kept as a bare, unused-by-any-component
+     scale step (not wired to anything) — headroom if a future
+     component wants a smaller radius than panel without introducing a
+     whole new tier.
      ======================================================================== */
 
 	--stella-radius-scale: 1;
 
-	--stella-radius-xs: calc(4px * var(--stella-radius-scale));
-	--stella-radius-sm: calc(6px * var(--stella-radius-scale));
 	--stella-radius-md: calc(8px * var(--stella-radius-scale));
-	--stella-radius-lg: calc(12px * var(--stella-radius-scale));
 	--stella-radius-xl: calc(16px * var(--stella-radius-scale));
-	--stella-radius-full: 9999px;
 
 	--stella-radius-panel: var(--stella-radius-xl);
-	--stella-radius-pill: max(
-		calc(var(--stella-radius-full) * (2 * var(--stella-radius-scale) - 1)),
-		var(--stella-radius-lg)
-	);
 
 	/* ========================================================================
      ELEVATION — shadow + rim.
@@ -514,27 +528,30 @@
        box-shadow: var(--stella-rim), var(--stella-shadow-lg);
      ======================================================================== */
 
-	--stella-shadow-color: light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.44));
-	--stella-shadow-color-soft: light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.3));
+	--stella-shadow-color: light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.32));
+	--stella-shadow-color-soft: light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.2));
 	--stella-rim-color: light-dark(
 		rgb(255 255 255 / 0.9),
 		rgb(255 255 255 / 0.06)
 	);
 
+	/* Tighter blur/offset than the old scale (which was Tailwind's
+     defaults verbatim) — each step sits closer to the element instead
+     of diffusing outward, on top of the lighter color above. */
 	--stella-shadow-none: none;
 	--stella-shadow-xs: 0 1px 2px 0 var(--stella-shadow-color-soft);
 	--stella-shadow-sm:
-		0 1px 3px 0 var(--stella-shadow-color),
-		0 1px 2px 0 var(--stella-shadow-color-soft);
+		0 1px 2px 0 var(--stella-shadow-color),
+		0 1px 1px 0 var(--stella-shadow-color-soft);
 	--stella-shadow-md:
-		0 4px 6px -1px var(--stella-shadow-color),
-		0 2px 4px -1px var(--stella-shadow-color-soft);
+		0 2px 4px -1px var(--stella-shadow-color),
+		0 1px 2px -1px var(--stella-shadow-color-soft);
 	--stella-shadow-lg:
-		0 10px 15px -3px var(--stella-shadow-color),
-		0 4px 6px -2px var(--stella-shadow-color-soft);
+		0 6px 10px -3px var(--stella-shadow-color),
+		0 2px 4px -2px var(--stella-shadow-color-soft);
 	--stella-shadow-xl:
-		0 20px 25px -5px var(--stella-shadow-color),
-		0 10px 10px -5px var(--stella-shadow-color-soft);
+		0 12px 16px -5px var(--stella-shadow-color),
+		0 4px 6px -5px var(--stella-shadow-color-soft);
 
 	--stella-rim: inset 0 1px 0 var(--stella-rim-color);
 
@@ -559,6 +576,19 @@
 	--stella-bar-height: calc(
 		var(--stella-size-md) + (2 * var(--stella-border-width))
 	);
+
+	/* ========================================================================
+     ICON SIZE GRID — fixed 16/20/24px, shared by Icon/Checkbox/Radio/
+     Spinner. Deliberately NOT density-scaled — see Icon's own docblock:
+     icons are drawn on a pixel grid and a fractional density multiplier
+     would land strokes on half-pixels and blur them. Single source for a
+     grid that was previously the same three literals copy-pasted into
+     each of those four stylesheets.
+     ======================================================================== */
+
+	--stella-icon-size-sm: 16px;
+	--stella-icon-size-md: 20px;
+	--stella-icon-size-lg: 24px;
 
 	/* ========================================================================
      MOTION / TIMING
@@ -597,6 +627,16 @@
      rename the keyframe name in component files. */
 	--stella-appear-animation: stella-appear var(--stella-motion-slower)
 		var(--stella-easing-expo) backwards;
+
+	/* Dialog's backdrop entrance — same `stella-appear` keyframe (a plain
+     opacity fade has nothing Dialog-specific about it), just faster and
+     on the plain decelerate curve instead of the expo settle: a modal
+     scrim needs to appear before its panel does, not glide in behind
+     it. Was a byte-identical `backdrop-in` keyframe redeclared in
+     Dialog.module.css; this alias points it at the one definition
+     instead. */
+	--stella-backdrop-in-animation: stella-appear var(--stella-motion-fast)
+		var(--stella-easing-out) both;
 
 	/* Shared entrance for anchored overlay panels (Popover, Menu — see
      `stella-overlay-pop` keyframes below). A faster, springier pop than
@@ -642,13 +682,34 @@
 *::-webkit-scrollbar-thumb {
 	background: var(--stella-border-default);
 	border: 2px solid transparent;
-	border-radius: var(--stella-radius-full);
+	border-radius: var(--stella-radius-panel);
 	background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
 	background: var(--stella-text-tertiary);
 	background-clip: padding-box;
+}
+
+/* ============================================================================
+   INLINE CODE — bare `<code>` had no styling anywhere in Terra (no
+   dedicated atom for it, and nothing in this reset touched it), so it
+   fell through to the browser default: serif-adjacent monospace, no
+   background, square corners, invisible against prose. A small tinted
+   chip instead, on the same muted surface a Checkbox's box sits on and
+   rounded with the one radius every other component uses.
+   `font-size: 0.9em` (not a fixed `--stella-text-mono` token) is
+   deliberate — inline code sits inside prose of varying sizes (body,
+   caption, a title), so it should scale with whatever text surrounds
+   it rather than pin to one size regardless of context.
+   ============================================================================ */
+
+code {
+	font-family: var(--stella-font-mono);
+	font-size: 0.9em;
+	background-color: var(--stella-surface-muted);
+	border-radius: var(--stella-radius-panel);
+	padding: 0.15em 0.4em;
 }
 
 /* ============================================================================
