@@ -38,6 +38,9 @@
     "react-dom": ">=18",
     "lucide-react": "^1.0.0"
   },
+  "engines": {
+    "node": ">=20.19"
+  },
   "peerDependenciesMeta": {
     "lucide-react": {
       "optional": true
@@ -53,20 +56,22 @@
     "docs": "typedoc"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.10.0",
-    "@playwright/experimental-ct-react": "^1.47.0",
-    "@playwright/test": "^1.47.0",
-    "@testing-library/jest-dom": "^6.5.0",
-    "@testing-library/react": "^16.0.1",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.2.1",
-    "jsdom": "^25.0.1",
-    "lucide-react": "^1.31.0",
-    "typedoc": "^0.26.0",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.8",
-    "vitest": "^2.1.4"
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/experimental-ct-react": "^1.62.1",
+    "@playwright/test": "^1.62.1",
+    "@testing-library/jest-dom": "~6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.5",
+    "jsdom": "^30.0.1",
+    "lucide-react": "^1.30.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typedoc": "^0.28.20",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
   }
 }

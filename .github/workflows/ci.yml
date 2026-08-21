@@ -23,11 +23,12 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 11
 
+      # Vite 8 requires ^20.19 || >=22.12; 22 keeps CI clear of that edge.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       # --frozen-lockfile makes a stale lockfile a build failure rather

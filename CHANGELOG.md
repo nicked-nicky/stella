@@ -27,6 +27,11 @@ All notable changes to Stella are documented here. Format loosely follows [Keep 
 - `.prettierrc` and `format` / `format:check` scripts.
 - `docs/` — `DEVELOPMENT.md` (authoring guide) and `WIKI.md` (architecture reference).
 
+### Changed
+
+- **Toolchain updated to current stable**: Vite 5 → 8, Vitest 2 → 4, jsdom 25 → 30, `@vitejs/plugin-react` 4 → 6, Testing Library React 16.3, Playwright 1.62, typedoc 0.26 → 0.28, pnpm 9 → 11, CI on Node 22. Terra now develops against React 19 while keeping its `react >=18` peer range, so both majors stay supported. TypeScript deliberately stays on 5.9 rather than 7.0 — the type-tooling ecosystem hasn't caught up to the native compiler yet, and Terra's build is only `tsc`.
+- `@testing-library/jest-dom` pinned to `~6.9.1`: 6.10.0 is published but deprecated, and a `^` range would resolve straight to it.
+
 ### Fixed
 
 - **`@stella/terra` could not be resolved by workspace consumers.** Its `exports` pointed only at `./dist`, which is gitignored and never built during development, so `pnpm dev` failed on a clean checkout with *"Failed to resolve entry for package @stella/terra"* — despite the WIKI documenting that `terra-test` consumes `src/` directly. `exports` now point at `./src/index.ts`, with `publishConfig` overriding them to `./dist` at publish time (pnpm swaps them automatically; nothing needs hand-editing at release).

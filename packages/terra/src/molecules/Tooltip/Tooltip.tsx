@@ -115,14 +115,22 @@ export function Tooltip({
   // element's prop type here is what makes the clone below typecheck —
   // the runtime behaviour is unchanged.
   const child = children as React.ReactElement<Record<string, unknown>> & {
-    // React 18 keeps `ref` on the element rather than in props (React 19
-    // moves it into props); read it from where this React actually puts it.
     ref?: React.Ref<HTMLElement>;
   };
   const childProps = child.props as Record<string, unknown>;
 
+  // Terra peers `react >=18` and develops against 19, and the two put a
+  // cloned element's existing ref in different places: 19 moved it into
+  // props, 18 keeps it on the element. Branching on the version rather
+  // than probing both is deliberate — reading `element.ref` on React 19
+  // logs a deprecation warning, so a "try props, fall back to element"
+  // shape would warn on every tooltip whose trigger has no ref of its own.
+  const childRef = Number.parseInt(React.version, 10) >= 19
+    ? (childProps.ref as React.Ref<HTMLElement> | undefined)
+    : child.ref;
+
   const trigger = cloneElement(child, {
-    ref: mergeRefs(anchorRef, child.ref),
+    ref: mergeRefs(anchorRef, childRef),
     onMouseEnter: composeHandlers(childProps.onMouseEnter as (e: React.MouseEvent) => void, show),
     onMouseLeave: composeHandlers(childProps.onMouseLeave as (e: React.MouseEvent) => void, hide),
     onFocus: composeHandlers(childProps.onFocus as (e: React.FocusEvent) => void, show),
