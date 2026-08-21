@@ -6,4 +6,5 @@ export {
   type RadiusStyle,
   type Density,
   type BorderWidthStyle,
+  type MotionStyle,
 } from './ThemeManager';

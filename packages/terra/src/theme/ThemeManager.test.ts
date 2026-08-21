@@ -61,6 +61,28 @@ describe('ThemeManager — colour scheme', () => {
   });
 });
 
+describe('ThemeManager — motion', () => {
+  it('removes data-stella-motion for `system`, handing the decision to CSS', () => {
+    // Same "system" contract as colour scheme: absence of an override,
+    // not a third value — prefers-reduced-motion alone decides.
+    const root = freshRoot();
+    const manager = new ThemeManager(root, { motion: 'reduced' });
+    expect(root.getAttribute('data-stella-motion')).toBe('reduced');
+
+    manager.setMotion('system');
+    expect(root.hasAttribute('data-stella-motion')).toBe(false);
+  });
+
+  it('writes data-stella-motion for an explicit reduced/off choice', () => {
+    const root = freshRoot();
+    const manager = new ThemeManager(root);
+    manager.setMotion('reduced');
+    expect(root.getAttribute('data-stella-motion')).toBe('reduced');
+    manager.setMotion('off');
+    expect(root.getAttribute('data-stella-motion')).toBe('off');
+  });
+});
+
 describe('ThemeManager — style scales', () => {
   it('writes the radius multiplier rather than a resolved pixel value', () => {
     // Components read --stella-radius-panel, which is defined in terms of

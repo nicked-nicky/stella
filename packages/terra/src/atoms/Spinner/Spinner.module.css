@@ -54,3 +54,23 @@
 		animation: stella-spin 1.5s linear infinite;
 	}
 }
+
+/* Same essential-motion exemption as the media query above, for
+   ThemeManager's explicit data-stella-motion="reduced" tier — an
+   in-app toggle should get the identical carve-out an OS setting
+   does. :global() reaches the ancestor attribute from inside this
+   CSS Module; .spinner itself stays locally scoped as usual. */
+:global([data-stella-motion="reduced"]) .spinner {
+	animation: stella-spin 1.5s linear infinite;
+}
+
+/* data-stella-motion="off" (see tokens.css) is a blanket
+   `animation: none !important` on every element — stronger than a
+   near-zero duration. Winning it back for Spinner needs `!important`
+   too; `[data-stella-motion="off"] .spinner` outweighs tokens.css's
+   `[data-stella-motion="off"] *` on specificity alone (a class beats
+   the universal selector), so this wins regardless of which
+   stylesheet a bundler happens to concatenate first. */
+:global([data-stella-motion="off"]) .spinner {
+	animation: stella-spin 1.5s linear infinite !important;
+}

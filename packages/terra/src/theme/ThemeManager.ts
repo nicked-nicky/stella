@@ -40,22 +40,53 @@ export type Density = 'compact' | 'default' | 'comfortable';
  */
 export type BorderWidthStyle = 'none' | 'thin' | 'default' | 'thick';
 
+/**
+ * Motion preset — mirrors `ColorScheme`'s system/explicit-override shape
+ * rather than `RadiusStyle`/`Density`'s scale-multiplier shape, because
+ * motion already has an OS-level preference to defer to
+ * (`prefers-reduced-motion`), the same way color scheme defers to
+ * `prefers-color-scheme`.
+ *
+ * - `'system'` (default) — no override; the `prefers-reduced-motion`
+ *   media query in tokens.css alone decides, exactly as today.
+ * - `'reduced'` — forces the same near-zero `--stella-motion-*` values
+ *   the media query applies, regardless of the OS setting. An in-app
+ *   "reduce motion" toggle wants this rather than waiting for someone
+ *   to change an OS setting.
+ * - `'off'` — a harder kill switch than `'reduced'`: every animation
+ *   and transition in the kit is removed outright (`animation: none`,
+ *   `transition: none`), not just sped to near-zero. `'reduced'`'s
+ *   near-zero durations still run a real (imperceptible) transition,
+ *   which is enough to cause flaky `transitionend` timing in
+ *   screenshot/visual-regression tests or to cost a frame on very
+ *   low-power devices — `'off'` removes that entirely.
+ *
+ * Both explicit tiers exempt Spinner the same way the existing
+ * `prefers-reduced-motion` block does: a frozen spinner reads as a
+ * hung app, not a design choice, so essential loading feedback keeps
+ * spinning (at a calm, fixed speed) even at `'off'`. See
+ * Spinner.module.css.
+ */
+export type MotionStyle = 'system' | 'reduced' | 'off';
+
 export interface ThemeConfig {
   /** Schema version — bump when the shape changes so `loadConfig` can
    * reason about migrating older saved configs. */
-  version: 4;
+  version: 5;
   colorScheme: ColorScheme;
   radius: RadiusStyle;
   density: Density;
   borderWidth: BorderWidthStyle;
+  motion: MotionStyle;
 }
 
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
-  version: 4,
+  version: 5,
   colorScheme: 'system',
   radius: 'default',
   density: 'default',
   borderWidth: 'default',
+  motion: 'system',
 };
 
 type ThemeChangeListener = (config: ThemeConfig) => void;
@@ -113,6 +144,7 @@ const BORDER_WIDTH: Record<BorderWidthStyle, string> = {
  * theme.setColorScheme('dark');
  * theme.setRadius('round');
  * theme.setBorderWidth('thick');
+ * theme.setMotion('reduced');
  *
  * // Save (however your runtime does it):
  * const json = JSON.stringify(theme.getConfig());
@@ -138,6 +170,7 @@ export class ThemeManager {
     this.applyRadius(this.config.radius);
     this.applyDensity(this.config.density);
     this.applyBorderWidth(this.config.borderWidth);
+    this.applyMotion(this.config.motion);
   }
 
   /**
@@ -172,6 +205,12 @@ export class ThemeManager {
     this.notify();
   }
 
+  setMotion(motion: MotionStyle): void {
+    this.config = { ...this.config, motion };
+    this.applyMotion(motion);
+    this.notify();
+  }
+
   /**
    * Apply a config loaded from wherever you persisted it. Accepts a
    * partial object — missing keys keep their current value rather than
@@ -188,6 +227,7 @@ export class ThemeManager {
     this.applyRadius(this.config.radius);
     this.applyDensity(this.config.density);
     this.applyBorderWidth(this.config.borderWidth);
+    this.applyMotion(this.config.motion);
     this.notify();
   }
 
@@ -242,5 +282,22 @@ export class ThemeManager {
       '--stella-border-width',
       BORDER_WIDTH[borderWidth]
     );
+  }
+
+  /**
+   * Same mechanism as applyColorScheme — 'system' removes the
+   * attribute and hands the decision to the `prefers-reduced-motion`
+   * media query in tokens.css; an explicit tier writes
+   * `data-stella-motion`, which tokens.css (var collapse for
+   * 'reduced', a hard `animation`/`transition: none` kill switch for
+   * 'off') and Spinner.module.css (both tiers' essential-motion
+   * exemption) key off of.
+   */
+  private applyMotion(motion: MotionStyle): void {
+    if (motion === 'system') {
+      this.root.removeAttribute('data-stella-motion');
+    } else {
+      this.root.setAttribute('data-stella-motion', motion);
+    }
   }
 }

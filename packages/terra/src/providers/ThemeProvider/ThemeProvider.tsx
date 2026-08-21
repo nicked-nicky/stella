@@ -13,6 +13,7 @@ import type {
   RadiusStyle,
   Density,
   BorderWidthStyle,
+  MotionStyle,
 } from '../../theme/ThemeManager';
 
 // ============================================================================
@@ -29,6 +30,8 @@ interface ThemeContextValue {
   setDensity: (density: Density) => void;
   /** Border thickness preset — sets --stella-border-width directly. */
   setBorderWidth: (borderWidth: BorderWidthStyle) => void;
+  /** Motion preset — 'system' defers to prefers-reduced-motion, 'reduced'/'off' override it explicitly. */
+  setMotion: (motion: MotionStyle) => void;
   /** Snapshot for your own save routine — see ThemeProvider's docstring. */
   getConfig: () => ThemeConfig;
   /** Apply a config loaded from your own save routine. */
@@ -119,6 +122,7 @@ export function ThemeProvider({
       setDensity: (density) => managerRef.current!.setDensity(density),
       setBorderWidth: (borderWidth) =>
         managerRef.current!.setBorderWidth(borderWidth),
+      setMotion: (motion) => managerRef.current!.setMotion(motion),
       getConfig: () => managerRef.current!.getConfig(),
       loadConfig: (c) => managerRef.current!.loadConfig(c),
     }),
