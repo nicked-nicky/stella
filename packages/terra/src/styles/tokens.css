@@ -413,17 +413,22 @@
      auto-separator and the Island's own outer border reacting to a
      hovered/pressed child via :has().
 
-     Separate from the state layers on purpose. A hairline has to read as
-     firmer than its resting --stella-border-default, and the state
-     layers are tuned as fills over a surface — reusing them is exactly
-     how the escalation ended up invisible. Regression-tested by
-     ButtonIsland.ct.tsx.
+     The rule is one rung above the fill it sits beside, and that offset
+     is the whole point. A separator between two buttons is painted
+     *against* the hovered button's own background — so if it escalates
+     to the same --stella-state-hover the button just filled itself with,
+     the line disappears into the button instead of surviving on top of
+     it. Same story at rest: --stella-state-hover and
+     --stella-border-default are the same value, so escalating a border
+     to the former sets it to the colour it was already painted.
+
+     --stella-border-hover is written as an alias of --stella-state-active
+     rather than a fresh palette pick, so the offset stays visible in the
+     source: the hairline tracks the same neutral distribution as the
+     fills, just shifted one step. Regression-tested by ButtonIsland.ct.tsx.
      ======================================================================== */
 
-	--stella-border-hover: light-dark(
-		var(--stella-neutral-300),
-		var(--stella-neutral-600)
-	);
+	--stella-border-hover: var(--stella-state-active);
 	--stella-border-active: light-dark(
 		var(--stella-neutral-400),
 		var(--stella-neutral-500)

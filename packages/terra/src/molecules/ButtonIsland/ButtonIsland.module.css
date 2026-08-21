@@ -13,6 +13,16 @@
    explicit, matched via `[role="separator"]`) brightens with a
    hovered/pressed Button on either side: `+` for "near side," `:has()`
    for "far side" (`+` alone only looks forward). See WIKI.md.
+
+   Reads the *border* ladder, not the state layers, and this is the one
+   thing not to "simplify" back. The separator is painted directly
+   against the hovered button's own fill. Point it at
+   --stella-state-hover and it becomes the exact colour that button just
+   filled itself with, so the hairline vanishes into the button — which
+   is also its resting colour, since --stella-state-hover and
+   --stella-border-default are the same value. The border ladder is the
+   same neutral distribution shifted one rung up, which is precisely
+   enough to keep the line on top of the fill. See tokens.css.
    ============================================================================ */
 
 .group > button:hover:not(:disabled) + [role='separator'],
