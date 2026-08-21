@@ -62,10 +62,21 @@ interface ButtonIslandProps
  *   <Button iconOnly aria-label="Settings">⚙</Button>
  * </ButtonIsland>
  *
- * // Single button — fills whatever width/height the Island is given
- * <ButtonIsland style={{ alignSelf: 'stretch' }}>
+ * // Single button — fills whatever width/height the Island is given.
+ * // `shape="pill"` is inline-flex, so the Island is content-sized until
+ * // something widens it; a lone Button can only fill space that exists.
+ * // Pick whichever of these matches the surrounding layout:
+ * <ButtonIsland style={{ width: '100%' }}>          // anywhere
  *   <Button>New note</Button>
  * </ButtonIsland>
+ *
+ * <ButtonIsland style={{ flex: 1 }}>                // inside a row flex parent
+ *   <Button>New note</Button>
+ * </ButtonIsland>
+ *
+ * <ButtonIsland style={{ alignSelf: 'stretch' }}>   // inside a COLUMN flex parent
+ *   <Button>New note</Button>                       // (in a row parent this
+ * </ButtonIsland>                                   //  stretches height, not width)
  * ```
  */
 const ButtonIslandBase = forwardRef<HTMLElement, ButtonIslandProps>(

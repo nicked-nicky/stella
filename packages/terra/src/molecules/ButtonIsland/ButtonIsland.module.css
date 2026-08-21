@@ -53,11 +53,38 @@
 	border-color: var(--stella-border-active);
 }
 
+/* The inner button row fills the Island's inline size rather than
+   sitting at its content width.
+
+   This is the middle link in the horizontal chain, and without it the
+   other two do nothing: the Island can be as wide as the caller likes
+   and `.stretchButton` can ask for all the free space it wants, but the
+   row between them was `flex-grow: 0`, so it stayed at content width and
+   there was no free space inside it to distribute. A solo Button in an
+   Island given an explicit width therefore refused to grow, which looked
+   like `.stretchButton` being broken when the row was the problem.
+
+   `min-width: 0` so a long label shrinks inside the pill instead of
+   pushing it wider than the Island. */
+.group {
+	flex-grow: 1;
+	min-width: 0;
+}
+
 /* Single-button mode — see ButtonIslandBase's `isSingleButton` check.
-   Main-axis growth only. Cross-axis fill (every button growing to the
-   island's interior height, Ray's `.menu-button { height: 100% }`) is
-   handled by the `align="stretch"` default on the inner FlexContainer
-   plus `alignItems: stretch` on the Island itself — see ButtonIsland.tsx.
+   Main-axis growth: in the default `direction="row"` that is horizontal,
+   so a lone Button spans whatever inline size the Island has.
+
+   Note this only *consumes* space the Island already has. `shape="pill"`
+   is `inline-flex` — sized to its content — so an Island nobody has
+   widened has nothing to give, and the button stays at content width by
+   design. Widening it is the caller's call; see ButtonIsland.tsx's
+   docblock for the three ways to do it.
+
+   Cross-axis fill (every button growing to the island's interior height,
+   Ray's `.menu-button { height: 100% }`) is separate, and handled by the
+   `align="stretch"` default on the inner FlexContainer plus
+   `alignItems: stretch` on the Island itself — see ButtonIsland.tsx.
    That pair is what keeps a `size="sm"` cluster (WindowControls) and a
    `size="md"` cluster (systemTools) the same height side by side in a
    title bar. */
