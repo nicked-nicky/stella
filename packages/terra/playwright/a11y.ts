@@ -25,7 +25,36 @@ import type { Page } from '@playwright/test';
  * });
  * ```
  */
+/**
+ * Waits for entrance animations to finish before anything measures colour.
+ *
+ * Terra fades components in on mount (`--stella-appear-animation`), and
+ * axe computes contrast from *rendered* colour — so an element sampled
+ * mid-fade reports its text blended toward the background and fails
+ * `color-contrast` for a problem that doesn't exist a few hundred
+ * milliseconds later. Both contrast failures on the suite's first green
+ * run were this: text-tertiary at ~69% opacity read as #888888 rather
+ * than #525252, and text-primary at ~58% read as #777777.
+ *
+ * Infinite animations are filtered out rather than awaited, because
+ * `Spinner`'s rotation never finishes and would hang the run.
+ */
+async function settleAnimations(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const finite = document.getAnimations().filter((animation) => {
+      const iterations = animation.effect?.getComputedTiming().iterations;
+      return iterations !== Infinity;
+    });
+    await Promise.all(
+      // A cancelled animation rejects; that's still "settled" for our purposes.
+      finite.map((animation) => animation.finished.catch(() => undefined))
+    );
+  });
+}
+
 export async function checkA11y(page: Page, selector = '#root'): Promise<void> {
+  await settleAnimations(page);
+
   const { violations } = await new AxeBuilder({ page })
     .include(selector)
     // Terra components are mounted in isolation here, with no page

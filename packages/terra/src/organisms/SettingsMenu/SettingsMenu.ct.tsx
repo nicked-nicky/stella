@@ -93,17 +93,36 @@ test.describe('field controls', () => {
     // The changelog records Input's error state setting outline-color
     // with no outline-style, so the declaration painted nothing — a
     // border-colour-only focus signal is exactly what that produced.
+    //
+    // The ring lives on Input's wrapper <span>, not on the <input>:
+    // the wrapper carries the whole visual box so leading/trailing icons
+    // sit inside the same bordered field, and the input itself is
+    // deliberately borderless and transparent. Reading `outline` off the
+    // input therefore always reports `none` no matter what the component
+    // does.
+    //
+    // The wrapper declares `outline: 2px solid transparent` up front so
+    // focus is a pure colour swap with no layout shift — which is why
+    // the assertion is on outline-*color* changing, not on the outline
+    // appearing.
     const component = await mount(<SettingsMenuFixture />);
     const field = component.getByLabel('Display name');
 
-    await field.focus();
-    const outline = await field.evaluate((el) => {
-      const s = getComputedStyle(el);
-      return { style: s.outlineStyle, width: s.outlineWidth };
-    });
+    const readRing = () =>
+      field.evaluate((el) => {
+        const s = getComputedStyle(el.parentElement!);
+        return { style: s.outlineStyle, width: s.outlineWidth, color: s.outlineColor };
+      });
 
-    expect(outline.style).not.toBe('none');
-    expect(outline.width).not.toBe('0px');
+    const resting = await readRing();
+    expect(resting.color).toBe('rgba(0, 0, 0, 0)');
+
+    await field.focus();
+    const focused = await readRing();
+
+    expect(focused.style).toBe('solid');
+    expect(focused.width).toBe('2px');
+    expect(focused.color).not.toBe(resting.color);
   });
 });
 
