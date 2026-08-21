@@ -82,7 +82,10 @@ export function Tooltip({
 }: TooltipProps) {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLElement | null>(null);
-  const showTimer = useRef<ReturnType<typeof setTimeout>>();
+  // Explicit initial value: React 19's types made useRef's argument
+  // required, so the bare `useRef<T>()` this used to be no longer
+  // compiles. Same runtime behaviour.
+  const showTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const tooltipId = useId();
 
   const handleClose = useCallback(() => setOpen(false), []);
