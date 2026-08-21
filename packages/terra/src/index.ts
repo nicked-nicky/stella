@@ -17,6 +17,7 @@ export {
 } from './atoms/Checkbox';
 export { Radio, type RadioProps, type RadioSize } from './atoms/Radio';
 export { Switch, type SwitchProps, type SwitchSize } from './atoms/Switch';
+export { Slider, type SliderProps, type SliderSize } from './atoms/Slider';
 export { Spinner, type SpinnerProps, type SpinnerSize } from './atoms/Spinner';
 export { Avatar, type AvatarProps, type AvatarSize } from './atoms/Avatar';
 export {
@@ -147,4 +148,5 @@ export {
   type RadiusStyle,
   type Density,
   type BorderWidthStyle,
+  type MotionStyle,
 } from './theme';

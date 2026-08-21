@@ -1,0 +1,407 @@
+/**
+ * Slider Component Styles
+ *
+ * Thumb and track are the same height (--slider-size, one token per
+ * size tier) — a chunky pill groove with the thumb flush inside it,
+ * rather than a thin rail with an oversized circle poking out of it.
+ *
+ * REAL OVERLAYS, NOT NATIVE PSEUDO-ELEMENTS — a native range input's
+ * thumb position and track fill are both computed internally by the
+ * browser, not via `left`/`width` box properties this component could
+ * transition directly, so every *visible* part is a decorative,
+ * `pointer-events: none` sibling span layered on top instead:
+ * `.trackRail` (the base groove), `.trackFill` (the filled portion),
+ * and `.thumbGhost` (the knob). The real `<input>` and its
+ * `::-webkit-slider-thumb`/`::-moz-range-thumb` stay fully interactive
+ * (focus, keyboard, drag) but are painted transparent — only the
+ * overlays show.
+ *
+ * `.trackFill` and `.thumbGhost` are positioned from the exact same
+ * `--slider-fraction` calc() expression (see GHOST THUMB below), so
+ * they can never drift apart the way an independently-computed fill
+ * percentage could — that was a real bug in an earlier version of this
+ * file: the fill used a naive 0–100% while the thumb used an
+ * inset-adjusted formula (accounting for its own radius), so the two
+ * only agreed exactly at the two ends of the track and visibly
+ * disagreed everywhere in between.
+ *
+ * DRAG VS. CLICK — Slider.tsx toggles `.dragging` the moment a pointer
+ * *moves* while pressed (not on the initial press itself), which is
+ * what lets a plain track click keep its spring transition — the first
+ * value jump fires before any movement — while a held drag afterward
+ * disables the transition entirely for 1:1, lag-free tracking.
+ *
+ * Every browser engine needs its own pseudo-elements for the native
+ * range input's hit-target parts, and none of them can be combined into
+ * one selector — the ::-webkit-/::-moz- rules below are each declared
+ * twice, once per engine, because there is no third way to do this in
+ * CSS today.
+ *
+ * @format
+ */
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--stella-space-2);
+	width: 100%;
+}
+
+.label {
+	font-size: var(--stella-text-caption-strong);
+	color: var(--stella-text-secondary);
+}
+
+.wrapper {
+	display: flex;
+	align-items: center;
+	gap: var(--stella-space-3);
+	width: 100%;
+}
+
+/* Positioning context for the ghost thumb overlay — sized to exactly
+   the track's own box (not the whole .wrapper, which also holds the
+   value readout), so the percentage math in .thumbGhost's `left` lines
+   up with the real thumb underneath it. */
+.trackBox {
+	position: relative;
+	display: flex;
+	align-items: center;
+	flex: 1;
+	min-width: 0;
+}
+
+/* ============================================================================
+   TRACK — the native <input type="range">, appearance reset so every
+   engine's default chrome is gone and only the rules below paint it.
+   ============================================================================ */
+
+.track {
+	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
+	animation: var(--stella-appear-animation);
+
+	width: 100%;
+	min-width: 0;
+	height: var(--slider-size);
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+	cursor: pointer;
+	outline: none;
+}
+
+.track:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+/* Webkit/Blink (Chrome, Edge, Safari) — transparent. The visible rail/
+   fill are .trackRail/.trackFill, real overlays positioned in sync
+   below (see file docblock for why). This pseudo-element only keeps
+   the native hit-target sized correctly. */
+.track::-webkit-slider-runnable-track {
+	height: var(--slider-size);
+	background: transparent;
+}
+
+/* Transparent — the visible circle is .thumbGhost, positioned in sync
+   below. This one keeps the real hit-target, keyboard focus, and drag
+   handling; only its paint is gone. */
+.track::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: var(--slider-size);
+	height: var(--slider-size);
+	border-radius: var(--stella-radius-panel);
+	background: transparent;
+	border: none;
+	box-shadow: none;
+}
+
+.track:focus-visible::-webkit-slider-thumb {
+	outline: 2px solid var(--stella-focus-ring);
+	outline-offset: 2px;
+}
+
+/* Firefox — same split, transparent for the same reason. */
+.track::-moz-range-track {
+	height: var(--slider-size);
+	background: transparent;
+}
+
+.track::-moz-range-thumb {
+	width: var(--slider-size);
+	height: var(--slider-size);
+	border-radius: var(--stella-radius-panel);
+	background: transparent;
+	border: none;
+	box-shadow: none;
+}
+
+.track:focus-visible::-moz-range-thumb {
+	outline: 2px solid var(--stella-focus-ring);
+	outline-offset: 2px;
+}
+
+/* Firefox draws its own dotted internal focus ring on range inputs —
+   suppressed so it doesn't double up with the real one above. */
+.track::-moz-focus-outer {
+	border: 0;
+}
+
+/* ============================================================================
+   TRACK RAIL / FILL — real overlays, not a gradient baked into the
+   native pseudo-element (see file docblock for why). `.trackRail` is
+   the static, full-width groove; `.trackFill` sits on top and is the
+   only one that moves, its `width` computed from the identical
+   `--slider-fraction` calc() expression `.thumbGhost` uses below — so
+   the filled edge and the thumb's center are, structurally, always the
+   same point. `width` is a genuinely animatable property (unlike a
+   gradient color-stop position), so this also gets a real transition
+   for free where the old gradient-based fill had none.
+   ============================================================================ */
+
+.trackRail {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	height: var(--slider-size);
+	border-radius: var(--stella-radius-panel);
+	background-color: var(--stella-switch-track);
+	pointer-events: none;
+}
+
+.trackFill {
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	height: var(--slider-size);
+	border-top-left-radius: var(--stella-radius-panel);
+	border-bottom-left-radius: var(--stella-radius-panel);
+	background-color: var(--stella-switch-track-on);
+	width: calc(
+		(100% - var(--slider-size)) * var(--slider-fraction) + var(--slider-size) /
+			2
+	);
+	pointer-events: none;
+	transition: width var(--stella-motion-base) var(--stella-easing-spring);
+}
+
+/* Disabled — dims every visible overlay together. The native input's
+   own `:disabled` opacity (above) does nothing visible on its own,
+   since it's already painted fully transparent; this is what actually
+   reads as "disabled" to the eye. */
+.track:disabled ~ .trackRail,
+.track:disabled ~ .trackFill,
+.track:disabled ~ .thumbGhost {
+	opacity: 0.5;
+}
+
+/* Actively dragging — fill tracks the pointer 1:1, no spring lag,
+   same reasoning as .thumbGhost below. */
+.trackBox.dragging .trackFill {
+	transition: none;
+}
+
+/* ============================================================================
+   GHOST THUMB — see file docblock. `--slider-fraction` (0–1, written
+   inline by Slider.tsx) locates its center; the calc() accounts for the
+   same edge-inset every native range thumb already has (a thumb's
+   center can only travel from half its own width to track-width minus
+   half its width, not the full 0–100%), so it sits exactly over the
+   real, invisible thumb rather than drifting from it at the extremes.
+   ============================================================================ */
+
+.thumbGhost {
+	position: absolute;
+	top: 50%;
+	left: calc(
+		(100% - var(--slider-size)) * var(--slider-fraction) + var(--slider-size) /
+			2
+	);
+	transform: translate(-50%, -50%) scale(var(--slider-thumb-scale, 1));
+	width: var(--slider-size);
+	height: var(--slider-size);
+	border-radius: var(--stella-radius-panel);
+	background-color: var(--stella-text-on-fill);
+	box-shadow: var(--stella-shadow-xs);
+	border: var(--stella-border-width) solid var(--stella-border-default);
+	pointer-events: none;
+
+	transition:
+		left var(--stella-motion-base) var(--stella-easing-spring),
+		box-shadow var(--stella-motion-fast) var(--stella-easing-out),
+		transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
+
+/* Grow on hover (an affordance: "this is grabbable"), shrink on press
+   (tactile squish), same idea as Button/Switch's existing press-scale,
+   just applied via a sibling selector since the ghost thumb is
+   `pointer-events: none` and can never receive its own :hover/:active.
+   Declared in this order so :active wins when both match (mouse down
+   while hovering). Kept subtle (1.06/0.92) — see Checkbox's box for the
+   same call on why. */
+.track:hover:not(:disabled) ~ .thumbGhost {
+	--slider-thumb-scale: 1.06;
+	box-shadow: var(--stella-shadow-sm);
+}
+
+.track:active:not(:disabled) ~ .thumbGhost {
+	--slider-thumb-scale: 0.92;
+}
+
+/* Actively dragging — position tracks the pointer 1:1, no spring lag.
+   The hover/press *scale* transition above stays alive (it's the
+   thumb's size reacting to being held, not its position), only `left`
+   drops out of the list here. Re-enabled the instant the pointer is
+   released, so the *next* interaction (a fresh click elsewhere on the
+   track, or a keyboard step) springs again. See Slider.tsx's pointer
+   handlers. */
+.trackBox.dragging .thumbGhost {
+	transition: transform var(--stella-motion-fast) var(--stella-easing-spring);
+}
+
+/* ============================================================================
+   COMMIT PULSE — a brief expanding, fading ring centered on the thumb,
+   played whenever Slider.tsx's `pulsing` flips true (see
+   ../../utils/usePulse.ts) — i.e. whenever a value actually *commits*
+   (click, keyboard step, drag release, typed entry). Same
+   `--slider-fraction`-driven `left` as the ghost thumb, so it's always
+   centered on it regardless of position. Centered via `margin` rather
+   than `transform: translate(-50%,-50%)` so `transform` stays free for
+   the shared scale-only pulse keyframe (same reasoning as Switch's
+   pulseRing).
+   ============================================================================ */
+
+.thumbPulse {
+	composes: pulseRing from "../../styles/shared/pulseRing.module.css";
+	position: absolute;
+	top: 50%;
+	left: calc(
+		(100% - var(--slider-size)) * var(--slider-fraction) + var(--slider-size) /
+			2
+	);
+	margin-top: calc(var(--slider-size) / -2);
+	margin-left: calc(var(--slider-size) / -2);
+	width: var(--slider-size);
+	height: var(--slider-size);
+	background-color: var(--stella-switch-track-on);
+}
+
+.wrapper.pulsing .thumbPulse {
+	animation: var(--stella-pulse-ring-animation);
+}
+
+/* The value readout gets the same "something just settled" beat, a
+   quick scale pop rather than the expanding ring (a button ballooning
+   past its own box would clip against neighbours). */
+@keyframes stella-slider-value-pop {
+	0% {
+		transform: scale(1);
+	}
+	40% {
+		transform: scale(1.2);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+.wrapper.pulsing .valueButton {
+	animation: stella-slider-value-pop 350ms var(--stella-easing-spring);
+}
+
+/* ============================================================================
+   SIZES — track/thumb diameter (equal, see file docblock) and the value
+   readout's font size (inherited by .valueButton/.valueInput via
+   `font: inherit`). Fixed pixels, deliberately NOT density-scaled, same
+   reasoning as Switch: a slider thumb is a pointer target, and the
+   fill-percentage math depends on definite values.
+   ============================================================================ */
+
+.size-sm {
+	--slider-size: 14px;
+	font-size: var(--stella-text-caption);
+}
+
+.size-md {
+	--slider-size: 18px;
+	font-size: var(--stella-text-body);
+}
+
+.size-lg {
+	--slider-size: 22px;
+	font-size: var(--stella-text-body);
+}
+
+/* ============================================================================
+   VALUE READOUT — plain `<button>`/`<input type="number">`, styled
+   locally rather than composing the Button/Input atoms. Checkbox, Radio,
+   and Switch all take the same approach for their own small interactive
+   parts — atoms in this kit don't reach for sibling atoms just to save
+   a few lines of CSS.
+   ============================================================================ */
+
+.valueButton {
+	flex-shrink: 0;
+	min-width: 2.5em;
+	padding: var(--stella-space-1) var(--stella-space-2);
+	border: var(--stella-border-width) solid transparent;
+	border-radius: var(--stella-radius-panel);
+	background: none;
+	color: var(--stella-text-secondary);
+	font: inherit;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+	cursor: pointer;
+
+	transition: background-color var(--stella-motion-fast)
+		var(--stella-easing-out);
+}
+
+.valueButton:hover:not(:disabled) {
+	background-color: var(--stella-state-hover);
+}
+
+.valueButton:focus-visible {
+	outline: 2px solid var(--stella-focus-ring);
+	outline-offset: 2px;
+}
+
+.valueButton:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.valueInput {
+	flex-shrink: 0;
+	width: 3.5em;
+	padding: var(--stella-space-1) var(--stella-space-2);
+	border: var(--stella-border-width) solid var(--stella-focus-ring);
+	border-radius: var(--stella-radius-panel);
+	background-color: var(--stella-surface-header);
+	color: var(--stella-text-primary);
+	font: inherit;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+	outline: none;
+	/* Chrome/Safari/Edge's built-in up/down spinner reads as visual
+	   noise here — the track is already the fine-adjustment affordance,
+	   this field is for typing an exact value once. Firefox's stepper
+	   is suppressed the same way, via -moz-appearance below. */
+	-moz-appearance: textfield;
+}
+
+.valueInput:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.valueInput::-webkit-outer-spin-button,
+.valueInput::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
