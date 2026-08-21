@@ -11,3 +11,10 @@ export type {
   SettingsValues,
   SettingsFieldValue,
 } from './types';
+export {
+  appearanceSettingsCategory,
+  getAppearanceValues,
+  applyAppearanceChange,
+  type AppearanceSettingsValues,
+  type AppearanceThemeControls,
+} from './appearanceCategory';

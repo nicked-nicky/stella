@@ -94,6 +94,11 @@ export {
   type SettingsChoiceOption,
   type SettingsValues,
   type SettingsFieldValue,
+  appearanceSettingsCategory,
+  getAppearanceValues,
+  applyAppearanceChange,
+  type AppearanceSettingsValues,
+  type AppearanceThemeControls,
 } from './organisms/SettingsMenu';
 export { Popover, type PopoverProps } from './organisms/Popover';
 export { Menu, type MenuProps, type MenuItemProps } from './organisms/Menu';
