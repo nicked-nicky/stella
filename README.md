@@ -17,7 +17,7 @@
 
 A React-first, runtime-agnostic UI kit with a GTK 4 / libadwaita-inspired visual identity — built for fast, native-feeling desktop apps (Tauri, Electron, or any webview), and just as usable on the web.
 
-Zero runtime dependencies and zero runtime CSS-in-JS. Theming is CSS custom properties, not JS-computed styles, so changing the colour scheme, density, rounding, or border weight never forces a React re-render across the tree.
+Zero runtime dependencies and zero runtime CSS-in-JS. Theming is CSS custom properties, not JS-computed styles, so changing the colour scheme, density, rounding, border weight, or motion never forces a React re-render across the tree.
 
 **[WIKI.md](./WIKI.md)** — how to develop, how to use components, component structure & conventions, architecture reference, testing. **[CONTRIBUTING.md](./CONTRIBUTING.md)** — how to send a change.
 
@@ -42,9 +42,9 @@ The `alpha` tag is required: `latest` is deliberately unset while the API can st
 
 What's solid:
 
-- 22 components across atoms, molecules, organisms and layout, plus three app-level providers.
+- 23 components across atoms, molecules, organisms and layout, plus three app-level providers.
 - 204 tests: 166 in Vitest for logic, ARIA and keyboard behaviour, 38 in Playwright for things only a real browser can answer (resolved CSS, computed geometry), with axe-core scanning the component tree.
-- Zero runtime dependencies. React and React DOM are peers; `lucide-react` is an _optional_ peer, only if you use `Icon` with it.
+- Zero runtime dependencies. React and React DOM are the only peers.
 - CI runs format, typecheck, both test layers and the build on every push.
 
 What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#known-gaps):
@@ -57,20 +57,21 @@ What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#kn
 
 ### Atoms
 
-| Component  | What it is                                                                                                                              |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `Avatar`   | Circular user/entity representation — image with initials fallback.                                                                     |
-| `Badge`    | Compact status/label indicator. Non-interactive.                                                                                        |
-| `Button`   | The primary interactive element. Carries no border, surface, or radius of its own — all come from the wrapping `ButtonIsland`.          |
-| `Checkbox` | Native `<input type="checkbox">`, including indeterminate state.                                                                        |
-| `Divider`  | Visual separator between content groups (horizontal or vertical rule).                                                                  |
-| `Icon`     | Sizing/color wrapper around any icon element. Terra ships no icon set — bring your own (`lucide-react` is an optional peer dependency). |
-| `Input`    | Bare text field atom.                                                                                                                   |
-| `Island`   | The core structural container — panel, pill, or card surface with tone/shape variants everything else builds on.                        |
-| `Radio`    | Native `<input type="radio">`, with roving arrow-key navigation between grouped radios for free.                                        |
-| `Spinner`  | Indeterminate loading indicator, inherits `currentColor`.                                                                               |
-| `Switch`   | GTK-style toggle — no native HTML switch element, so this is the one atom with custom keyboard/ARIA wiring on top of a `<button>`.      |
-| `Text`     | Typography primitive mapping directly to Terra's type scale.                                                                            |
+| Component  | What it is                                                                                                                                                 |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Avatar`   | Circular user/entity representation — image with initials fallback.                                                                                        |
+| `Badge`    | Compact status/label indicator. Non-interactive.                                                                                                           |
+| `Button`   | The primary interactive element. Carries no border, surface, or radius of its own — all come from the wrapping `ButtonIsland`.                             |
+| `Checkbox` | Native `<input type="checkbox">`, including indeterminate state.                                                                                           |
+| `Divider`  | Visual separator between content groups (horizontal or vertical rule).                                                                                     |
+| `Icon`     | Sizing/color wrapper around any icon element. Terra ships no icon set — bring your own; a handful of chrome/SettingsMenu glyphs live in `utils/icons.tsx`. |
+| `Input`    | Bare text field atom.                                                                                                                                      |
+| `Island`   | The core structural container — panel, pill, or card surface with tone/shape variants everything else builds on.                                           |
+| `Radio`    | Native `<input type="radio">`, with roving arrow-key navigation between grouped radios for free.                                                           |
+| `Slider`   | Native `<input type="range">` with ghost-thumb overlay, animated fill, and editable value readout.                                                         |
+| `Spinner`  | Indeterminate loading indicator, inherits `currentColor`.                                                                                                  |
+| `Switch`   | GTK-style toggle — no native HTML switch element, so this is the one atom with custom keyboard/ARIA wiring on top of a `<button>`.                         |
+| `Text`     | Typography primitive mapping directly to Terra's type scale.                                                                                               |
 
 ### Layout
 
@@ -99,7 +100,7 @@ What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#kn
 
 ## Theming
 
-`ThemeManager` writes CSS custom properties to the document root; `ThemeProvider`/`useTheme` is the React binding most consumers use. Four independent axes, each backed by a scale token — set one, everything reading it updates, no re-render required:
+`ThemeManager` writes CSS custom properties to the document root; `ThemeProvider`/`useTheme` is the React binding most consumers use. Five independent axes, each backed by a scale token — set one, everything reading it updates, no re-render required:
 
 There is deliberately **no accent hue**. Stella-Componente has a single neutral colour scheme, and colour is reserved for exactly five status meanings (success / info / warning / error / debug) carried by `Badge` and `Notification`. A "checked" control inverts to the foreground tone rather than picking a brand colour.
 
@@ -109,6 +110,7 @@ There is deliberately **no accent hue**. Stella-Componente has a single neutral 
 | `radius`      | `sharp` / `default` / `round`         |
 | `density`     | `compact` / `default` / `comfortable` |
 | `borderWidth` | `none` / `thin` / `default` / `thick` |
+| `motion`      | `system` / `reduced` / `off`          |
 
 ```tsx
 import { ThemeProvider, useTheme } from "@stella-componente/terra";

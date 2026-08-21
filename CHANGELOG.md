@@ -4,6 +4,28 @@ All notable changes to Stella-Componente are documented here. Format loosely fol
 
 ## [Unreleased]
 
+## [0.1.0-alpha.1] — 2026-08-21
+
+### Added
+
+- **Slider atom** (`atoms/Slider`) — native `<input type="range">` with a decorative ghost thumb overlay so the thumb position is animatable. Live vs. committed value split (live updates every tick, `onValueChange` fires once per gesture), editable numeric readout, `showValue` prop, and the shared commit-pulse on settle.
+- **Commit-pulse feedback** — a brief expanding, fading ring played when a value actually commits. Shared `utils/usePulse.ts` hook and `styles/shared/pulseRing.module.css` base, `tokens.css` `--stella-pulse-ring-animation`/`stella-pulse-ring` keyframes. Integrated in `Checkbox`, `Radio`, `Switch`, and `Slider`; JS-gated (onChange/onClick) so pre-checked/pre-set values never pulse on mount.
+- **Motion theme axis** — `MotionStyle` (`'system'` | `'reduced'` | `'off'`) mirroring `ColorScheme`'s system-deference shape. `ThemeManager.setMotion()` / `ThemeProvider.setMotion()` write `data-stella-motion`; `tokens.css` collapses durations for `reduced` and kills `animation`/`transition` for `off`. `Spinner` is explicitly exempt at both tiers so loading never looks hung.
+- **Pre-built Appearance settings category** — `organisms/SettingsMenu/appearanceCategory.tsx` (`appearanceSettingsCategory`, `getAppearanceValues()`, `applyAppearanceChange()`, `AppearanceThemeControls`, `AppearanceSettingsValues`). Bridges `ThemeManager`/`useTheme()` to a ready-made `SettingsCategory` covering colorScheme/radius/density/borderWidth/motion; fully optional/composable.
+- **Theme icons** — `PaletteIcon`, `SunIcon`, `MoonIcon`, `MonitorIcon` in `utils/icons.tsx` for the appearance category (and any consumer use).
+
+### Changed
+
+- **Hover/press micro-interactions** on form controls — `Checkbox` box, `Radio` dot, `Switch` thumb, and `Slider` ghost thumb use a single-scale CSS variable per control (e.g. `--checkbox-box-scale`, `--switch-thumb-scale`, `--slider-thumb-scale`) for a subtle grow on hover (1.03–1.06×) and shrink on press (0.92–0.94×). `Switch` thumb translation is now via `--switch-thumb-x` rather than a direct `transform`.
+- `Input` hover/press now uses a `::before` overlay animating `opacity` instead of a swapped `background-image` gradient (gradients are not reliably interpolable — the overlay gives a smooth tween).
+- `Spinner` retains its spin at `prefers-reduced-motion` and at explicit `data-stella-motion="reduced"`/`"off"` (with `!important` for the `off` kill-switch).
+- **Build output is `dist/` only** — `package.json` `files` is now `dist/**/*.js` + `dist/**/*.d.ts` + `dist/**/*.css` + `LICENSE` + `README.md` (was `dist` + `src` with negations). Published tarball no longer ships `src/`; debugging still works byte-for-byte via `tsconfig.json` `inlineSources: true` (sources embedded in each `.js.map`) and `.js` comments are stripped (`removeComments: true`, declaration emit untouched so JSDoc stays in `.d.ts`). `scripts/copy-css.mjs` now strips `/* … */` CSS comments on copy to `dist/` (tokens.css alone is ~59% comments).
+- **CI** — workflow now also triggers on `tags: ['v*']` for releases (comment-only cleanup).
+
+### Removed
+
+- `lucide-react` peer and dev dependency — `@stella-componente/terra` now has zero runtime dependencies by default (peers are `react`/`react-dom` only). The optional `peerDependenciesMeta` entry is gone; internal chrome icons live in `utils/icons.tsx`.
+
 ## [0.1.0-alpha.0] — 2026-08-21
 
 First published release of `@stella-componente/terra`, on the `alpha` dist-tag so it

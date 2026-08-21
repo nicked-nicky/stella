@@ -51,9 +51,9 @@ This works because `@stella-componente/terra`'s `exports` point at `./src/index.
 pnpm --filter @stella-componente/terra build
 ```
 
-Terra builds unbundled: `tsc` compiles `src/` to `dist/` 1:1 (declarations included), then `scripts/copy-css.mjs` copies every `*.css`/`*.module.css` alongside its compiled `.js` twin, since `tsc` only touches TypeScript. No bundler in the middle — the consuming app's own bundler (Vite, webpack, Next, a Tauri frontend) resolves the CSS Modules imports from `dist/`, the same way it already resolves them from any other package. This keeps Terra genuinely thin (zero build-tool dependency shipped or required beyond `tsc`) and gives perfect tree-shaking for free, since there's no bundler decision-making step to get in the way of dead-code elimination.
+Terra builds unbundled: `tsc` compiles `src/` to `dist/` 1:1 (declarations included, `inlineSources: true` + `removeComments: true` — the published `dist/*.js` is comment-free but each `.js.map` embeds the original `src/` text so debugging lands in the real source without shipping `src/`), then `scripts/copy-css.mjs` copies every `*.css`/`*.module.css` alongside its compiled `.js` twin while stripping `/* … */` comments (tokens.css alone is ~59% comments), since `tsc` only touches TypeScript. No bundler in the middle — the consuming app's own bundler (Vite, webpack, Next, a Tauri frontend) resolves the CSS Modules imports from `dist/`, the same way it already resolves them from any other package. This keeps Terra genuinely thin (zero build-tool dependency shipped or required beyond `tsc`) and gives perfect tree-shaking for free, since there's no bundler decision-making step to get in the way of dead-code elimination.
 
-The tradeoff: `dist/` output uses extensionless relative imports (`from '../atoms/Button'`), which needs a bundler to resolve — running the built output under plain Node ESM directly won't work. Every realistic Stella-Componente consumer (Vite, webpack, Next, Tauri) already has one, so this hasn't been a real constraint.
+The tradeoff: `dist/` output uses extensionless relative imports (`from '../atoms/Button'`), which needs a bundler to resolve — running the built output under plain Node ESM directly won't work. Every realistic Stella-Componente consumer (Vite, webpack, Next, Tauri) already has one, so this hasn't been a real constraint. `declarationMap` has no `inlineSources` equivalent, so "go to definition" on a published install lands on the `.d.ts` signature (still fully typed with JSDoc) rather than the commented implementation — runtime debugging via `.js.map` is unaffected.
 
 **Typecheck:**
 
@@ -237,7 +237,7 @@ Only the root component (`SettingsMenu`) is exported from the barrel. Everything
 
 **Accessibility:** native HTML element first (`<input type="checkbox">`, real `<button>`) — custom ARIA wiring (`role="switch"`, roving tabindex) only when no native element matches, and even then keyboard behavior and focus management are non-optional, not an opt-in prop. `:focus-visible` gets a real ring on every interactive component; see the inset-ring pattern in [Architecture reference](#architecture-reference).
 
-**Icons:** Terra ships no icon set. Symbolic UI glyphs it does need internally (window controls, dialog close) live in `utils/icons.tsx`, one file, no duplication — check there before inlining a new SVG.
+**Icons:** Terra ships no icon set. Symbolic UI glyphs it does need internally (window controls, dialog close, plus `Palette`/`Sun`/`Moon`/`Monitor` for the pre-built `appearanceSettingsCategory`) live in `utils/icons.tsx`, one file, no duplication — check there before inlining a new SVG.
 
 ## Architecture reference
 
@@ -245,14 +245,15 @@ Deeper design reasoning that used to live as long inline comments scattered acro
 
 ### Design tokens & theming
 
-`ThemeManager` (framework-agnostic) writes CSS custom properties to the document root; `ThemeProvider`/`useTheme` is the React binding. Four independent axes, each backed by a scale token multiplier so changing one updates every component reading it with no re-render:
+`ThemeManager` (framework-agnostic) writes CSS custom properties to the document root; `ThemeProvider`/`useTheme` is the React binding. Five independent axes, each backed by a scale token multiplier so changing one updates every component reading it with no re-render:
 
-| Axis         | Token                   | Values                                |
-| ------------ | ----------------------- | ------------------------------------- |
-| Color scheme | native `light-dark()`   | `light` / `dark` / `system`           |
-| Radius       | `--stella-radius-scale` | `sharp` / `default` / `round`         |
-| Density      | `--stella-space-scale`  | `compact` / `default` / `comfortable` |
-| Border width | `--stella-border-width` | `none` / `thin` / `default` / `thick` |
+| Axis         | Token                                      | Values                                |
+| ------------ | ------------------------------------------ | ------------------------------------- |
+| Color scheme | native `light-dark()`                      | `light` / `dark` / `system`           |
+| Radius       | `--stella-radius-scale`                    | `sharp` / `default` / `round`         |
+| Density      | `--stella-space-scale`                     | `compact` / `default` / `comfortable` |
+| Border width | `--stella-border-width`                    | `none` / `thin` / `default` / `thick` |
+| Motion       | `data-stella-motion` + `--stella-motion-*` | `system` / `reduced` / `off`          |
 
 **Single radius token model:** every component reads `--stella-radius-panel` for its rounding — there is no per-component radius scale. This was a deliberate consolidation (there used to be `-xs/-sm/-lg/-full/-pill` variants); one token that everything shares means changing the kit's overall "roundedness" is a single edit, and every surface stays visually consistent with every other one at any radius setting.
 
