@@ -15,3 +15,6 @@ blob-report/
 *.log
 *.out
 terra-test/
+
+# npm pack output, when run without --dry-run.
+*.tgz
