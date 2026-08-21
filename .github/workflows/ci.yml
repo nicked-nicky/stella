@@ -21,11 +21,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No `version:` here on purpose. package.json's `packageManager`
+      # field already pins pnpm, and action-setup treats declaring it in
+      # both places as a hard error rather than a preference — so the
+      # single source of truth is the one that also governs local installs
+      # and Corepack.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 11
 
       # Vite 8 requires ^20.19 || >=22.12; 22 keeps CI clear of that edge.
+      # (The runner's own Node-20 deprecation notice is about the runtime
+      # GitHub executes actions with, not this version.)
       - uses: actions/setup-node@v4
         with:
           node-version: 22
