@@ -19,12 +19,12 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/nicked-nicky/stella.git",
+		"url": "git+https://github.com/nicked-nicky/stella-componente.git",
 		"directory": "packages/terra"
 	},
-	"homepage": "https://github.com/nicked-nicky/stella#readme",
+	"homepage": "https://github.com/nicked-nicky/stella-componente#readme",
 	"bugs": {
-		"url": "https://github.com/nicked-nicky/stella/issues"
+		"url": "https://github.com/nicked-nicky/stella-componente/issues"
 	},
 	"type": "module",
 	"main": "./src/index.ts",

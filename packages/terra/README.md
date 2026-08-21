@@ -58,7 +58,7 @@ export function App() {
 
 22 components across atoms, molecules, organisms and layout primitives — `Avatar`, `Badge`, `Button`, `Checkbox`, `Divider`, `Icon`, `Input`, `Island`, `Radio`, `Spinner`, `Switch`, `Text`, `FlexContainer`, `ButtonIsland`, `Notification`, `Tooltip`, `WindowControls`, `Dialog`, `Menu`, `Popover`, `SettingsMenu`, `WindowChrome`.
 
-Full component reference, architecture notes and the theming API live in the [repository README](https://github.com/nicked-nicky/stella#readme) and [WIKI](https://github.com/nicked-nicky/stella/blob/alpha/WIKI.md).
+Full component reference, architecture notes and the theming API live in the [repository README](https://github.com/nicked-nicky/stella-componente#readme) and [WIKI](https://github.com/nicked-nicky/stella-componente/blob/alpha/WIKI.md).
 
 ## Theming
 

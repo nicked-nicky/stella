@@ -1,6 +1,6 @@
 # Stella-Componente
 
-[![CI](https://github.com/nicked-nicky/stella/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/nicked-nicky/stella/actions/workflows/ci.yml)
+[![CI](https://github.com/nicked-nicky/stella-componente/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/nicked-nicky/stella-componente/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@stella-componente/terra/alpha.svg)](https://www.npmjs.com/package/@stella-componente/terra)
 [![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](#project-status)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
