@@ -68,7 +68,7 @@ importers:
 
   packages/terra-test:
     dependencies:
-      '@stella/terra':
+      '@stella-componente/terra':
         specifier: workspace:*
         version: link:../terra
       lucide-react:
@@ -102,7 +102,7 @@ importers:
 
   packages/vidrio:
     dependencies:
-      '@stella/terra':
+      '@stella-componente/terra':
         specifier: workspace:*
         version: link:../terra
       react:
