@@ -15,6 +15,7 @@ import { checkA11y } from '../../../playwright/a11y';
 test.describe('nav row states', () => {
   test('the current category stays lit whether or not it is hovered', async ({
     mount,
+    page,
   }) => {
     // SettingsMenu.module.css states the intent outright: "Active is just
     // hover, but sticky." The current row and a hovered row share a fill
@@ -32,6 +33,10 @@ test.describe('nav row states', () => {
     expect(atRest).not.toBe('rgba(0, 0, 0, 0)');
 
     await other.hover();
+    // Outlasts the transition window on purpose: a "must not change"
+    // assertion read immediately would sample the old value and stay
+    // green even if hovering a sibling did disturb the current row.
+    await page.waitForTimeout(250);
     const whileOtherHovered = await current.evaluate(
       (el) => getComputedStyle(el).backgroundColor
     );
@@ -118,11 +123,15 @@ test.describe('field controls', () => {
     expect(resting.color).toBe('rgba(0, 0, 0, 0)');
 
     await field.focus();
-    const focused = await readRing();
 
+    // Polled, not read once: outline-color is transitioned over
+    // --stella-motion-fast, and a single read right after focus catches
+    // the ring still interpolating away from transparent.
+    await expect.poll(async () => (await readRing()).color).not.toBe(resting.color);
+
+    const focused = await readRing();
     expect(focused.style).toBe('solid');
     expect(focused.width).toBe('2px');
-    expect(focused.color).not.toBe(resting.color);
   });
 });
 

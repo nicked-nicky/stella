@@ -24,6 +24,18 @@ async function token(page: import('@playwright/test').Page, name: string) {
   );
 }
 
+/**
+ * Waits out the kit's longest interaction transition.
+ *
+ * Only for assertions that a value has *not* changed. Those can't use
+ * `expect.poll` — it would pass on the first tick, before any transition
+ * has had a chance to run, which is exactly the stale read that makes
+ * the assertion vacuous. Comfortably longer than --stella-motion-fast.
+ */
+async function settle(page: import('@playwright/test').Page) {
+  await page.waitForTimeout(250);
+}
+
 test.describe('state-layer ladder', () => {
   test('press steps firmer than hover, and selected deliberately matches hover', async ({
     mount,
@@ -104,13 +116,16 @@ test.describe('state-layer ladder', () => {
     const restColor = await button.evaluate((el) => getComputedStyle(el).color);
     await button.hover();
 
-    const hoverBackground = await button.evaluate(
-      (el) => getComputedStyle(el).backgroundColor
-    );
-    const hoverColor = await button.evaluate((el) => getComputedStyle(el).color);
-
-    expect(hoverBackground).not.toBe('rgba(0, 0, 0, 0)');
-    expect(hoverColor).not.toBe(restColor);
+    // Polled: background-color and color are both transitioned over
+    // --stella-motion-fast, so a single read here samples the
+    // interpolation rather than the destination. See ButtonIsland.ct.tsx
+    // for the run where that difference flipped two tests red.
+    await expect
+      .poll(() => button.evaluate((el) => getComputedStyle(el).backgroundColor))
+      .not.toBe('rgba(0, 0, 0, 0)');
+    await expect
+      .poll(() => button.evaluate((el) => getComputedStyle(el).color))
+      .not.toBe(restColor);
   });
 
   test('press escalates beyond hover rather than repeating it', async ({
@@ -124,22 +139,24 @@ test.describe('state-layer ladder', () => {
     );
     const button = component.getByRole('button', { name: 'Save' });
 
+    const read = () =>
+      button.evaluate((el) => getComputedStyle(el).backgroundColor);
+
+    // Let hover finish landing before capturing the value the press is
+    // compared against — otherwise the baseline is itself a half-finished
+    // interpolation, and the comparison means nothing in either direction.
     await button.hover();
-    const hoverBackground = await button.evaluate(
-      (el) => getComputedStyle(el).backgroundColor
-    );
+    await expect.poll(read).not.toBe('rgba(0, 0, 0, 0)');
+    const hoverBackground = await read();
 
     await page.mouse.down();
-    const pressBackground = await button.evaluate(
-      (el) => getComputedStyle(el).backgroundColor
-    );
+    await expect.poll(read).not.toBe(hoverBackground);
     await page.mouse.up();
-
-    expect(pressBackground).not.toBe(hoverBackground);
   });
 
   test('the selected state out-specifies hover, so it does not flicker while hovered', async ({
     mount,
+    page,
   }) => {
     // The CSS repeats .active across :hover/:active precisely to win the
     // specificity fight — easy to lose in a refactor, invisible without
@@ -155,6 +172,11 @@ test.describe('state-layer ladder', () => {
       (el) => getComputedStyle(el).backgroundColor
     );
     await button.hover();
+    // A "must not change" assertion has to outlast the transition window,
+    // or it passes on a stale sample and would stay green even if the
+    // specificity fight had been lost. Polling is no help here — it would
+    // succeed on the first tick for the same reason.
+    await settle(page);
     const hoverBackground = await button.evaluate(
       (el) => getComputedStyle(el).backgroundColor
     );
@@ -187,7 +209,7 @@ test.describe('state-layer ladder', () => {
     expect(selectedBackground).not.toBe(plainBackground);
   });
 
-  test('a disabled button does not respond to hover', async ({ mount }) => {
+  test('a disabled button does not respond to hover', async ({ mount, page }) => {
     const component = await mount(
       <ButtonIsland>
         <Button disabled>Save</Button>
@@ -199,6 +221,7 @@ test.describe('state-layer ladder', () => {
       (el) => getComputedStyle(el).backgroundColor
     );
     await button.hover({ force: true });
+    await settle(page);
     const hoverBackground = await button.evaluate(
       (el) => getComputedStyle(el).backgroundColor
     );

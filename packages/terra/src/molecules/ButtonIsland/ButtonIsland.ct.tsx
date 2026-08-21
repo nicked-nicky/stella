@@ -11,6 +11,15 @@ import { Button } from '../../atoms/Button';
 // The stretch tests below are here for the same reason: whether a box
 // actually grew is a measured fact about layout, and jsdom reports every
 // element as 0×0.
+//
+// Colour-after-interaction is asserted with `expect.poll`, never with a
+// single read. Every one of these properties is transitioned over
+// --stella-motion-fast, and getComputedStyle during a transition returns
+// the *current* interpolated value — so reading immediately after a
+// hover reliably catches the colour the element is still leaving. That
+// makes a plain read a coin toss on timing: these two tests passed one
+// run and failed the next with no source change between them. Polling
+// asserts what the property settles on, which is the actual contract.
 
 test('separator between two buttons changes color on hover', async ({ mount }) => {
   const component = await mount(
@@ -24,9 +33,10 @@ test('separator between two buttons changes color on hover', async ({ mount }) =
   const restingColor = await separator.evaluate((el) => getComputedStyle(el).backgroundColor);
 
   await component.getByRole('button', { name: 'Left' }).hover();
-  const hoveredColor = await separator.evaluate((el) => getComputedStyle(el).backgroundColor);
 
-  expect(hoveredColor).not.toBe(restingColor);
+  await expect
+    .poll(() => separator.evaluate((el) => getComputedStyle(el).backgroundColor))
+    .not.toBe(restingColor);
 });
 
 test('outer Island border changes color on button hover', async ({ mount }) => {
@@ -41,9 +51,10 @@ test('outer Island border changes color on button hover', async ({ mount }) => {
   const restingColor = await island.evaluate((el) => getComputedStyle(el).borderColor);
 
   await component.getByRole('button', { name: 'Left' }).hover();
-  const hoveredColor = await island.evaluate((el) => getComputedStyle(el).borderColor);
 
-  expect(hoveredColor).not.toBe(restingColor);
+  await expect
+    .poll(() => island.evaluate((el) => getComputedStyle(el).borderColor))
+    .not.toBe(restingColor);
 });
 
 test.describe('single-button stretch', () => {
