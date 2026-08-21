@@ -10,5 +10,15 @@
 		"rootDir": "./src"
 	},
 	"include": ["src"],
-	"exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.ct.tsx"]
+	// `.story.tsx` is here for the same reason as the test files: Playwright
+	// CT can't mount a component defined inside a `.ct.tsx`, so its fixtures
+	// live in sibling story modules. They are test scaffolding, not part of
+	// the public surface, and were shipping into dist/ until this line
+	// existed — a package consumer could `import` the SettingsMenu fixture.
+	"exclude": [
+		"src/**/*.test.ts",
+		"src/**/*.test.tsx",
+		"src/**/*.ct.tsx",
+		"src/**/*.story.tsx"
+	]
 }
