@@ -61,10 +61,10 @@ jobs:
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm --filter @stella/terra exec playwright install --with-deps chromium
+        run: pnpm --filter @stella-componente/terra exec playwright install --with-deps chromium
 
       - name: Component tests (Playwright)
-        run: pnpm --filter @stella/terra test:ct
+        run: pnpm --filter @stella-componente/terra test:ct
 
       - name: Upload Playwright report on failure
         if: failure()

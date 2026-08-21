@@ -59,9 +59,9 @@ interface IslandProps extends React.HTMLAttributes<HTMLElement> {
 // ============================================================================
 
 /**
- * Island - the core structural container of Stella's visual identity.
+ * Island - the core structural container of Stella-Componente's visual identity.
  *
- * Nothing in a Stella app should sit flush against the window edge or
+ * Nothing in a Stella-Componente app should sit flush against the window edge or
  * directly against a sibling region — every top-level area is its own
  * bordered, elevated box with a gap around it, exactly like Ray IDE's
  * `.full-size-container`/`.menu-button-group` and color-cart's `Island`

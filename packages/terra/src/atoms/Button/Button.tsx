@@ -73,7 +73,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  * brightening to full strength on hover, so a dense toolbar reads
  * calmly at rest.
  *
- * There is no `variant` prop: Stella has a single neutral color scheme,
+ * There is no `variant` prop: Stella-Componente has a single neutral color scheme,
  * so there was only ever one value. Mark the current pick in a group
  * with `active`. Status meaning (success/info/warning/error/debug)
  * lives on Badge and Notification, not here.

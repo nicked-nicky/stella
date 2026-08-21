@@ -1,7 +1,7 @@
 {
-	"name": "stella",
+	"name": "stella-componente",
 	"private": true,
-	"description": "Stella — a React-first, Tauri-optimized UI kit. @stella/terra (base) + @stella/vidrio (aesthetic expansion).",
+	"description": "Stella-Componente — a React-first, Tauri-optimized UI kit. @stella-componente/terra (base) + @stella-componente/vidrio (aesthetic expansion).",
 	"license": "MIT",
 	"packageManager": "pnpm@11.22.0",
 	"engines": {

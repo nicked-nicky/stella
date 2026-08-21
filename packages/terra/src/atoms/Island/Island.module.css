@@ -1,7 +1,7 @@
 /**
  * Island Component Styles
  *
- * The structural container every surface in Stella builds on. Two
+ * The structural container every surface in Stella-Componente builds on. Two
  * shapes, both reading the same `--stella-radius-panel` (shape is a
  * layout distinction, not a rounding one):
  * - `panel` — block-level, fills its container. Sidebars, modals, cards.

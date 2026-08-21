@@ -53,7 +53,7 @@ export interface WindowControlsProps {
  * bar without it and this is still the piece that knows how to render
  * the three buttons correctly.
  *
- * Every button is neutral — no red-on-hover close button. Stella has a
+ * Every button is neutral — no red-on-hover close button. Stella-Componente has a
  * single neutral color scheme with color reserved for exactly 5 status
  * meanings (see tokens.css); a colored close button would be a sixth,
  * one-off exception to that rule.

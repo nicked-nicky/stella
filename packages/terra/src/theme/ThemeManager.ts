@@ -89,7 +89,7 @@ const BORDER_WIDTH: Record<BorderWidthStyle, string> = {
 /**
  * ThemeManager - the engine behind Terra's theming.
  *
- * Stella has a single neutral color scheme — no runtime-switchable
+ * Stella-Componente has a single neutral color scheme — no runtime-switchable
  * accent hue (see tokens.css's docblock). ThemeManager's job is
  * narrower than it used to be: whether `data-theme` is forced
  * light/dark or left to `prefers-color-scheme` ("system"), the
@@ -104,7 +104,7 @@ const BORDER_WIDTH: Record<BorderWidthStyle, string> = {
  * touches localStorage, a filesystem, or an IPC channel. Where and how
  * the config gets saved is the host application's job: Tauri's `fs`
  * plugin, an Electron IPC round-trip to the main process, a plain web
- * app's `localStorage`, anything else. Stella doesn't know or care
+ * app's `localStorage`, anything else. Stella-Componente doesn't know or care
  * which webview host it's running in — that boundary is intentional.
  *
  * @example

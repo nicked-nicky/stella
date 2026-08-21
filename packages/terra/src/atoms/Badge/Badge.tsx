@@ -19,7 +19,7 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   /**
    * Semantic color. `success`/`info`/`warning`/`error`/`debug` reuse the
    * alias status tokens — these 5 are the only place color appears in
-   * Stella (single neutral color scheme, no accent hue).
+   * Stella-Componente (single neutral color scheme, no accent hue).
    * @default 'neutral'
    */
   color?: BadgeColor;

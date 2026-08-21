@@ -1,7 +1,7 @@
-# Stella
+# Stella-Componente
 
 [![CI](https://github.com/nicked-nicky/stella/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/nicked-nicky/stella/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@stella/terra/alpha.svg)](https://www.npmjs.com/package/@stella/terra)
+[![npm](https://img.shields.io/npm/v/@stella-componente/terra/alpha.svg)](https://www.npmjs.com/package/@stella-componente/terra)
 [![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](#project-status)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
@@ -23,22 +23,22 @@ Zero runtime dependencies and zero runtime CSS-in-JS. Theming is CSS custom prop
 
 ## Packages
 
-- **`@stella/terra`** — the base. Thin, opinionated, functional. Every component follows atomic design (`atoms/` → `molecules/` → `organisms/`), is built on native HTML elements wherever one exists, and ships with keyboard navigation + ARIA semantics by default, not as an opt-in prop.
-- **`@stella/vidrio`** — the expansion. A superset of Terra adding purely aesthetic richness: frosted glass, dynamic lighting, textures, dynamic borders. Never required to use Terra alone.
+- **`@stella-componente/terra`** — the base. Thin, opinionated, functional. Every component follows atomic design (`atoms/` → `molecules/` → `organisms/`), is built on native HTML elements wherever one exists, and ships with keyboard navigation + ARIA semantics by default, not as an opt-in prop.
+- **`@stella-componente/vidrio`** — the expansion. A superset of Terra adding purely aesthetic richness: frosted glass, dynamic lighting, textures, dynamic borders. Never required to use Terra alone.
 
 **Terra never depends on Vidrio. Vidrio depends on Terra.** That direction is fixed.
 
-`@stella/terra` has a working component set (below) and is the package to reach for today. `@stella/vidrio` is scaffolded but empty — nothing has been built on top of Terra yet, so it stays unpublished (`private: true`) rather than squatting the name.
+`@stella-componente/terra` has a working component set (below) and is the package to reach for today. `@stella-componente/vidrio` is scaffolded but empty — nothing has been built on top of Terra yet, so it stays unpublished (`private: true`) rather than squatting the name.
 
 ```bash
-pnpm add @stella/terra@alpha
+pnpm add @stella-componente/terra@alpha
 ```
 
-The `alpha` tag is required: `latest` is deliberately unset while the API can still move, so a bare `pnpm add @stella/terra` won't resolve. See [WIKI.md's publish checklist](./WIKI.md#how-to-develop) for how releases are cut.
+The `alpha` tag is required: `latest` is deliberately unset while the API can still move, so a bare `pnpm add @stella-componente/terra` won't resolve. See [WIKI.md's publish checklist](./WIKI.md#how-to-develop) for how releases are cut.
 
 ## Project status
 
-**Alpha, and honest about it.** Terra's component set is complete enough to build a real app against — the author uses it for exactly that — but it is pre-1.0, unpublished, and the API is still allowed to move.
+**Alpha, and honest about it.** Terra's component set is complete enough to build a real app against — the author uses it for exactly that — but it is pre-1.0 and the API is still allowed to move. It publishes under the `alpha` dist-tag, so `latest` stays unset and installing it is a deliberate choice.
 
 What's solid:
 
@@ -49,11 +49,11 @@ What's solid:
 
 What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#known-gaps):
 
-- `@stella/vidrio` is an empty scaffold.
+- `@stella-componente/vidrio` is an empty scaffold.
 - Component tests run in Chromium only, so the visual layer is unverified on WebKit.
 - Prerelease, so no semver guarantees yet — pin an exact version if that matters. No ESLint config.
 
-## Components (`@stella/terra`)
+## Components (`@stella-componente/terra`)
 
 ### Atoms
 
@@ -101,7 +101,7 @@ What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#kn
 
 `ThemeManager` writes CSS custom properties to the document root; `ThemeProvider`/`useTheme` is the React binding most consumers use. Four independent axes, each backed by a scale token — set one, everything reading it updates, no re-render required:
 
-There is deliberately **no accent hue**. Stella has a single neutral colour scheme, and colour is reserved for exactly five status meanings (success / info / warning / error / debug) carried by `Badge` and `Notification`. A "checked" control inverts to the foreground tone rather than picking a brand colour.
+There is deliberately **no accent hue**. Stella-Componente has a single neutral colour scheme, and colour is reserved for exactly five status meanings (success / info / warning / error / debug) carried by `Badge` and `Notification`. A "checked" control inverts to the foreground tone rather than picking a brand colour.
 
 | Axis          | Values                                |
 | ------------- | ------------------------------------- |
@@ -111,7 +111,7 @@ There is deliberately **no accent hue**. Stella has a single neutral colour sche
 | `borderWidth` | `none` / `thin` / `default` / `thick` |
 
 ```tsx
-import { ThemeProvider, useTheme } from "@stella/terra";
+import { ThemeProvider, useTheme } from "@stella-componente/terra";
 
 function App() {
 	return (
@@ -141,10 +141,10 @@ Full example, provider list, and the `ThemeManager` API are in [WIKI.md → How 
 pnpm install
 pnpm typecheck
 pnpm test                                  # Vitest — logic, ARIA, keyboard
-pnpm --filter @stella/terra test:ct        # Playwright — resolved CSS, geometry, axe
+pnpm --filter @stella-componente/terra test:ct        # Playwright — resolved CSS, geometry, axe
 ```
 
-The component showcase used for day-to-day development (`packages/terra-test`) lives in its own repository and is **not** part of this one — it's gitignored here, so `pnpm dev` has nothing to run on a fresh clone. Drop a Vite app in at `packages/terra-test` and the pnpm workspace picks it up automatically, consuming `@stella/terra` straight from source with hot reload.
+The component showcase used for day-to-day development (`packages/terra-test`) lives in its own repository and is **not** part of this one — it's gitignored here, so `pnpm dev` has nothing to run on a fresh clone. Drop a Vite app in at `packages/terra-test` and the pnpm workspace picks it up automatically, consuming `@stella-componente/terra` straight from source with hot reload.
 
 See [WIKI.md → How to develop](./WIKI.md#how-to-develop) for the build, test, and publish workflow.
 

@@ -252,7 +252,7 @@ export interface MenuItemProps extends Omit<
   /** Fired on click or Enter/Space (native `<button>` behavior). */
   onSelect?: () => void;
   /** Status-red text, for a destructive action — the same red used
-   * everywhere else status color appears in Stella (see tokens.css),
+   * everywhere else status color appears in Stella-Componente (see tokens.css),
    * not a one-off. */
   destructive?: boolean;
   /** Persistent "selected" mark — same meaning as `Button`'s `active`.

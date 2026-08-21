@@ -5,7 +5,7 @@
  * content-hugging rounded-full chrome rather than a wide left-accented
  * card. Status is carried by the icon color alone (the same status
  * alias tokens Badge/Input already use — no new colors introduced;
- * these 5 hues are the only place color appears anywhere in Stella),
+ * these 5 hues are the only place color appears anywhere in Stella-Componente),
  * not by a colored border, matching color-cart's neutral-bordered pill
  * with a tinted icon.
  */

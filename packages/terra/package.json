@@ -1,7 +1,7 @@
 {
-	"name": "@stella/terra",
+	"name": "@stella-componente/terra",
 	"version": "0.1.0-alpha.0",
-	"description": "Stella — Terra. Thin, optimized, GTK4/libadwaita-inspired base UI kit for React.",
+	"description": "Stella-Componente — Terra. Thin, optimized, GTK4/libadwaita-inspired base UI kit for React.",
 	"license": "MIT",
 	"keywords": [
 		"react",

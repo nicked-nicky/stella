@@ -1,8 +1,8 @@
 {
-	"name": "@stella/vidrio",
+	"name": "@stella-componente/vidrio",
 	"version": "0.0.1",
 	"private": true,
-	"description": "Stella — Vidrio. Aesthetic superset of Terra: frosted glass, dynamic lighting, textures, dynamic borders.",
+	"description": "Stella-Componente — Vidrio. Aesthetic superset of Terra: frosted glass, dynamic lighting, textures, dynamic borders.",
 	"license": "MIT",
 	"type": "module",
 	"engines": {
@@ -35,7 +35,7 @@
 		"**/*.css"
 	],
 	"dependencies": {
-		"@stella/terra": "workspace:*"
+		"@stella-componente/terra": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": ">=18",

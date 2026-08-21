@@ -1,6 +1,6 @@
-# @stella/terra
+# @stella-componente/terra
 
-[![npm](https://img.shields.io/npm/v/@stella/terra/alpha.svg)](https://www.npmjs.com/package/@stella/terra)
+[![npm](https://img.shields.io/npm/v/@stella-componente/terra/alpha.svg)](https://www.npmjs.com/package/@stella-componente/terra)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20deps-0-success.svg)](#zero-runtime-dependencies)
 
@@ -11,8 +11,8 @@ A React-first, runtime-agnostic UI kit with a GTK 4 / libadwaita-inspired visual
 ## Install
 
 ```bash
-npm install @stella/terra@alpha
-# or: pnpm add @stella/terra@alpha
+npm install @stella-componente/terra@alpha
+# or: pnpm add @stella-componente/terra@alpha
 ```
 
 React 18 or 19 is a peer dependency. `lucide-react` is an _optional_ peer — only needed if you feed Lucide icons to `Icon`.
@@ -22,7 +22,7 @@ React 18 or 19 is a peer dependency. `lucide-react` is an _optional_ peer — on
 Import the design tokens once, at your app entry. Nothing renders correctly without them — every component reads its colours, spacing and radii from these custom properties.
 
 ```tsx
-import "@stella/terra/styles/tokens.css";
+import "@stella-componente/terra/styles/tokens.css";
 ```
 
 Then wrap your app in the providers you actually need. All three are optional and independent:
@@ -34,7 +34,7 @@ import {
 	NotificationProvider,
 	ButtonIsland,
 	Button,
-} from "@stella/terra";
+} from "@stella-componente/terra";
 
 export function App() {
 	return (
@@ -71,7 +71,7 @@ Four independent axes, each written to the document root as a CSS custom propert
 | `density`     | `compact` / `default` / `comfortable` |
 | `borderWidth` | `none` / `thin` / `default` / `thick` |
 
-There is deliberately no accent hue: Stella has a single neutral colour scheme, and colour is reserved for five status meanings (success / info / warning / error / debug).
+There is deliberately no accent hue: Stella-Componente has a single neutral colour scheme, and colour is reserved for five status meanings (success / info / warning / error / debug).
 
 Persistence is your job — `ThemeProvider`'s `onChange` hands you a plain serialisable config to save wherever your runtime saves things (Tauri's fs plugin, Electron IPC, `localStorage`).
 

@@ -1,13 +1,13 @@
 # Changelog
 
-All notable changes to Stella are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning will follow [Semantic Versioning](https://semver.org/) once a package is actually published (both `@stella/terra` and `@stella/vidrio` are pre-release, `0.0.1`, workspace-only today).
+All notable changes to Stella-Componente are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@stella-componente/terra` follows [Semantic Versioning](https://semver.org/) from its first published release; pre-1.0, a minor bump may still carry breaking changes (the standard semver-0.x reading). `@stella-componente/vidrio` remains unpublished and workspace-only.
 
 ## [Unreleased]
 
 ## [0.1.0-alpha.0] — 2026-08-21
 
-First published release of `@stella/terra`, on the `alpha` dist-tag so it
-does not become `latest`. `@stella/vidrio` stays unpublished — it is still
+First published release of `@stella-componente/terra`, on the `alpha` dist-tag so it
+does not become `latest`. `@stella-componente/vidrio` stays unpublished — it is still
 an empty scaffold, and shipping a package with no components would only
 squat the name.
 
@@ -18,13 +18,13 @@ squat the name.
 - **axe-core accessibility scanning** in the Playwright layer, via a shared `checkA11y()` helper (`playwright/a11y.ts`). devDependency only — no effect on Terra's shipped bundle.
 - **CI workflow** (`.github/workflows/ci.yml`) running format check, typecheck, Vitest, Playwright CT and build on push and PR. Everything was manual before this.
 - `tsconfig.typecheck.json` — a noEmit config covering the test files, `playwright/`, and the config files, which the build config deliberately excludes.
-- Initial atomic component set for `@stella/terra`: 13 atoms (Avatar, Badge, Button, Checkbox, Divider, Icon, Input, Island, Radio, Separator, Spinner, Switch, Text), the `FlexContainer` layout primitive, `ButtonIsland` and `Notification` molecules, and `Dialog` and `SettingsMenu` organisms.
+- Initial atomic component set for `@stella-componente/terra`: 13 atoms (Avatar, Badge, Button, Checkbox, Divider, Icon, Input, Island, Radio, Separator, Spinner, Switch, Text), the `FlexContainer` layout primitive, `ButtonIsland` and `Notification` molecules, and `Dialog` and `SettingsMenu` organisms.
 - Theme engine (`ThemeManager` / `ThemeProvider` / `useTheme`) with four independently configurable axes, each backed by CSS custom properties: color scheme (`light`/`dark`/`system`), corner radius (`sharp`/`default`/`round`), spacing density (`compact`/`default`/`comfortable`), and border width (`none`/`thin`/`default`/`thick`) — `none` is a genuine borderless mode, every hairline in Terra reads the same token.
 - `OverlayProvider` — shared portal, DOM-order stacking, and Escape-key scoping (only the topmost layer responds) for `Dialog` and future overlay-type components.
 - `NotificationProvider` / `useNotifications` — toast queueing, pause-on-hover auto-dismiss, `aria-live` announcement.
 - Automatic hairline separators between adjacent buttons inside a `ButtonIsland` (GTK/libadwaita's "linked" button-group convention) — no manual separator needed for the common case. `ButtonIsland.Separator` (the standalone `Separator` atom) remains for an explicit sub-cluster break.
 - Fade-out exit animations for `Dialog` (backdrop + panel) and `Notification` toasts before unmount, respecting `prefers-reduced-motion`.
-- `@stella/vidrio` package scaffold — depends on `@stella/terra` via `workspace:*`; no components built on top yet.
+- `@stella-componente/vidrio` package scaffold — depends on `@stella-componente/terra` via `workspace:*`; no components built on top yet.
 
 - State-layer tokens (`--stella-state-hover` / `-active` / `-selected`) — translucent overlays of the foreground color rather than opaque surface tones, so one definition composites correctly over any surface (libadwaita's model). Replaces `--stella-surface-hover`.
 - `--stella-rim` — libadwaita's hairline top highlight, composed alongside the drop shadow on floating surfaces (`Island tone="overlay"`, `Dialog`, `Notification`).
@@ -61,7 +61,7 @@ squat the name.
 - **The ButtonIsland separator dissolved into a hovered button.** `--stella-state-hover` is both the fill a Button takes on hover and the exact value of `--stella-border-default`, which the separator rests at — so escalating the hairline to it painted the line the same colour as the button now sitting against it, while also "changing" it to the colour it already was. Both the separator's and the Island's border escalation now read a dedicated hairline ladder (`--stella-border-hover` / `--stella-border-active`), written as the fill ladder shifted one rung so the relationship stays visible in the source.
 - **A lone `Button` would not fill a widened `ButtonIsland`.** Horizontal growth runs through three boxes and the middle one opted out: the inner button row is a `FlexContainer` with no flex declaration, so it defaulted to `flex-grow: 0` and sat at content width, leaving nothing inside it for the single child's `flex: 1` to claim. The row now grows. `shape="pill"` stays content-sized, so an Island nobody has widened still hugs its button.
 - **`SettingsMenu` resized itself when switching category**, taking the window and the nav column's scroll position with it. It now holds a fixed height (`--stella-settings-height`, default `80vh`) with both columns scrolling independently.
-- **`@stella/terra` could not be resolved by workspace consumers.** Its `exports` pointed only at `./dist`, which is gitignored and never built during development, so `pnpm dev` failed on a clean checkout with _"Failed to resolve entry for package @stella/terra"_ — despite the WIKI documenting that `terra-test` consumes `src/` directly. `exports` now point at `./src/index.ts`, with `publishConfig` overriding them to `./dist` at publish time (pnpm swaps them automatically; nothing needs hand-editing at release).
+- **`@stella-componente/terra` could not be resolved by workspace consumers.** Its `exports` pointed only at `./dist`, which is gitignored and never built during development, so `pnpm dev` failed on a clean checkout with _"Failed to resolve entry for package @stella-componente/terra"_ — despite the WIKI documenting that `terra-test` consumes `src/` directly. `exports` now point at `./src/index.ts`, with `publishConfig` overriding them to `./dist` at publish time (pnpm swaps them automatically; nothing needs hand-editing at release).
 - **`pnpm build` would have emitted test files into `dist/`.** The build `tsconfig` compiled everything under `src/`, so `*.test.tsx`/`*.ct.tsx` would ship alongside the components and drag Vitest/Playwright types into consumers' type resolution — and `tsc` would fail outright on `playwright/` sitting outside `rootDir`. Build and typecheck configs are now separate.
 - **`Button` had no visible focus ring.** It set `outline: 0` on `:focus-visible`, making it the only interactive component in the kit with no keyboard focus indicator — a direct contradiction of both its own docblock and the project's accessibility principle. Now draws an inset ring (`outline-offset: -2px`), matching `Menu.Item`, so it stays visible inside a clipping `Island`.
 - **`--stella-easing-out` was an accelerating curve** (`cubic-bezier(0.4, 0, 1, 1)` — Material's _accelerate_) despite its name, so nearly every transition in the kit sped up as it finished. Corrected to `cubic-bezier(0, 0, 0.2, 1)`; the old value now lives on as `--stella-easing-in` and is applied to exit animations.

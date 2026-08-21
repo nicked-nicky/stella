@@ -1,5 +1,5 @@
 /**
- * @stella/terra — GTK 4 / libadwaita-inspired React UI kit
+ * @stella-componente/terra — GTK 4 / libadwaita-inspired React UI kit
  *
  * Atoms (base components)
  */

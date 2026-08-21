@@ -1,6 +1,6 @@
-# Stella Wiki
+# Stella-Componente Wiki
 
-Everything about developing Stella, using its components, and why things are built the way they are. Start here; jump to [CONTRIBUTING.md](./CONTRIBUTING.md) when you're ready to send a change.
+Everything about developing Stella-Componente, using its components, and why things are built the way they are. Start here; jump to [CONTRIBUTING.md](./CONTRIBUTING.md) when you're ready to send a change.
 
 ## Contents
 
@@ -17,14 +17,14 @@ Everything about developing Stella, using its components, and why things are bui
 
 ## Orientation
 
-Stella is two packages: `@stella/terra` (the base — thin, functional, GTK 4/libadwaita-inspired) and `@stella/vidrio` (an aesthetic superset of Terra — frosted glass, dynamic lighting; scaffolded, not built yet). Terra never depends on Vidrio; that direction is fixed.
+Stella-Componente is two packages: `@stella-componente/terra` (the base — thin, functional, GTK 4/libadwaita-inspired) and `@stella-componente/vidrio` (an aesthetic superset of Terra — frosted glass, dynamic lighting; scaffolded, not built yet). Terra never depends on Vidrio; that direction is fixed.
 
 Repo layout:
 
 ```
 packages/
-  terra/       @stella/terra  — the package you install
-  vidrio/      @stella/vidrio — depends on @stella/terra via workspace:*
+  terra/       @stella-componente/terra  — the package you install
+  vidrio/      @stella-componente/vidrio — depends on @stella-componente/terra via workspace:*
   terra-test/  (not in this repo — see below)
 ```
 
@@ -43,17 +43,17 @@ pnpm dev   # runs terra-test, if you have it — see Orientation
 
 Terra's `src/` is consumed directly by `terra-test` through the pnpm workspace, so editing a component hot-reloads immediately — no build step in the loop. `pnpm dev` is where you'll do almost all component work, _when the showcase is present_; on a bare clone of this repo it's a no-op and the tests are your feedback loop instead.
 
-This works because `@stella/terra`'s `exports` point at `./src/index.ts`, and `publishConfig` overrides them to `./dist/` — pnpm swaps the two at publish time, so workspace consumers get live source and published consumers get compiled output, with no build step in between and no `dist/` needing to exist locally. (It previously pointed only at `dist/`, which meant `pnpm dev` failed with _"Failed to resolve entry for package @stella/terra"_ on a clean checkout, since `dist/` is gitignored and never built in the dev loop.)
+This works because `@stella-componente/terra`'s `exports` point at `./src/index.ts`, and `publishConfig` overrides them to `./dist/` — pnpm swaps the two at publish time, so workspace consumers get live source and published consumers get compiled output, with no build step in between and no `dist/` needing to exist locally. (It previously pointed only at `dist/`, which meant `pnpm dev` failed with _"Failed to resolve entry for package @stella-componente/terra"_ on a clean checkout, since `dist/` is gitignored and never built in the dev loop.)
 
 **Build** (only needed to actually publish — not part of the dev loop):
 
 ```bash
-pnpm --filter @stella/terra build
+pnpm --filter @stella-componente/terra build
 ```
 
 Terra builds unbundled: `tsc` compiles `src/` to `dist/` 1:1 (declarations included), then `scripts/copy-css.mjs` copies every `*.css`/`*.module.css` alongside its compiled `.js` twin, since `tsc` only touches TypeScript. No bundler in the middle — the consuming app's own bundler (Vite, webpack, Next, a Tauri frontend) resolves the CSS Modules imports from `dist/`, the same way it already resolves them from any other package. This keeps Terra genuinely thin (zero build-tool dependency shipped or required beyond `tsc`) and gives perfect tree-shaking for free, since there's no bundler decision-making step to get in the way of dead-code elimination.
 
-The tradeoff: `dist/` output uses extensionless relative imports (`from '../atoms/Button'`), which needs a bundler to resolve — running the built output under plain Node ESM directly won't work. Every realistic Stella consumer (Vite, webpack, Next, Tauri) already has one, so this hasn't been a real constraint.
+The tradeoff: `dist/` output uses extensionless relative imports (`from '../atoms/Button'`), which needs a bundler to resolve — running the built output under plain Node ESM directly won't work. Every realistic Stella-Componente consumer (Vite, webpack, Next, Tauri) already has one, so this hasn't been a real constraint.
 
 **Typecheck:**
 
@@ -76,11 +76,11 @@ Prettier config: tabs + double quotes everywhere, **except** `*.{ts,tsx}` which 
 
 **Publish checklist** (manual, no Changesets).
 
-Only `@stella/terra` publishes. `@stella/vidrio` keeps `private: true` until it has an actual component — publishing an empty package would just squat the name.
+Only `@stella-componente/terra` publishes. `@stella-componente/vidrio` keeps `private: true` until it has an actual component — publishing an empty package would just squat the name.
 
 **One-time setup**
 
-1. The `@stella` scope has to belong to you before npm will accept the package. It maps to either your npm username or an org: create the org once with `npm org create stella` (free for public packages), or rename the packages to `@<your-username>/terra`.
+1. The `@stella-componente` scope has to belong to you before npm will accept the package — it maps to an npm org of that name, created once and free for public packages. The shorter `@stella` was taken (registered years ago, nothing published under it), which is why the scope reads the way it does; npm does not release squatted scopes, so the only options were a different scope or a dispute nobody wants to file.
 2. `npm login`, or put a granular automation token in `~/.npmrc`. Never commit either — there is no `.npmrc` in this repo on purpose.
 3. Enable 2FA on the npm account. For a package other people install, this is the difference between a leaked token being an inconvenience and being a supply-chain incident.
 
@@ -88,12 +88,12 @@ Only `@stella/terra` publishes. `@stella/vidrio` keeps `private: true` until it 
 
 1. Bump `version` in `packages/terra/package.json`. Semver: patch for fixes, minor for new components/props, major for breaking API/behaviour changes. Pre-1.0, minor can carry breaking changes too (standard semver-0.x reading). Prereleases use `-alpha.N` / `-beta.N`.
 2. Move the relevant entries out of `[Unreleased]` in the root `CHANGELOG.md` under a new version heading.
-3. Verify locally: `pnpm typecheck && pnpm test && pnpm --filter @stella/terra test:ct`. `prepublishOnly` re-runs clean/typecheck/test/build during publish anyway, so a broken tree can't ship — but the component tests aren't in that hook (they need a browser), so run them yourself.
-4. `pnpm --filter @stella/terra publish --tag alpha --access public --dry-run` and **read the file list**. It should be `dist/**`, `package.json`, `README.md`, `LICENSE` and nothing else. Source, tests and configs must not appear.
+3. Verify locally: `pnpm typecheck && pnpm test && pnpm --filter @stella-componente/terra test:ct`. `prepublishOnly` re-runs clean/typecheck/test/build during publish anyway, so a broken tree can't ship — but the component tests aren't in that hook (they need a browser), so run them yourself.
+4. `pnpm --filter @stella-componente/terra publish --tag alpha --access public --dry-run` and **read the file list**. It should be `dist/**`, `package.json`, `README.md`, `LICENSE` and nothing else. Source, tests and configs must not appear.
 5. Drop `--dry-run` to publish for real.
 6. `git tag v0.1.0-alpha.0 && git push --tags`.
 
-**Why `--tag alpha` matters.** Without it npm sets the `latest` dist-tag, so `npm install @stella/terra` gives everyone a prerelease. With it, `latest` stays unset until a stable release and installing the alpha is opt-in via `@stella/terra@alpha`. Getting this wrong on the first publish is awkward to undo — `latest` can be repointed, but anyone who installed in between already has it pinned.
+**Why `--tag alpha` matters.** Without it npm sets the `latest` dist-tag, so `npm install @stella-componente/terra` gives everyone a prerelease. With it, `latest` stays unset until a stable release and installing the alpha is opt-in via `@stella-componente/terra@alpha`. Getting this wrong on the first publish is awkward to undo — `latest` can be repointed, but anyone who installed in between already has it pinned.
 
 **What `publishConfig` does for you.** The package points `main`/`types`/`exports` at `./src` so the workspace consumes TypeScript source directly; `publishConfig` overrides all of them to `./dist` at publish time. pnpm performs the swap — nothing in `package.json` needs hand-editing at release, and there is no state to remember to revert afterwards.
 
@@ -102,15 +102,15 @@ Only `@stella/terra` publishes. `@stella/vidrio` keeps `private: true` until it 
 ## How to use components
 
 ```bash
-pnpm add @stella/terra@alpha
+pnpm add @stella-componente/terra@alpha
 ```
 
-The `alpha` tag is required while the package is pre-1.0 — `latest` is deliberately unset, so a bare `pnpm add @stella/terra` will not resolve.
+The `alpha` tag is required while the package is pre-1.0 — `latest` is deliberately unset, so a bare `pnpm add @stella-componente/terra` will not resolve.
 
 Import the design tokens once, at your app's entry point — everything else in Terra reads these as CSS custom properties, nothing works visually without them:
 
 ```tsx
-import "@stella/terra/styles/tokens.css";
+import "@stella-componente/terra/styles/tokens.css";
 ```
 
 Wrap your app root in the providers you need — none are required for a component to render, but `ThemeProvider` is needed for runtime theme switching, `OverlayProvider` for `Dialog`/`Menu`/`Popover`, `NotificationProvider` for toasts:
@@ -120,7 +120,7 @@ import {
 	ThemeProvider,
 	OverlayProvider,
 	NotificationProvider,
-} from "@stella/terra";
+} from "@stella-componente/terra";
 
 function Root() {
 	return (
@@ -138,7 +138,7 @@ function Root() {
 Then use components directly:
 
 ```tsx
-import { ButtonIsland, Button } from "@stella/terra";
+import { ButtonIsland, Button } from "@stella-componente/terra";
 
 <ButtonIsland size="sm">
 	<Button>Cancel</Button>
@@ -154,7 +154,7 @@ import {
 	SettingsMenu,
 	type SettingsSchema,
 	type SettingsValues,
-} from "@stella/terra";
+} from "@stella-componente/terra";
 
 const schema: SettingsSchema = {
 	categories: [
@@ -262,7 +262,7 @@ This ladder is reused as a _border-color_ escalation too (see Button/ButtonIslan
 
 ### Island — the structural primitive
 
-`Island` is the one container every surface in Stella builds on: a bordered, elevated box (`panel` shape, block-level, fills its container) or a content-hugging pill (`pill` shape, `ButtonIsland`/toolbar clusters). Both shapes share the same radius token — shape is a layout distinction, not a rounding one. `ButtonIsland`, `Dialog`, `Menu`'s panel, `Notification` are all an `Island` underneath.
+`Island` is the one container every surface in Stella-Componente builds on: a bordered, elevated box (`panel` shape, block-level, fills its container) or a content-hugging pill (`pill` shape, `ButtonIsland`/toolbar clusters). Both shapes share the same radius token — shape is a layout distinction, not a rounding one. `ButtonIsland`, `Dialog`, `Menu`'s panel, `Notification` are all an `Island` underneath.
 
 ### Button / ButtonIsland — the border model
 
@@ -303,15 +303,15 @@ For desktop hosts this floor is easier than it looks: Tauri on macOS and Electro
 Two host-specific integrations are worth knowing about, both in `WindowChrome`:
 
 - **Dragging** is declared twice, unconditionally — `data-tauri-drag-region` for Tauri and `-webkit-app-region: drag` for Electron — because Terra is runtime-agnostic and can't know which shell wraps it. Electron additionally needs every interactive child marked `no-drag` or the buttons swallow their own clicks; that's handled for you.
-- **Window controls** are neutral by design, with no red close button, because colour in Stella means status and nothing else.
+- **Window controls** are neutral by design, with no red close button, because colour in Stella-Componente means status and nothing else.
 
 ## Testing
 
 Two layers, deliberately not one — jsdom (what Vitest runs against) doesn't evaluate real CSS: no `:has()`, no `light-dark()`, no real computed-style cascade. A whole class of real bug (the `--stella-state-hover`/`--stella-border-default` collision above) is invisible to a jsdom-based test no matter how thorough, because jsdom never actually paints anything.
 
-**Vitest + Testing Library** (`pnpm --filter @stella/terra test`) — logic, ARIA attributes, controlled/uncontrolled behavior, keyboard event handlers. Colocated as `Component.test.tsx` next to the component. See `Checkbox.test.tsx` and `Switch.test.tsx` for the pattern.
+**Vitest + Testing Library** (`pnpm --filter @stella-componente/terra test`) — logic, ARIA attributes, controlled/uncontrolled behavior, keyboard event handlers. Colocated as `Component.test.tsx` next to the component. See `Checkbox.test.tsx` and `Switch.test.tsx` for the pattern.
 
-**Playwright component tests** (`pnpm --filter @stella/terra test:ct`) — anything whose correctness lives in actual computed CSS: state-layer escalation, `:has()` reactions, focus ring visibility. Colocated as `Component.ct.tsx`. See `ButtonIsland.ct.tsx` — it's a direct regression test for the hover-collision bug above, asserting `getComputedStyle(...).backgroundColor` actually changes on hover rather than trusting that the CSS rule exists.
+**Playwright component tests** (`pnpm --filter @stella-componente/terra test:ct`) — anything whose correctness lives in actual computed CSS: state-layer escalation, `:has()` reactions, focus ring visibility. Colocated as `Component.ct.tsx`. See `ButtonIsland.ct.tsx` — it's a direct regression test for the hover-collision bug above, asserting `getComputedStyle(...).backgroundColor` actually changes on hover rather than trusting that the CSS rule exists.
 
 **axe-core** (`@axe-core/playwright`, via the shared `checkA11y()` helper in `playwright/a11y.ts`) runs inside the Playwright layer. It complements the hand-written ARIA tests rather than replacing them — axe can't tell you that Escape closes only the topmost overlay, and the hand-written tests can't tell you the focus ring fails contrast. It's a devDependency only, so it never reaches Terra's shipped bundle. Landmark/`lang`/heading rules are disabled in the helper: components are mounted in isolation there, and those are the host application's responsibility.
 
@@ -337,7 +337,7 @@ Kept honest deliberately — an empty list here would mean nobody's looking, not
 - **Component tests run in Chromium only.** `playwright-ct.config.ts` defines a single project. Everything the CT layer proves about resolved CSS — the state and border ladders, `light-dark()`, `:has()`, computed geometry — is proven in Blink and nowhere else. For a kit that claims "any webview" this is the most significant gap on the list, and WebKit is the one that matters: it's where `:has()` and `light-dark()` support is newest, and it's what Tauri uses on Linux and macOS. Adding a `webkit` project to the config is the fix.
 - **`Popover` and `Tooltip` have no tests of their own.** Their positioning math is covered by `utils/positioning.test.ts` and their overlay plumbing indirectly through `Menu`, but nothing exercises their own open/close/anchor behaviour.
 - **No coverage thresholds in CI.** The suite is real, but nothing stops it from silently getting thinner.
-- **`@stella/vidrio` is an empty scaffold** — directories and a `workspace:*` dependency on Terra, no components.
+- **`@stella-componente/vidrio` is an empty scaffold** — directories and a `workspace:*` dependency on Terra, no components.
 
 ### Design debt
 

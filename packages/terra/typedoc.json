@@ -2,7 +2,7 @@
 	"$schema": "https://typedoc.org/schema.json",
 	"entryPoints": ["src/index.ts"],
 	"out": "api-docs",
-	"name": "@stella/terra API",
+	"name": "@stella-componente/terra API",
 	"excludePrivate": true,
 	"excludeInternal": true,
 	"excludeProtected": true,

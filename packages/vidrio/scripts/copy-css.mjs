@@ -8,7 +8,7 @@
  * A deliberate copy of terra/scripts/copy-css.mjs rather than a shared
  * module: each package's build has to stand on its own once published,
  * and a cross-package script import would only work inside the
- * workspace. Vidrio is the CSS-heavy half of Stella by definition —
+ * workspace. Vidrio is the CSS-heavy half of Stella-Componente by definition —
  * frosted glass, textures, dynamic borders — so it needs this from the
  * moment it has a first component, not later.
  *

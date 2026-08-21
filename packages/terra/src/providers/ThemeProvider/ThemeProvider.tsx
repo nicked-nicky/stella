@@ -46,7 +46,7 @@ interface ThemeProviderProps {
   /**
    * Fires on every theme change with the new config. This is where you
    * wire your own save call (Tauri fs write, Electron IPC, etc.) —
-   * Stella never persists anything itself.
+   * Stella-Componente never persists anything itself.
    */
   onChange?: (config: ThemeConfig) => void;
 }

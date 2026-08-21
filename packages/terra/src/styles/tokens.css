@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap");
 
 /**
- * Stella Terra - CSS Custom Properties
+ * Stella-Componente Terra - CSS Custom Properties
  * Design tokens as CSS variables for runtime theming.
  *
  * Usage:
@@ -296,7 +296,7 @@
 		var(--stella-neutral-400)
 	);
 
-	/* Status — the only 5 places color appears in Stella. Each hue
+	/* Status — the only 5 places color appears in Stella-Componente. Each hue
      contributes `-text` (Notification's icon, Badge's tinted/outline
      text), `-bg` (Badge's tinted fill), and `-border` (Badge's outline
      ring; `error` additionally has `-border-strong`, used by Input's

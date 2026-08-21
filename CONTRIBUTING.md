@@ -1,6 +1,6 @@
-# Contributing to Stella
+# Contributing to Stella-Componente
 
-Stella is a personal-identity project — the author uses it to build their own desktop apps and releases it open source. That shapes how contributions work: functional fixes, accessibility improvements, bug reports, and new components that fit the existing patterns are very welcome; visual-identity decisions (radius, spacing, motion, color, "does this look like libadwaita") are the maintainer's call, since the whole point of the kit is a specific, opinionated look. When in doubt, open an issue to discuss before writing code — see [Before you start](#before-you-start).
+Stella-Componente is a personal-identity project — the author uses it to build their own desktop apps and releases it open source. That shapes how contributions work: functional fixes, accessibility improvements, bug reports, and new components that fit the existing patterns are very welcome; visual-identity decisions (radius, spacing, motion, color, "does this look like libadwaita") are the maintainer's call, since the whole point of the kit is a specific, opinionated look. When in doubt, open an issue to discuss before writing code — see [Before you start](#before-you-start).
 
 ## Before you start
 
@@ -15,7 +15,7 @@ Stella is a personal-identity project — the author uses it to build their own 
 pnpm install
 pnpm typecheck
 pnpm test                                  # Vitest
-pnpm --filter @stella/terra test:ct        # Playwright (needs `playwright install chromium` once)
+pnpm --filter @stella-componente/terra test:ct        # Playwright (needs `playwright install chromium` once)
 ```
 
 The live showcase (`packages/terra-test`) is a **separate repository** and is gitignored here, so `pnpm dev` won't have anything to run on a fresh clone — the test suites are your feedback loop instead. Full dev workflow (build, test, format) is in [WIKI.md → How to develop](./WIKI.md#how-to-develop).
@@ -24,7 +24,7 @@ The live showcase (`packages/terra-test`) is a **separate repository** and is gi
 
 - Prettier is authoritative — run `pnpm format` before committing. `.tsx`/`.ts` files use spaces + single quotes (an override in `.prettierrc`); everything else uses tabs + double quotes. `pnpm format:check` runs in CI-equivalent mode if you want to check without writing.
 - TypeScript strict mode is on (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`). Don't relax these for a single file — fix the type instead.
-- No new dependency in `@stella/terra` without a strong reason — the default answer to "should we add this" is no. If your change genuinely needs one, say why in the PR description (bundle size cost, what it replaces, why a small hand-rolled version isn't enough) and expect it to be a bigger discussion than the rest of the change.
+- No new dependency in `@stella-componente/terra` without a strong reason — the default answer to "should we add this" is no. If your change genuinely needs one, say why in the PR description (bundle size cost, what it replaces, why a small hand-rolled version isn't enough) and expect it to be a bigger discussion than the rest of the change.
 - CSS Modules only. No inline styles for anything that should vary by theme — that's what the design tokens in `tokens.css` are for. Cross-file CSS sharing uses `composes:`, not copy-paste.
 
 ## Accessibility
