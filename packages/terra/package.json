@@ -50,7 +50,12 @@
 		}
 	},
 	"files": [
-		"dist"
+		"dist",
+		"src",
+		"!src/**/*.test.ts",
+		"!src/**/*.test.tsx",
+		"!src/**/*.ct.tsx",
+		"!src/**/*.story.tsx"
 	],
 	"sideEffects": [
 		"**/*.css"
