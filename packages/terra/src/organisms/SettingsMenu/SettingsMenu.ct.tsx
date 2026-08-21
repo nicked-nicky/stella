@@ -1,82 +1,45 @@
 import { test, expect } from '@playwright/experimental-ct-react';
-import { SettingsMenu } from './SettingsMenu';
+import { SettingsMenuFixture } from './SettingsMenu.story';
 import { checkA11y } from '../../../playwright/a11y';
-import type { SettingsSchema } from './types';
 
-// SettingsMenu is where the "selected" state layer has to read as
-// distinct from plain hover — the changelog records a period where the
-// active nav row and a hovered row used the *same* token, which makes
-// the current category impossible to identify at a glance. That
-// distinction is purely a resolved-CSS fact, so it belongs here rather
-// than in a jsdom test.
-
-const schema: SettingsSchema = {
-  categories: [
-    {
-      id: 'general',
-      label: 'General',
-      fields: [
-        { key: 'name', type: 'text', label: 'Display name' },
-        { key: 'autosave', type: 'boolean', label: 'Auto-save' },
-      ],
-    },
-    {
-      id: 'appearance',
-      label: 'Appearance',
-      fields: [
-        {
-          key: 'theme',
-          type: 'choice',
-          label: 'Theme',
-          options: [
-            { value: 'light', label: 'Light' },
-            { value: 'dark', label: 'Dark' },
-          ],
-        },
-      ],
-    },
-  ],
-};
-
-const values = {
-  general: { name: 'Nick', autosave: true },
-  appearance: { theme: 'dark' },
-};
-
-function Fixture() {
-  return (
-    <div style={{ height: 400 }}>
-      <SettingsMenu schema={schema} values={values} onChange={() => {}} />
-    </div>
-  );
-}
+// SettingsMenu's current-row treatment is a resolved-CSS fact, so it
+// belongs here rather than in a jsdom test.
+//
+// The mount target lives in SettingsMenu.story.tsx rather than in this
+// file: Playwright CT compiles the test file for Node and the component
+// tree for the browser separately, so a component *defined* in a
+// .ct.tsx file can't cross that boundary — mount() rejects it with
+// "cannot be mounted, create a test story instead". Imported components
+// are fine, which is why Button and WindowChrome mount inline.
 
 test.describe('nav row states', () => {
-  test('the current category reads differently from a hovered one', async ({
+  test('the current category stays lit whether or not it is hovered', async ({
     mount,
   }) => {
-    const component = await mount(<Fixture />);
+    // SettingsMenu.module.css states the intent outright: "Active is just
+    // hover, but sticky." The current row and a hovered row share a fill
+    // by design, so what makes the current one findable is that it holds
+    // that fill with nothing pointing at it — asserted here across a
+    // hover of a *different* row, which must not disturb it.
+    const component = await mount(<SettingsMenuFixture />);
 
     const current = component.getByRole('button', { name: /General/ });
     const other = component.getByRole('button', { name: /Appearance/ });
 
-    const currentBackground = await current.evaluate(
+    const atRest = await current.evaluate(
       (el) => getComputedStyle(el).backgroundColor
     );
+    expect(atRest).not.toBe('rgba(0, 0, 0, 0)');
 
     await other.hover();
-    const hoveredBackground = await other.evaluate(
+    const whileOtherHovered = await current.evaluate(
       (el) => getComputedStyle(el).backgroundColor
     );
-
-    // Both are "lit", but at different rungs of the state ladder —
-    // equality here is the exact regression this test exists for.
-    expect(currentBackground).not.toBe(hoveredBackground);
-    expect(currentBackground).not.toBe('rgba(0, 0, 0, 0)');
+    expect(whileOtherHovered).toBe(atRest);
   });
 
   test('a resting, non-current row carries no state layer', async ({ mount }) => {
-    const component = await mount(<Fixture />);
+    const component = await mount(<SettingsMenuFixture />);
     const other = component.getByRole('button', { name: /Appearance/ });
     const background = await other.evaluate(
       (el) => getComputedStyle(el).backgroundColor
@@ -87,7 +50,7 @@ test.describe('nav row states', () => {
   test('marks the current category with aria-current, not colour alone', async ({
     mount,
   }) => {
-    const component = await mount(<Fixture />);
+    const component = await mount(<SettingsMenuFixture />);
     await expect(
       component.getByRole('button', { name: /General/ })
     ).toHaveAttribute('aria-current', 'true');
@@ -100,7 +63,7 @@ test.describe('nav row states', () => {
     mount,
     page,
   }) => {
-    const component = await mount(<Fixture />);
+    const component = await mount(<SettingsMenuFixture />);
     await page.keyboard.press('Tab');
 
     const focused = component.getByRole('button', { name: /General/ });
@@ -115,7 +78,7 @@ test.describe('nav row states', () => {
 
 test.describe('field controls', () => {
   test('switching category swaps the rendered fields', async ({ mount }) => {
-    const component = await mount(<Fixture />);
+    const component = await mount(<SettingsMenuFixture />);
 
     await expect(component.getByLabel('Display name')).toBeVisible();
 
@@ -130,7 +93,7 @@ test.describe('field controls', () => {
     // The changelog records Input's error state setting outline-color
     // with no outline-style, so the declaration painted nothing — a
     // border-colour-only focus signal is exactly what that produced.
-    const component = await mount(<Fixture />);
+    const component = await mount(<SettingsMenuFixture />);
     const field = component.getByLabel('Display name');
 
     await field.focus();
@@ -146,14 +109,14 @@ test.describe('field controls', () => {
 
 test.describe('accessibility', () => {
   test('the settings surface has no axe violations', async ({ mount, page }) => {
-    await mount(<Fixture />);
+    await mount(<SettingsMenuFixture />);
     await checkA11y(page);
   });
 
   test('the category list is exposed as a labelled navigation landmark', async ({
     mount,
   }) => {
-    const component = await mount(<Fixture />);
+    const component = await mount(<SettingsMenuFixture />);
     await expect(
       component.getByRole('navigation', { name: 'Settings categories' })
     ).toBeVisible();

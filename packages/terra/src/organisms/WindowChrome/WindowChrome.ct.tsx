@@ -107,15 +107,23 @@ test.describe('drag region', () => {
     const region = await component
       .getByRole('button', { name: 'Close' })
       .evaluate((el) => {
-        // Walk up to whichever ancestor declares the region, the same way
-        // the host runtime's hit-testing does. Typed as Element because
-        // parentElement can climb into non-HTML (SVG) elements.
+        // Walk up to whichever ancestor actually *declares* a region, the
+        // same way the host runtime's hit-testing does.
+        //
+        // `none` has to be skipped rather than treated as an answer:
+        // -webkit-app-region doesn't inherit, so every element that
+        // hasn't opted in computes to `none` — including the button
+        // itself. Stopping at the first non-empty value therefore always
+        // returned `none` and never reached the .noDrag wrapper.
+        //
+        // Typed as Element because parentElement can climb into
+        // non-HTML (SVG) elements.
         let node: Element | null = el;
         while (node) {
           const value = getComputedStyle(node)
             .getPropertyValue('-webkit-app-region')
             .trim();
-          if (value) return value;
+          if (value && value !== 'none') return value;
           node = node.parentElement;
         }
         return '';

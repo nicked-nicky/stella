@@ -25,13 +25,19 @@ async function token(page: import('@playwright/test').Page, name: string) {
 }
 
 test.describe('state-layer ladder', () => {
-  test('the three state tokens resolve to three distinct values', async ({
+  test('press steps firmer than hover, and selected deliberately matches hover', async ({
     mount,
     page,
   }) => {
     // Asserted at the token level as well as the rendered level: if these
-    // ever collide again, this failure names the cause directly instead
-    // of just reporting that a hover looked the same as a press.
+    // drift, this failure names the cause directly instead of just
+    // reporting that a hover looked the same as a press.
+    //
+    // `selected === hover` is a deliberate visual-identity choice, not an
+    // oversight — a selected button is distinguished by being lit *at
+    // rest* (persistence is the signal), and hovering the current item
+    // lands it back on the tone it already had. Pinned as an equality so
+    // it reads as intended rather than as the collision it resembles.
     await mount(
       <ButtonIsland>
         <Button>Save</Button>
@@ -43,7 +49,33 @@ test.describe('state-layer ladder', () => {
     const selected = await token(page, '--stella-state-selected');
 
     expect(hover).not.toBe('');
-    expect(new Set([hover, active, selected]).size).toBe(3);
+    expect(active).not.toBe(hover);
+    expect(selected).toBe(hover);
+  });
+
+  test('the fill ladder and the hairline ladder stay distinct', async ({
+    mount,
+    page,
+  }) => {
+    // The regression that actually cost something: --stella-state-hover
+    // once equalled --stella-border-default, so every border-colour
+    // escalation reading it (ButtonIsland's separator, the Island's outer
+    // border via :has()) painted the colour it was already painted. The
+    // two ladders are separate tokens now precisely so they can't
+    // silently converge again.
+    await mount(
+      <ButtonIsland>
+        <Button>Save</Button>
+      </ButtonIsland>
+    );
+
+    const borderDefault = await token(page, '--stella-border-default');
+    const borderHover = await token(page, '--stella-border-hover');
+    const borderActive = await token(page, '--stella-border-active');
+
+    expect(borderHover).not.toBe('');
+    expect(borderHover).not.toBe(borderDefault);
+    expect(borderActive).not.toBe(borderHover);
   });
 
   test('rest state carries no surface of its own', async ({ mount }) => {
@@ -130,9 +162,13 @@ test.describe('state-layer ladder', () => {
     expect(hoverBackground).toBe(restBackground);
   });
 
-  test('a selected button reads differently from a merely hovered one', async ({
+  test('a selected button is lit at rest, where an unselected one is not', async ({
     mount,
   }) => {
+    // This — not colour — is what makes the current item findable in a
+    // cluster. Selected and hover share a fill by design, so the honest
+    // assertion is about the *resting* state: one button carries a fill
+    // with nothing pointing at it, the other carries none.
     const component = await mount(
       <ButtonIsland>
         <Button active>Editor</Button>
@@ -140,18 +176,15 @@ test.describe('state-layer ladder', () => {
       </ButtonIsland>
     );
 
-    const selected = component.getByRole('button', { name: 'Editor' });
-    const plain = component.getByRole('button', { name: 'Settings' });
+    const selectedBackground = await component
+      .getByRole('button', { name: 'Editor' })
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    const plainBackground = await component
+      .getByRole('button', { name: 'Settings' })
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
 
-    const selectedBackground = await selected.evaluate(
-      (el) => getComputedStyle(el).backgroundColor
-    );
-    await plain.hover();
-    const hoveredBackground = await plain.evaluate(
-      (el) => getComputedStyle(el).backgroundColor
-    );
-
-    expect(selectedBackground).not.toBe(hoveredBackground);
+    expect(plainBackground).toBe('rgba(0, 0, 0, 0)');
+    expect(selectedBackground).not.toBe(plainBackground);
   });
 
   test('a disabled button does not respond to hover', async ({ mount }) => {
