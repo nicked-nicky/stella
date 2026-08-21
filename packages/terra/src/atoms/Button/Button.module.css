@@ -74,7 +74,7 @@
    snaps back via the same spring curve). The button chrome stays put:
    no whole-control scale, the action lives on the icon. */
 .button:active:not(:disabled) .icon {
-	transform: scale(0.85);
+	transform: scale(0.95)  translateY(2px);
 }
 
 /* ============================================================================
