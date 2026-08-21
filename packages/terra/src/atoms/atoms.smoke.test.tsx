@@ -54,7 +54,11 @@ describe('Badge', () => {
     // The whole component is an attribute carrier — Badge.module.css's
     // [data-color][data-variant] rules do the work, so these attributes
     // are the actual public contract, not an implementation detail.
-    render(<Badge color="error" variant="filled">3 errors</Badge>);
+    render(
+      <Badge color="error" variant="filled">
+        3 errors
+      </Badge>
+    );
     const badge = screen.getByText('3 errors');
     expect(badge).toHaveAttribute('data-color', 'error');
     expect(badge).toHaveAttribute('data-variant', 'filled');
@@ -112,14 +116,24 @@ describe('Text', () => {
         <Text variant="title-3">Three</Text>
       </>
     );
-    expect(screen.getByRole('heading', { level: 1, name: 'One' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 2, name: 'Two' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 3, name: 'Three' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'One' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Two' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Three' })
+    ).toBeInTheDocument();
   });
 
   it('keeps the visual variant and the semantic element independent', () => {
     // The documented escape hatch: look like a title-2, still be the h1.
-    render(<Text variant="title-2" as="h1">Smaller but primary</Text>);
+    render(
+      <Text variant="title-2" as="h1">
+        Smaller but primary
+      </Text>
+    );
     expect(
       screen.getByRole('heading', { level: 1, name: 'Smaller but primary' })
     ).toBeInTheDocument();
@@ -156,9 +170,13 @@ describe('WindowControls', () => {
   it('renders only the buttons whose handler was supplied', () => {
     // A consumer that can't minimize omits the handler and should get a
     // two-button cluster — not a disabled placeholder.
-    render(<WindowControls controls={{ maximize: () => {}, close: () => {} }} />);
+    render(
+      <WindowControls controls={{ maximize: () => {}, close: () => {} }} />
+    );
     expect(screen.queryByRole('button', { name: 'Minimize' })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Maximize' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Maximize' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
   });
 
@@ -168,7 +186,9 @@ describe('WindowControls', () => {
   });
 
   it('swaps the maximize button to Restore when the window is maximized', () => {
-    render(<WindowControls controls={{ maximize: () => {}, maximized: true }} />);
+    render(
+      <WindowControls controls={{ maximize: () => {}, maximized: true }} />
+    );
     expect(screen.getByRole('button', { name: 'Restore' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Maximize' })).toBeNull();
   });

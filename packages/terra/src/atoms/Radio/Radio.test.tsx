@@ -13,7 +13,9 @@ import { Radio } from './Radio';
 describe('Radio — label association', () => {
   it('associates the generated label with the input', () => {
     render(<Radio label="Free plan" />);
-    expect(screen.getByRole('radio', { name: 'Free plan' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('radio', { name: 'Free plan' })
+    ).toBeInTheDocument();
   });
 
   it('honours a caller-supplied id instead of generating one', () => {
@@ -101,7 +103,9 @@ describe('Radio — controlled and disabled', () => {
   it('defers to the parent when controlled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    render(<Radio name="plan" label="Pro" checked={false} onChange={onChange} />);
+    render(
+      <Radio name="plan" label="Pro" checked={false} onChange={onChange} />
+    );
     const radio = screen.getByRole('radio', { name: 'Pro' });
 
     await user.click(radio);

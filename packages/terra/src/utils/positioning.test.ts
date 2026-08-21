@@ -15,7 +15,10 @@ const VIEWPORT = { viewportWidth: 1000, viewportHeight: 800 };
 /** Anchor sitting comfortably mid-viewport — nothing collides. */
 const CENTER_ANCHOR = { top: 400, left: 400, width: 100, height: 40 };
 
-function compute(placement: Placement, overrides: Partial<Parameters<typeof computeAnchoredPosition>[0]> = {}) {
+function compute(
+  placement: Placement,
+  overrides: Partial<Parameters<typeof computeAnchoredPosition>[0]> = {}
+) {
   return computeAnchoredPosition({
     anchorRect: CENTER_ANCHOR,
     panelWidth: 200,

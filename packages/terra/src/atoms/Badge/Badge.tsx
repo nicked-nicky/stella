@@ -6,7 +6,8 @@ import styles from './Badge.module.css';
 // ============================================================================
 
 type BadgeVariant = 'filled' | 'tinted' | 'outline';
-type BadgeColor = 'neutral' | 'success' | 'info' | 'warning' | 'error' | 'debug';
+type BadgeColor =
+  'neutral' | 'success' | 'info' | 'warning' | 'error' | 'debug';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   /**

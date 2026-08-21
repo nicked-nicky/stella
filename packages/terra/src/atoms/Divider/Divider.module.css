@@ -15,7 +15,8 @@
 	   hover/press (see ButtonIsland.module.css's SEPARATOR ESCALATION
 	   section) — this is what makes that color swap ease instead of
 	   snap. */
-	transition: background-color var(--stella-motion-fast) var(--stella-easing-out);
+	transition: background-color var(--stella-motion-fast)
+		var(--stella-easing-out);
 }
 
 .horizontal {

@@ -66,7 +66,10 @@ export async function checkA11y(page: Page, selector = '#root'): Promise<void> {
   expect(
     violations,
     violations
-      .map((v) => `${v.id} (${v.impact}): ${v.help}\n  ${v.nodes.map((n) => n.html).join('\n  ')}`)
+      .map(
+        (v) =>
+          `${v.id} (${v.impact}): ${v.help}\n  ${v.nodes.map((n) => n.html).join('\n  ')}`
+      )
       .join('\n\n')
   ).toEqual([]);
 }

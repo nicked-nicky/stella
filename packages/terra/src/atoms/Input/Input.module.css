@@ -189,7 +189,7 @@
 }
 
 .icon {
-	composes: icon from '../../styles/shared/controlIcon.module.css';
+	composes: icon from "../../styles/shared/controlIcon.module.css";
 	color: var(--stella-text-secondary);
 	/* Springy press squeeze (see the :active rule above) */
 	transition: transform var(--stella-motion-fast) var(--stella-easing-spring);

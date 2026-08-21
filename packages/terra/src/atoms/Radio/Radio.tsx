@@ -7,8 +7,10 @@ import styles from './Radio.module.css';
 
 type RadioSize = 'sm' | 'md';
 
-interface RadioProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
+interface RadioProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'type' | 'size'
+> {
   /**
    * @default 'md'
    */

@@ -1,77 +1,77 @@
 {
-  "name": "@stella/terra",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Stella — Terra. Thin, optimized, GTK4/libadwaita-inspired base UI kit for React.",
-  "license": "MIT",
-  "type": "module",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": "./src/index.ts",
-    "./styles/tokens.css": "./src/styles/tokens.css",
-    "./package.json": "./package.json"
-  },
-  "publishConfig": {
-    "access": "public",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
-      },
-      "./styles/tokens.css": "./dist/styles/tokens.css",
-      "./package.json": "./package.json"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "sideEffects": [
-    "**/*.css"
-  ],
-  "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18",
-    "lucide-react": "^1.0.0"
-  },
-  "engines": {
-    "node": ">=20.19"
-  },
-  "peerDependenciesMeta": {
-    "lucide-react": {
-      "optional": true
-    }
-  },
-  "scripts": {
-    "build": "tsc && node scripts/copy-css.mjs",
-    "clean": "rm -rf dist",
-    "typecheck": "tsc -p tsconfig.typecheck.json",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ct": "playwright test -c playwright-ct.config.ts",
-    "docs": "typedoc"
-  },
-  "devDependencies": {
-    "@axe-core/playwright": "^4.13.0",
-    "@playwright/experimental-ct-react": "^1.62.1",
-    "@playwright/test": "^1.62.1",
-    "@testing-library/jest-dom": "~6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.5",
-    "jsdom": "^30.0.1",
-    "lucide-react": "^1.30.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "typedoc": "^0.28.20",
-    "typescript": "^5.9.3",
-    "vite": "^8.2.2",
-    "vitest": "^4.1.11"
-  }
+	"name": "@stella/terra",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Stella — Terra. Thin, optimized, GTK4/libadwaita-inspired base UI kit for React.",
+	"license": "MIT",
+	"type": "module",
+	"main": "./src/index.ts",
+	"module": "./src/index.ts",
+	"types": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./styles/tokens.css": "./src/styles/tokens.css",
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public",
+		"main": "./dist/index.js",
+		"module": "./dist/index.js",
+		"types": "./dist/index.d.ts",
+		"exports": {
+			".": {
+				"types": "./dist/index.d.ts",
+				"import": "./dist/index.js"
+			},
+			"./styles/tokens.css": "./dist/styles/tokens.css",
+			"./package.json": "./package.json"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"sideEffects": [
+		"**/*.css"
+	],
+	"peerDependencies": {
+		"react": ">=18",
+		"react-dom": ">=18",
+		"lucide-react": "^1.0.0"
+	},
+	"engines": {
+		"node": ">=20.19"
+	},
+	"peerDependenciesMeta": {
+		"lucide-react": {
+			"optional": true
+		}
+	},
+	"scripts": {
+		"build": "tsc && node scripts/copy-css.mjs",
+		"clean": "rm -rf dist",
+		"typecheck": "tsc -p tsconfig.typecheck.json",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ct": "playwright test -c playwright-ct.config.ts",
+		"docs": "typedoc"
+	},
+	"devDependencies": {
+		"@axe-core/playwright": "^4.13.0",
+		"@playwright/experimental-ct-react": "^1.62.1",
+		"@playwright/test": "^1.62.1",
+		"@testing-library/jest-dom": "~6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.5",
+		"jsdom": "^30.0.1",
+		"lucide-react": "^1.30.0",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
+		"typedoc": "^0.28.20",
+		"typescript": "^5.9.3",
+		"vite": "^8.2.2",
+		"vitest": "^4.1.11"
+	}
 }

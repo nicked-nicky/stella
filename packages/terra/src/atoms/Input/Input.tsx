@@ -8,8 +8,10 @@ import styles from './Input.module.css';
 type InputVariant = 'default' | 'filled';
 type InputSize = 'sm' | 'md' | 'lg';
 
-interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+interface InputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'size'
+> {
   /**
    * @default 'default'
    */

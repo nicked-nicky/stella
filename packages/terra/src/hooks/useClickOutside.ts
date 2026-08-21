@@ -10,10 +10,7 @@ import React, { useEffect, useRef } from 'react';
  * nothing to exclude). `null`/`undefined` entries are ignored, so
  * callers don't need to filter conditionally-present refs themselves. */
 type OutsideTarget =
-  | React.RefObject<HTMLElement | null>
-  | HTMLElement
-  | null
-  | undefined;
+  React.RefObject<HTMLElement | null> | HTMLElement | null | undefined;
 
 // ============================================================================
 // HOOK
@@ -65,6 +62,7 @@ export function useClickOutside(
     }
 
     document.addEventListener('pointerdown', handlePointerDown, true);
-    return () => document.removeEventListener('pointerdown', handlePointerDown, true);
+    return () =>
+      document.removeEventListener('pointerdown', handlePointerDown, true);
   }, [enabled]);
 }

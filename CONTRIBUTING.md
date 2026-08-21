@@ -37,15 +37,15 @@ Not optional, not an opt-in prop. If you're adding an interactive component:
 
 ## Tests
 
-See [WIKI.md → Testing](./WIKI.md#testing) for what belongs in a Vitest unit test vs. a Playwright component test. Rough rule: if the behavior lives in JS/TSX logic (state, event handlers, ARIA attributes), it's a `.test.tsx`. If the behavior lives in actual CSS (a color that should change on hover/press, a `:has()` reaction), it's a `.ct.tsx` — jsdom can't verify real computed styles, so a unit test asserting a CSS rule *exists* doesn't actually prove it *works*.
+See [WIKI.md → Testing](./WIKI.md#testing) for what belongs in a Vitest unit test vs. a Playwright component test. Rough rule: if the behavior lives in JS/TSX logic (state, event handlers, ARIA attributes), it's a `.test.tsx`. If the behavior lives in actual CSS (a color that should change on hover/press, a `:has()` reaction), it's a `.ct.tsx` — jsdom can't verify real computed styles, so a unit test asserting a CSS rule _exists_ doesn't actually prove it _works_.
 
 New components/props should come with at least one test of whichever kind is relevant. Bug fixes for a real regression (like a CSS token collision that silently broke a hover state) should come with a test that would have caught it — see `ButtonIsland.ct.tsx` for the pattern.
 
 ## Commits & PRs
 
-- Commit messages: short imperative summary line (`Fix Button focus ring`, not `Fixed` or `Fixing`), body if the *why* isn't obvious from the diff.
+- Commit messages: short imperative summary line (`Fix Button focus ring`, not `Fixed` or `Fixing`), body if the _why_ isn't obvious from the diff.
 - One logical change per PR. A component fix and an unrelated README tweak are two PRs.
-- Update `CHANGELOG.md` under `[Unreleased]` for anything user-facing (new component, prop, bug fix, breaking change) — see existing entries for the level of detail expected: what changed and *why*, not just what.
+- Update `CHANGELOG.md` under `[Unreleased]` for anything user-facing (new component, prop, bug fix, breaking change) — see existing entries for the level of detail expected: what changed and _why_, not just what.
 - If your change affects a documented pattern, update [WIKI.md](./WIKI.md) in the same PR. Docs drifting out of sync with the code is worse than no docs.
 
 ## Reporting issues

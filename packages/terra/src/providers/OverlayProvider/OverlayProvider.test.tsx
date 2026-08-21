@@ -55,7 +55,9 @@ describe('OverlayProvider — portal root', () => {
       </OverlayProvider>
     );
     await waitFor(() =>
-      expect(document.querySelector('[data-stella-overlay-root]')).not.toBeNull()
+      expect(
+        document.querySelector('[data-stella-overlay-root]')
+      ).not.toBeNull()
     );
     unmount();
     expect(document.querySelector('[data-stella-overlay-root]')).toBeNull();
@@ -77,7 +79,10 @@ describe('OverlayProvider — stacking', () => {
         'true'
       );
     });
-    expect(screen.getByTestId('first')).toHaveAttribute('data-topmost', 'false');
+    expect(screen.getByTestId('first')).toHaveAttribute(
+      'data-topmost',
+      'false'
+    );
   });
 
   it('closing the top layer hands topmost back to the one underneath', async () => {
@@ -104,7 +109,10 @@ describe('OverlayProvider — stacking', () => {
     await user.click(screen.getByRole('button', { name: 'close second' }));
 
     await waitFor(() =>
-      expect(screen.getByTestId('first')).toHaveAttribute('data-topmost', 'true')
+      expect(screen.getByTestId('first')).toHaveAttribute(
+        'data-topmost',
+        'true'
+      )
     );
   });
 
@@ -150,7 +158,10 @@ describe('OverlayProvider — Escape scoping', () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByTestId('inner')).toHaveAttribute('data-topmost', 'true')
+      expect(screen.getByTestId('inner')).toHaveAttribute(
+        'data-topmost',
+        'true'
+      )
     );
 
     await user.keyboard('{Escape}');
@@ -178,7 +189,10 @@ describe('OverlayProvider — Escape scoping', () => {
     render(<Harness />);
 
     await waitFor(() =>
-      expect(screen.getByTestId('inner')).toHaveAttribute('data-topmost', 'true')
+      expect(screen.getByTestId('inner')).toHaveAttribute(
+        'data-topmost',
+        'true'
+      )
     );
 
     await user.keyboard('{Escape}'); // closes inner
@@ -243,7 +257,9 @@ describe('useOverlayContext — guard', () => {
     }
     // React logs the error boundary trace; silence it for this one case.
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => render(<Orphan />)).toThrow(/must be used within an <OverlayProvider>/);
+    expect(() => render(<Orphan />)).toThrow(
+      /must be used within an <OverlayProvider>/
+    );
     spy.mockRestore();
   });
 });

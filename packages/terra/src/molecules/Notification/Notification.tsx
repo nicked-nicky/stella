@@ -8,8 +8,10 @@ import styles from './Notification.module.css';
 
 type NotificationVariant = 'info' | 'success' | 'warning' | 'error' | 'debug';
 
-interface NotificationProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+interface NotificationProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'children'
+> {
   /**
    * @default 'info'
    */

@@ -16,16 +16,40 @@ interface SettingsFieldRowProps {
  * field type instead of one growing if-chain, so a new field type
  * means adding a file here, not editing this one.
  */
-export function SettingsFieldRow({ categoryId, field, value, onChange }: SettingsFieldRowProps) {
+export function SettingsFieldRow({
+  categoryId,
+  field,
+  value,
+  onChange,
+}: SettingsFieldRowProps) {
   const fieldId = useId();
 
   if (field.type === 'boolean') {
-    return <BooleanField field={field} fieldId={fieldId} value={value} onChange={onChange} />;
+    return (
+      <BooleanField
+        field={field}
+        fieldId={fieldId}
+        value={value}
+        onChange={onChange}
+      />
+    );
   }
   if (field.type === 'choice') {
     return (
-      <ChoiceField categoryId={categoryId} field={field} value={value} onChange={onChange} />
+      <ChoiceField
+        categoryId={categoryId}
+        field={field}
+        value={value}
+        onChange={onChange}
+      />
     );
   }
-  return <TextField field={field} fieldId={fieldId} value={value} onChange={onChange} />;
+  return (
+    <TextField
+      field={field}
+      fieldId={fieldId}
+      value={value}
+      onChange={onChange}
+    />
+  );
 }

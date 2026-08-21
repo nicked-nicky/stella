@@ -238,6 +238,9 @@ export class ThemeManager {
    * one token, so this one write re-thicknesses all of them.
    */
   private applyBorderWidth(borderWidth: BorderWidthStyle): void {
-    this.root.style.setProperty('--stella-border-width', BORDER_WIDTH[borderWidth]);
+    this.root.style.setProperty(
+      '--stella-border-width',
+      BORDER_WIDTH[borderWidth]
+    );
   }
 }

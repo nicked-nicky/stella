@@ -19,7 +19,8 @@ import { checkA11y } from '../../../playwright/a11y';
 /** Resolves a design token to its computed value on the document root. */
 async function token(page: import('@playwright/test').Page, name: string) {
   return page.evaluate(
-    (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim(),
+    (n) =>
+      getComputedStyle(document.documentElement).getPropertyValue(n).trim(),
     name
   );
 }
@@ -105,7 +106,9 @@ test.describe('state-layer ladder', () => {
     expect(background).toBe('rgba(0, 0, 0, 0)');
   });
 
-  test('hover paints a state layer and brightens the label', async ({ mount }) => {
+  test('hover paints a state layer and brightens the label', async ({
+    mount,
+  }) => {
     const component = await mount(
       <ButtonIsland>
         <Button>Save</Button>
@@ -209,7 +212,10 @@ test.describe('state-layer ladder', () => {
     expect(selectedBackground).not.toBe(plainBackground);
   });
 
-  test('a disabled button does not respond to hover', async ({ mount, page }) => {
+  test('a disabled button does not respond to hover', async ({
+    mount,
+    page,
+  }) => {
     const component = await mount(
       <ButtonIsland>
         <Button disabled>Save</Button>

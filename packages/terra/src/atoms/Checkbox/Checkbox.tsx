@@ -8,8 +8,10 @@ import styles from './Checkbox.module.css';
 
 type CheckboxSize = 'sm' | 'md';
 
-interface CheckboxProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
+interface CheckboxProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'type' | 'size'
+> {
   /**
    * @default 'md'
    */

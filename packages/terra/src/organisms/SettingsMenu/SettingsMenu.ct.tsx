@@ -43,7 +43,9 @@ test.describe('nav row states', () => {
     expect(whileOtherHovered).toBe(atRest);
   });
 
-  test('a resting, non-current row carries no state layer', async ({ mount }) => {
+  test('a resting, non-current row carries no state layer', async ({
+    mount,
+  }) => {
     const component = await mount(<SettingsMenuFixture />);
     const other = component.getByRole('button', { name: /Appearance/ });
     const background = await other.evaluate(
@@ -116,7 +118,11 @@ test.describe('field controls', () => {
     const readRing = () =>
       field.evaluate((el) => {
         const s = getComputedStyle(el.parentElement!);
-        return { style: s.outlineStyle, width: s.outlineWidth, color: s.outlineColor };
+        return {
+          style: s.outlineStyle,
+          width: s.outlineWidth,
+          color: s.outlineColor,
+        };
       });
 
     const resting = await readRing();
@@ -127,7 +133,9 @@ test.describe('field controls', () => {
     // Polled, not read once: outline-color is transitioned over
     // --stella-motion-fast, and a single read right after focus catches
     // the ring still interpolating away from transparent.
-    await expect.poll(async () => (await readRing()).color).not.toBe(resting.color);
+    await expect
+      .poll(async () => (await readRing()).color)
+      .not.toBe(resting.color);
 
     const focused = await readRing();
     expect(focused.style).toBe('solid');
@@ -173,7 +181,10 @@ test.describe('layout', () => {
 });
 
 test.describe('accessibility', () => {
-  test('the settings surface has no axe violations', async ({ mount, page }) => {
+  test('the settings surface has no axe violations', async ({
+    mount,
+    page,
+  }) => {
     await mount(<SettingsMenuFixture />);
     await checkA11y(page);
   });

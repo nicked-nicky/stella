@@ -15,7 +15,12 @@ interface BooleanFieldProps {
  * block (title + description) is clickable — libadwaita's
  * ActionRow/SwitchRow convention of a large click target.
  */
-export function BooleanField({ field, fieldId, value, onChange }: BooleanFieldProps) {
+export function BooleanField({
+  field,
+  fieldId,
+  value,
+  onChange,
+}: BooleanFieldProps) {
   return (
     <FlexContainer justify="between" align="center" gap="4">
       <label htmlFor={fieldId} style={{ cursor: 'pointer' }}>
@@ -33,7 +38,11 @@ export function BooleanField({ field, fieldId, value, onChange }: BooleanFieldPr
           </Text>
         )}
       </label>
-      <Switch id={fieldId} checked={Boolean(value)} onCheckedChange={onChange} />
+      <Switch
+        id={fieldId}
+        checked={Boolean(value)}
+        onCheckedChange={onChange}
+      />
     </FlexContainer>
   );
 }

@@ -51,9 +51,7 @@ export interface SettingsChoiceField extends SettingsFieldBase {
 }
 
 export type SettingsField =
-  | SettingsTextField
-  | SettingsBooleanField
-  | SettingsChoiceField;
+  SettingsTextField | SettingsBooleanField | SettingsChoiceField;
 
 export interface SettingsCategory {
   id: string;

@@ -13,7 +13,10 @@ interface TextFieldProps {
 export function TextField({ field, fieldId, value, onChange }: TextFieldProps) {
   return (
     <div>
-      <label htmlFor={fieldId} style={{ display: 'block', marginBottom: 'var(--stella-space-1)' }}>
+      <label
+        htmlFor={fieldId}
+        style={{ display: 'block', marginBottom: 'var(--stella-space-1)' }}
+      >
         <Text as="span" variant="body-strong">
           {field.label}
         </Text>

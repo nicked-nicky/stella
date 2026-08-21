@@ -31,8 +31,7 @@
    guarantees this wins over `.backdrop`'s own `animation` regardless
    of stylesheet order, same pattern as Button's `.button.active`. */
 .backdrop.closing {
-	animation: backdrop-out var(--stella-motion-fast) var(--stella-easing-in)
-		both;
+	animation: backdrop-out var(--stella-motion-fast) var(--stella-easing-in) both;
 }
 
 .panel {
@@ -49,8 +48,7 @@
 	box-shadow: var(--stella-rim), var(--stella-shadow-xl);
 	overflow: hidden;
 	outline: none;
-	animation: panel-in var(--stella-motion-slow) var(--stella-easing-spring)
-		both;
+	animation: panel-in var(--stella-motion-slow) var(--stella-easing-spring) both;
 	box-sizing: border-box;
 }
 

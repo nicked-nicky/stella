@@ -14,7 +14,11 @@ interface SettingsNavProps {
  * SettingsMenu.module.css). Internal decomposition detail of
  * `SettingsMenu`, not exported.
  */
-export function SettingsNav({ categories, activeId, onSelect }: SettingsNavProps) {
+export function SettingsNav({
+  categories,
+  activeId,
+  onSelect,
+}: SettingsNavProps) {
   return (
     <nav aria-label="Settings categories" className={styles.nav}>
       <FlexContainer direction="column" gap="1" style={{ width: '100%' }}>
@@ -22,7 +26,10 @@ export function SettingsNav({ categories, activeId, onSelect }: SettingsNavProps
           <button
             key={category.id}
             type="button"
-            className={[styles.navItem, category.id === activeId && styles.navItemActive]
+            className={[
+              styles.navItem,
+              category.id === activeId && styles.navItemActive,
+            ]
               .filter(Boolean)
               .join(' ')}
             onClick={() => onSelect(category.id)}

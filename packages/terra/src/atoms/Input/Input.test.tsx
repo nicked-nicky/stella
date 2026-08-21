@@ -63,7 +63,14 @@ describe('Input — native behaviour passes through', () => {
   });
 
   it('forwards arbitrary input attributes to the real <input>', async () => {
-    render(<Input aria-label="Email" type="email" placeholder="you@example.com" required />);
+    render(
+      <Input
+        aria-label="Email"
+        type="email"
+        placeholder="you@example.com"
+        required
+      />
+    );
     const input = screen.getByRole('textbox', { name: 'Email' });
     expect(input).toHaveAttribute('type', 'email');
     expect(input).toHaveAttribute('placeholder', 'you@example.com');

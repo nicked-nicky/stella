@@ -40,7 +40,8 @@
 	user-select: none;
 	-webkit-user-select: none;
 
-	transition: background-color var(--stella-motion-fast) var(--stella-easing-out),
+	transition:
+		background-color var(--stella-motion-fast) var(--stella-easing-out),
 		color var(--stella-motion-fast) var(--stella-easing-out);
 }
 
@@ -61,13 +62,13 @@
    (`+` alone only looks forward).
    ============================================================================ */
 
-.menu > .item:hover:not(:disabled) + [role='separator'],
-.menu > [role='separator']:has(+ .item:hover:not(:disabled)) {
+.menu > .item:hover:not(:disabled) + [role="separator"],
+.menu > [role="separator"]:has(+ .item:hover:not(:disabled)) {
 	background-color: var(--stella-state-hover);
 }
 
-.menu > .item:active:not(:disabled) + [role='separator'],
-.menu > [role='separator']:has(+ .item:active:not(:disabled)) {
+.menu > .item:active:not(:disabled) + [role="separator"],
+.menu > [role="separator"]:has(+ .item:active:not(:disabled)) {
 	background-color: var(--stella-state-active);
 }
 

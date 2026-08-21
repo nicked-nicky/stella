@@ -70,7 +70,9 @@ describe('Dialog — ARIA semantics', () => {
     );
     // Resolving by accessible name proves the aria-labelledby wiring
     // actually points at the rendered title node.
-    expect(await screen.findByRole('dialog', { name: 'Preferences' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('dialog', { name: 'Preferences' })
+    ).toBeInTheDocument();
   });
 
   it('describes itself from Dialog.Description when one is present', async () => {
@@ -85,7 +87,9 @@ describe('Dialog — ARIA semantics', () => {
     const dialog = await screen.findByRole('dialog');
     const describedBy = dialog.getAttribute('aria-describedby');
     expect(describedBy).toBeTruthy();
-    expect(document.getElementById(describedBy!)).toHaveTextContent('Tune the app');
+    expect(document.getElementById(describedBy!)).toHaveTextContent(
+      'Tune the app'
+    );
   });
 
   it('omits aria-labelledby entirely when there is no title, rather than pointing at a missing id', async () => {
@@ -133,7 +137,9 @@ describe('Dialog — focus management', () => {
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(true);
+      expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(
+        true
+      );
     });
   });
 
@@ -144,7 +150,9 @@ describe('Dialog — focus management', () => {
 
     await user.click(trigger);
     await waitFor(() =>
-      expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(true)
+      expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(
+        true
+      )
     );
 
     await user.keyboard('{Escape}');
@@ -216,7 +224,9 @@ describe('Dialog — dismissal', () => {
     render(<DialogHarness onClose={onClose} />);
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
-    await user.click(await screen.findByRole('button', { name: 'Close dialog' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Close dialog' })
+    );
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -268,9 +278,9 @@ describe('Dialog — dismissal', () => {
 describe('Dialog — compound-component guard', () => {
   it('throws a named error if a subcomponent is used outside Dialog', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() =>
-      render(<Dialog.Title>Orphan</Dialog.Title>)
-    ).toThrow(/must be used inside <Dialog>/);
+    expect(() => render(<Dialog.Title>Orphan</Dialog.Title>)).toThrow(
+      /must be used inside <Dialog>/
+    );
     spy.mockRestore();
   });
 });

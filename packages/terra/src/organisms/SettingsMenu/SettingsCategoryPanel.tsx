@@ -25,7 +25,11 @@ export function SettingsCategoryPanel({
 }: SettingsCategoryPanelProps) {
   return (
     <div>
-      <Text variant="title-2" as="h2" style={{ marginBottom: 'var(--stella-space-1)' }}>
+      <Text
+        variant="title-2"
+        as="h2"
+        style={{ marginBottom: 'var(--stella-space-1)' }}
+      >
         {category.label}
       </Text>
       {category.description && (
@@ -38,7 +42,9 @@ export function SettingsCategoryPanel({
           {category.description}
         </Text>
       )}
-      {!category.description && <div style={{ marginBottom: 'var(--stella-space-4)' }} />}
+      {!category.description && (
+        <div style={{ marginBottom: 'var(--stella-space-4)' }} />
+      )}
 
       <FlexContainer direction="column" gap="0">
         {category.fields.map((field, idx) => (
@@ -51,7 +57,9 @@ export function SettingsCategoryPanel({
                 onChange={(value) => onFieldChange(field.key, value)}
               />
             </div>
-            {idx < category.fields.length - 1 && <Divider className={styles.rowDivider} />}
+            {idx < category.fields.length - 1 && (
+              <Divider className={styles.rowDivider} />
+            )}
           </Fragment>
         ))}
       </FlexContainer>

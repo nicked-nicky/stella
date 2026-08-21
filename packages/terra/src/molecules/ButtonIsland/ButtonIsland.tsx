@@ -1,4 +1,9 @@
-import React, { Children, cloneElement, forwardRef, isValidElement } from 'react';
+import React, {
+  Children,
+  cloneElement,
+  forwardRef,
+  isValidElement,
+} from 'react';
 import { Island } from '../../atoms/Island';
 import type { IslandProps } from '../../atoms/Island';
 import { FlexContainer } from '../../layout/FlexContainer';
@@ -14,7 +19,8 @@ import styles from './ButtonIsland.module.css';
 // ============================================================================
 
 interface ButtonIslandProps
-  extends Omit<FlexContainerProps, 'direction' | 'ref'>,
+  extends
+    Omit<FlexContainerProps, 'direction' | 'ref'>,
     Pick<IslandProps, 'tone' | 'clip'> {
   /**
    * Sizing token applied to every `Button` child. A Button that already
@@ -96,7 +102,8 @@ const ButtonIslandBase = forwardRef<HTMLElement, ButtonIslandProps>(
   ) => {
     const childArray = Children.toArray(children);
     const onlyChild = childArray.length === 1 ? childArray[0] : undefined;
-    const isSingleButton = isValidElement(onlyChild) && onlyChild.type === Button;
+    const isSingleButton =
+      isValidElement(onlyChild) && onlyChild.type === Button;
 
     // Built up by hand rather than `Children.map` — inserting the
     // auto-hairline `Divider` between Button pairs means the output
@@ -105,7 +112,10 @@ const ButtonIslandBase = forwardRef<HTMLElement, ButtonIslandProps>(
     const sizedChildren: React.ReactNode[] = [];
     childArray.forEach((child, index) => {
       if (isValidElement(child) && child.type === Button) {
-        const childProps = child.props as { size?: ButtonSize; className?: string };
+        const childProps = child.props as {
+          size?: ButtonSize;
+          className?: string;
+        };
         // Built up rather than spread as one literal: `className` is only
         // ever set (never set-to-undefined) — exactOptionalPropertyTypes
         // rejects an explicit `undefined` for an optional-but-not-nullable
@@ -121,7 +131,10 @@ const ButtonIslandBase = forwardRef<HTMLElement, ButtonIslandProps>(
         }
         sizedChildren.push(
           cloneElement(
-            child as React.ReactElement<{ size?: ButtonSize; className?: string }>,
+            child as React.ReactElement<{
+              size?: ButtonSize;
+              className?: string;
+            }>,
             overrides
           )
         );
@@ -133,7 +146,10 @@ const ButtonIslandBase = forwardRef<HTMLElement, ButtonIslandProps>(
         const next = childArray[index + 1];
         if (isValidElement(next) && next.type === Button) {
           sizedChildren.push(
-            <Divider key={`${child.key ?? index}-hairline`} orientation="vertical" />
+            <Divider
+              key={`${child.key ?? index}-hairline`}
+              orientation="vertical"
+            />
           );
         }
       } else {

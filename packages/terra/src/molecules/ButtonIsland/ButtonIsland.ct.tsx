@@ -21,7 +21,9 @@ import { Button } from '../../atoms/Button';
 // run and failed the next with no source change between them. Polling
 // asserts what the property settles on, which is the actual contract.
 
-test('separator between two buttons changes color on hover', async ({ mount }) => {
+test('separator between two buttons changes color on hover', async ({
+  mount,
+}) => {
   const component = await mount(
     <ButtonIsland>
       <Button>Left</Button>
@@ -30,12 +32,16 @@ test('separator between two buttons changes color on hover', async ({ mount }) =
   );
 
   const separator = component.getByRole('separator');
-  const restingColor = await separator.evaluate((el) => getComputedStyle(el).backgroundColor);
+  const restingColor = await separator.evaluate(
+    (el) => getComputedStyle(el).backgroundColor
+  );
 
   await component.getByRole('button', { name: 'Left' }).hover();
 
   await expect
-    .poll(() => separator.evaluate((el) => getComputedStyle(el).backgroundColor))
+    .poll(() =>
+      separator.evaluate((el) => getComputedStyle(el).backgroundColor)
+    )
     .not.toBe(restingColor);
 });
 
@@ -48,7 +54,9 @@ test('outer Island border changes color on button hover', async ({ mount }) => {
   );
 
   const island = component; // Island is the mounted root element
-  const restingColor = await island.evaluate((el) => getComputedStyle(el).borderColor);
+  const restingColor = await island.evaluate(
+    (el) => getComputedStyle(el).borderColor
+  );
 
   await component.getByRole('button', { name: 'Left' }).hover();
 
@@ -58,7 +66,9 @@ test('outer Island border changes color on button hover', async ({ mount }) => {
 });
 
 test.describe('single-button stretch', () => {
-  test('a lone button fills an Island that has been widened', async ({ mount }) => {
+  test('a lone button fills an Island that has been widened', async ({
+    mount,
+  }) => {
     // The chain is three boxes deep — Island, the inner button row, then
     // the Button — and it only takes one of them declining to grow for
     // the whole thing to look broken. The row was the one: it sat at

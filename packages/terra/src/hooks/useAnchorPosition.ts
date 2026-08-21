@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { computeAnchoredPosition } from '../utils/positioning';
 import type { Anchor, Placement } from '../utils/positioning';
 
@@ -102,8 +108,11 @@ export function useAnchorPosition({
     setPanel(node);
   }, []);
 
-  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
-  const [resolvedPlacement, setResolvedPlacement] = useState<Placement>(placement);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(
+    null
+  );
+  const [resolvedPlacement, setResolvedPlacement] =
+    useState<Placement>(placement);
 
   const recompute = useCallback(() => {
     const panel = panelElementRef.current;

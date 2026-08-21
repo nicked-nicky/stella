@@ -12,19 +12,19 @@
  */
 
 .wrapper {
-	composes: wrapper from '../../styles/shared/formControl.module.css';
+	composes: wrapper from "../../styles/shared/formControl.module.css";
 }
 
 .size-sm {
-	composes: size-sm from '../../styles/shared/formControl.module.css';
+	composes: size-sm from "../../styles/shared/formControl.module.css";
 }
 
 .size-md {
-	composes: size-md from '../../styles/shared/formControl.module.css';
+	composes: size-md from "../../styles/shared/formControl.module.css";
 }
 
 .input {
-	composes: input from '../../styles/shared/formControl.module.css';
+	composes: input from "../../styles/shared/formControl.module.css";
 }
 
 .dot {
@@ -38,20 +38,22 @@
 	border: var(--stella-border-width) solid var(--stella-border-default);
 	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-surface-card);
-	transition: background-color var(--stella-motion-fast) var(--stella-easing-out),
+	transition:
+		background-color var(--stella-motion-fast) var(--stella-easing-out),
 		border-color var(--stella-motion-fast) var(--stella-easing-out),
 		transform var(--stella-motion-fast) var(--stella-easing-spring);
 }
 
 .dot::after {
-	content: '';
+	content: "";
 	width: 40%;
 	height: 40%;
 	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-selected-content);
 	opacity: 0;
 	transform: scale(0.4);
-	transition: opacity var(--stella-motion-instant) var(--stella-easing-out),
+	transition:
+		opacity var(--stella-motion-instant) var(--stella-easing-out),
 		transform var(--stella-motion-fast) var(--stella-easing-spring);
 }
 
@@ -84,9 +86,9 @@
    ============================================================================ */
 
 .label {
-	composes: label from '../../styles/shared/formControl.module.css';
+	composes: label from "../../styles/shared/formControl.module.css";
 }
 
 .labelText {
-	composes: labelText from '../../styles/shared/formControl.module.css';
+	composes: labelText from "../../styles/shared/formControl.module.css";
 }

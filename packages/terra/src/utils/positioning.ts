@@ -87,7 +87,10 @@ function parsePlacement(placement: Placement): {
   side: PlacementSide;
   align: PlacementAlign;
 } {
-  const [side, align] = placement.split('-') as [PlacementSide, PlacementAlign?];
+  const [side, align] = placement.split('-') as [
+    PlacementSide,
+    PlacementAlign?,
+  ];
   return { side, align: align ?? 'center' };
 }
 
@@ -113,7 +116,8 @@ function place(
         ? anchorRect.top - panelHeight - offset
         : anchorRect.top + anchorRect.height + offset;
     if (align === 'start') left = anchorRect.left;
-    else if (align === 'end') left = anchorRect.left + anchorRect.width - panelWidth;
+    else if (align === 'end')
+      left = anchorRect.left + anchorRect.width - panelWidth;
     else left = anchorRect.left + anchorRect.width / 2 - panelWidth / 2;
   } else {
     left =
@@ -121,7 +125,8 @@ function place(
         ? anchorRect.left - panelWidth - offset
         : anchorRect.left + anchorRect.width + offset;
     if (align === 'start') top = anchorRect.top;
-    else if (align === 'end') top = anchorRect.top + anchorRect.height - panelHeight;
+    else if (align === 'end')
+      top = anchorRect.top + anchorRect.height - panelHeight;
     else top = anchorRect.top + anchorRect.height / 2 - panelHeight / 2;
   }
 
@@ -139,9 +144,14 @@ function fitsOnSide(
 ): boolean {
   if (side === 'top') return anchorRect.top - panelHeight - offset >= 0;
   if (side === 'bottom')
-    return anchorRect.top + anchorRect.height + offset + panelHeight <= viewportHeight;
+    return (
+      anchorRect.top + anchorRect.height + offset + panelHeight <=
+      viewportHeight
+    );
   if (side === 'left') return anchorRect.left - panelWidth - offset >= 0;
-  return anchorRect.left + anchorRect.width + offset + panelWidth <= viewportWidth;
+  return (
+    anchorRect.left + anchorRect.width + offset + panelWidth <= viewportWidth
+  );
 }
 
 // ============================================================================
@@ -200,12 +210,25 @@ export function computeAnchoredPosition({
 
   const resolvedSide = preferredFits ? side : oppositeFits ? opposite : side;
 
-  let { top, left } = place(resolvedSide, align, anchorRect, panelWidth, panelHeight, offset);
+  let { top, left } = place(
+    resolvedSide,
+    align,
+    anchorRect,
+    panelWidth,
+    panelHeight,
+    offset
+  );
 
   if (resolvedSide === 'top' || resolvedSide === 'bottom') {
-    left = Math.min(Math.max(left, padding), viewportWidth - panelWidth - padding);
+    left = Math.min(
+      Math.max(left, padding),
+      viewportWidth - panelWidth - padding
+    );
   } else {
-    top = Math.min(Math.max(top, padding), viewportHeight - panelHeight - padding);
+    top = Math.min(
+      Math.max(top, padding),
+      viewportHeight - panelHeight - padding
+    );
   }
 
   return { top, left, placement: joinPlacement(resolvedSide, align) };

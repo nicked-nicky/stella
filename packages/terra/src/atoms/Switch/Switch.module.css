@@ -27,7 +27,8 @@
 	outline: 2px solid transparent;
 	outline-offset: 2px;
 
-	transition: background-color var(--stella-motion-fast) var(--stella-easing-out);
+	transition: background-color var(--stella-motion-fast)
+		var(--stella-easing-out);
 }
 
 .switch:focus-visible {

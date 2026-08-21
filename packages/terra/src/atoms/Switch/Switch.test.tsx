@@ -38,7 +38,13 @@ describe('Switch', () => {
   it('controlled: defers to checked/onCheckedChange, does not flip on its own', async () => {
     const user = userEvent.setup();
     const onCheckedChange = vi.fn();
-    render(<Switch checked={false} onCheckedChange={onCheckedChange} aria-label="Wifi" />);
+    render(
+      <Switch
+        checked={false}
+        onCheckedChange={onCheckedChange}
+        aria-label="Wifi"
+      />
+    );
     const el = screen.getByRole('switch', { name: 'Wifi' });
 
     await user.click(el);
@@ -51,7 +57,9 @@ describe('Switch', () => {
   it('does not fire onCheckedChange when disabled', async () => {
     const user = userEvent.setup();
     const onCheckedChange = vi.fn();
-    render(<Switch disabled onCheckedChange={onCheckedChange} aria-label="Locked" />);
+    render(
+      <Switch disabled onCheckedChange={onCheckedChange} aria-label="Locked" />
+    );
     await user.click(screen.getByRole('switch', { name: 'Locked' }));
     expect(onCheckedChange).not.toHaveBeenCalled();
   });

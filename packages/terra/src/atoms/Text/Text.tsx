@@ -23,15 +23,7 @@ type TextColor = 'primary' | 'secondary' | 'tertiary' | 'disabled';
  * generic/polymorphic to keep the prop types simple; extend this list
  * if a real need comes up rather than opening it to `React.ElementType`. */
 type TextElement =
-  | 'span'
-  | 'p'
-  | 'div'
-  | 'label'
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'h4'
-  | 'kbd';
+  'span' | 'p' | 'div' | 'label' | 'h1' | 'h2' | 'h3' | 'h4' | 'kbd';
 
 interface TextProps extends React.HTMLAttributes<HTMLElement> {
   /**

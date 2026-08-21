@@ -7,11 +7,10 @@ import styles from './Switch.module.css';
 
 type SwitchSize = 'sm' | 'md';
 
-interface SwitchProps
-  extends Omit<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    'onChange' | 'value'
-  > {
+interface SwitchProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'onChange' | 'value'
+> {
   /**
    * @default 'md'
    */

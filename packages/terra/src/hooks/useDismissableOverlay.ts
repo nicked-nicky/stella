@@ -100,11 +100,22 @@ export function useDismissableOverlay({
     },
     [onClose]
   );
-  const handleEscapeClose = useCallback(() => requestClose(true), [requestClose]);
-  const handleOutsideClose = useCallback(() => requestClose(false), [requestClose]);
+  const handleEscapeClose = useCallback(
+    () => requestClose(true),
+    [requestClose]
+  );
+  const handleOutsideClose = useCallback(
+    () => requestClose(false),
+    [requestClose]
+  );
 
   const { root } = useOverlayLayer({ open, onClose: handleEscapeClose });
-  const { panelRef, panel, style, placement: resolvedPlacement } = useAnchorPosition({
+  const {
+    panelRef,
+    panel,
+    style,
+    placement: resolvedPlacement,
+  } = useAnchorPosition({
     open,
     anchor,
     placement,
@@ -138,5 +149,12 @@ export function useDismissableOverlay({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, panel]);
 
-  return { root, panelRef, panel, style, placement: resolvedPlacement, requestClose };
+  return {
+    root,
+    panelRef,
+    panel,
+    style,
+    placement: resolvedPlacement,
+    requestClose,
+  };
 }

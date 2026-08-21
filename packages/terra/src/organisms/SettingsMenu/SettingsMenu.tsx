@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { FlexContainer } from '../../layout/FlexContainer';
 import { SettingsNav } from './SettingsNav';
 import { SettingsCategoryPanel } from './SettingsCategoryPanel';
-import type { SettingsSchema, SettingsValues, SettingsFieldValue } from './types';
+import type {
+  SettingsSchema,
+  SettingsValues,
+  SettingsFieldValue,
+} from './types';
 import styles from './SettingsMenu.module.css';
 
 // ============================================================================
@@ -14,7 +18,11 @@ interface SettingsMenuProps {
   schema: SettingsSchema;
   /** Current field values. Fully controlled — SettingsMenu holds no data of its own. */
   values: SettingsValues;
-  onChange: (categoryId: string, fieldKey: string, value: SettingsFieldValue) => void;
+  onChange: (
+    categoryId: string,
+    fieldKey: string,
+    value: SettingsFieldValue
+  ) => void;
   /** Controlled category selection. Omit to let SettingsMenu manage it internally. */
   selectedCategoryId?: string;
   onCategoryChange?: (categoryId: string) => void;
@@ -67,13 +75,19 @@ export function SettingsMenu({
 
   return (
     <FlexContainer align="stretch" className={styles.root}>
-      <SettingsNav categories={schema.categories} activeId={activeId} onSelect={handleSelect} />
+      <SettingsNav
+        categories={schema.categories}
+        activeId={activeId}
+        onSelect={handleSelect}
+      />
       <div className={styles.panel}>
         {activeCategory && (
           <SettingsCategoryPanel
             category={activeCategory}
             values={values[activeCategory.id] ?? {}}
-            onFieldChange={(key, value) => onChange(activeCategory.id, key, value)}
+            onFieldChange={(key, value) =>
+              onChange(activeCategory.id, key, value)
+            }
           />
         )}
       </div>

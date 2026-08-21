@@ -175,10 +175,17 @@ export function NotificationProvider({
   );
 
   const push = useCallback(
-    (variant: NotificationVariant, message: string, options?: NotifyOptions) => {
+    (
+      variant: NotificationVariant,
+      message: string,
+      options?: NotifyOptions
+    ) => {
       const id = `stella-notification-${++notificationCounter}`;
       const duration = options?.duration ?? DEFAULT_DURATION;
-      setItems((prev) => [...prev, { id, variant, message, duration, icon: options?.icon }]);
+      setItems((prev) => [
+        ...prev,
+        { id, variant, message, duration, icon: options?.icon },
+      ]);
       scheduleDismiss(id, duration);
       return id;
     },

@@ -1,4 +1,11 @@
-import React, { Children, createContext, isValidElement, useContext, useMemo, useRef } from 'react';
+import React, {
+  Children,
+  createContext,
+  isValidElement,
+  useContext,
+  useMemo,
+  useRef,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { useDismissableOverlay } from '../../hooks';
 import type { Anchor, Placement } from '../../hooks';
@@ -111,7 +118,10 @@ export function Menu({
   className,
   children,
 }: MenuProps) {
-  const typeahead = useRef<{ buffer: string; timer: ReturnType<typeof setTimeout> | undefined }>({
+  const typeahead = useRef<{
+    buffer: string;
+    timer: ReturnType<typeof setTimeout> | undefined;
+  }>({
     buffer: '',
     timer: undefined,
   });
@@ -134,7 +144,9 @@ export function Menu({
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (!panel) return;
-    const items = Array.from(panel.querySelectorAll<HTMLElement>(ITEM_SELECTOR));
+    const items = Array.from(
+      panel.querySelectorAll<HTMLElement>(ITEM_SELECTOR)
+    );
     if (items.length === 0) return;
     const currentIndex = items.indexOf(document.activeElement as HTMLElement);
 
@@ -200,7 +212,10 @@ export function Menu({
       next.type === MenuItem
     ) {
       content.push(
-        <Divider key={`${child.key ?? index}-hairline`} className={styles.autoSeparator} />
+        <Divider
+          key={`${child.key ?? index}-hairline`}
+          className={styles.autoSeparator}
+        />
       );
     }
   });
@@ -215,7 +230,9 @@ export function Menu({
         onKeyDown={handleKeyDown}
         className={[styles.menu, className].filter(Boolean).join(' ')}
       >
-        <MenuContext.Provider value={contextValue}>{content}</MenuContext.Provider>
+        <MenuContext.Provider value={contextValue}>
+          {content}
+        </MenuContext.Provider>
       </Island>
     </div>,
     root
@@ -228,8 +245,10 @@ Menu.displayName = 'Menu';
 // ITEM
 // ============================================================================
 
-export interface MenuItemProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onSelect'> {
+export interface MenuItemProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'onSelect'
+> {
   /** Fired on click or Enter/Space (native `<button>` behavior). */
   onSelect?: () => void;
   /** Status-red text, for a destructive action — the same red used

@@ -29,7 +29,9 @@ describe('Checkbox', () => {
 
   it('sets the native indeterminate property (no HTML attribute for it)', () => {
     render(<Checkbox label="Select all" indeterminate />);
-    const input = screen.getByRole('checkbox', { name: 'Select all' }) as HTMLInputElement;
+    const input = screen.getByRole('checkbox', {
+      name: 'Select all',
+    }) as HTMLInputElement;
     expect(input.indeterminate).toBe(true);
   });
 

@@ -85,7 +85,9 @@ export function Tooltip({
   // Explicit initial value: React 19's types made useRef's argument
   // required, so the bare `useRef<T>()` this used to be no longer
   // compiles. Same runtime behaviour.
-  const showTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const showTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
   const tooltipId = useId();
 
   const handleClose = useCallback(() => setOpen(false), []);
@@ -128,16 +130,29 @@ export function Tooltip({
   // than probing both is deliberate — reading `element.ref` on React 19
   // logs a deprecation warning, so a "try props, fall back to element"
   // shape would warn on every tooltip whose trigger has no ref of its own.
-  const childRef = Number.parseInt(React.version, 10) >= 19
-    ? (childProps.ref as React.Ref<HTMLElement> | undefined)
-    : child.ref;
+  const childRef =
+    Number.parseInt(React.version, 10) >= 19
+      ? (childProps.ref as React.Ref<HTMLElement> | undefined)
+      : child.ref;
 
   const trigger = cloneElement(child, {
     ref: mergeRefs(anchorRef, childRef),
-    onMouseEnter: composeHandlers(childProps.onMouseEnter as (e: React.MouseEvent) => void, show),
-    onMouseLeave: composeHandlers(childProps.onMouseLeave as (e: React.MouseEvent) => void, hide),
-    onFocus: composeHandlers(childProps.onFocus as (e: React.FocusEvent) => void, show),
-    onBlur: composeHandlers(childProps.onBlur as (e: React.FocusEvent) => void, hide),
+    onMouseEnter: composeHandlers(
+      childProps.onMouseEnter as (e: React.MouseEvent) => void,
+      show
+    ),
+    onMouseLeave: composeHandlers(
+      childProps.onMouseLeave as (e: React.MouseEvent) => void,
+      hide
+    ),
+    onFocus: composeHandlers(
+      childProps.onFocus as (e: React.FocusEvent) => void,
+      show
+    ),
+    onBlur: composeHandlers(
+      childProps.onBlur as (e: React.FocusEvent) => void,
+      hide
+    ),
     'aria-describedby': open
       ? [childProps['aria-describedby'], tooltipId].filter(Boolean).join(' ')
       : childProps['aria-describedby'],

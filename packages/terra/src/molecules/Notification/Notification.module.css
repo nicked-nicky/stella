@@ -16,7 +16,8 @@
 	gap: var(--stella-space-2);
 
 	max-width: 360px;
-	padding: var(--stella-space-2) var(--stella-space-2) var(--stella-space-2) var(--stella-space-4);
+	padding: var(--stella-space-2) var(--stella-space-2) var(--stella-space-2)
+		var(--stella-space-4);
 
 	background-color: var(--stella-surface-overlay);
 	border: var(--stella-border-width) solid var(--stella-border-default);
@@ -30,7 +31,8 @@
 	 * keyframe so Terra takes on zero animation dependency, but flipped
 	 * to rise from below since the stack now anchors to the bottom
 	 * center instead of the top right. */
-	animation: stella-notification-enter var(--stella-motion-base) var(--stella-easing-expo) both;
+	animation: stella-notification-enter var(--stella-motion-base)
+		var(--stella-easing-expo) both;
 }
 
 @keyframes stella-notification-enter {
@@ -56,7 +58,8 @@
  * on its way out.
  */
 .notification.closing {
-	animation: stella-notification-exit var(--stella-motion-fast) var(--stella-easing-in) both;
+	animation: stella-notification-exit var(--stella-motion-fast)
+		var(--stella-easing-in) both;
 	pointer-events: none;
 }
 
@@ -118,7 +121,8 @@
 	color: var(--stella-text-secondary);
 	cursor: pointer;
 
-	transition: background-color var(--stella-motion-fast) var(--stella-easing-out);
+	transition: background-color var(--stella-motion-fast)
+		var(--stella-easing-out);
 }
 
 .dismiss svg {

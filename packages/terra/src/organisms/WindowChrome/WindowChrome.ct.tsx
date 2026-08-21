@@ -13,7 +13,9 @@ import { checkA11y } from '../../../playwright/a11y';
 const controls = { minimize: () => {}, maximize: () => {}, close: () => {} };
 
 test.describe('the strip itself', () => {
-  test('is transparent, letting the app canvas show through', async ({ mount }) => {
+  test('is transparent, letting the app canvas show through', async ({
+    mount,
+  }) => {
     // The changelog's "WindowChrome lost its bottom seam" change — the
     // bar is a transparent strip now, not a surface with a border.
     const component = await mount(
@@ -99,7 +101,11 @@ test.describe('drag region', () => {
     const component = await mount(
       <WindowChrome
         title="Ray IDE"
-        systemTools={<Button iconOnly aria-label="Settings">S</Button>}
+        systemTools={
+          <Button iconOnly aria-label="Settings">
+            S
+          </Button>
+        }
         windowControls={controls}
       />
     );
@@ -143,7 +149,12 @@ test.describe('drag region', () => {
     const component = await mount(
       <WindowChrome
         title="Ray IDE"
-        windowControls={{ ...controls, maximize: () => { maximizeCalls += 1; } }}
+        windowControls={{
+          ...controls,
+          maximize: () => {
+            maximizeCalls += 1;
+          },
+        }}
       />
     );
 
@@ -158,17 +169,31 @@ test.describe('render modes', () => {
       <WindowChrome
         title="Ray IDE"
         tabs={<span>tabs</span>}
-        tools={<Button iconOnly aria-label="Search">S</Button>}
-        systemTools={<Button iconOnly aria-label="Settings">G</Button>}
+        tools={
+          <Button iconOnly aria-label="Search">
+            S
+          </Button>
+        }
+        systemTools={
+          <Button iconOnly aria-label="Settings">
+            G
+          </Button>
+        }
         windowControls={controls}
       />
     );
 
     await expect(component.getByText('Ray IDE')).toBeVisible();
     await expect(component.getByText('tabs')).toBeVisible();
-    await expect(component.getByRole('button', { name: 'Search' })).toBeVisible();
-    await expect(component.getByRole('button', { name: 'Settings' })).toBeVisible();
-    await expect(component.getByRole('button', { name: 'Close' })).toBeVisible();
+    await expect(
+      component.getByRole('button', { name: 'Search' })
+    ).toBeVisible();
+    await expect(
+      component.getByRole('button', { name: 'Settings' })
+    ).toBeVisible();
+    await expect(
+      component.getByRole('button', { name: 'Close' })
+    ).toBeVisible();
   });
 
   test('empty mode renders freeform children instead of the grid', async ({
@@ -181,7 +206,9 @@ test.describe('render modes', () => {
     );
 
     await expect(component.getByText('Quick Capture')).toBeVisible();
-    await expect(component.getByRole('button', { name: 'Close' })).toBeVisible();
+    await expect(
+      component.getByRole('button', { name: 'Close' })
+    ).toBeVisible();
   });
 
   test('clusters of different size still line up on one baseline', async ({
@@ -193,7 +220,11 @@ test.describe('render modes', () => {
     const component = await mount(
       <WindowChrome
         title="Ray IDE"
-        systemTools={<Button iconOnly aria-label="Settings">G</Button>}
+        systemTools={
+          <Button iconOnly aria-label="Settings">
+            G
+          </Button>
+        }
         windowControls={controls}
         size="md"
       />
@@ -221,8 +252,16 @@ test.describe('accessibility', () => {
     await mount(
       <WindowChrome
         title="Ray IDE"
-        tools={<Button iconOnly aria-label="Search">S</Button>}
-        systemTools={<Button iconOnly aria-label="Settings">G</Button>}
+        tools={
+          <Button iconOnly aria-label="Search">
+            S
+          </Button>
+        }
+        systemTools={
+          <Button iconOnly aria-label="Settings">
+            G
+          </Button>
+        }
         windowControls={controls}
       />
     );
@@ -233,8 +272,14 @@ test.describe('accessibility', () => {
     const component = await mount(
       <WindowChrome title="Ray IDE" windowControls={controls} />
     );
-    await expect(component.getByRole('button', { name: 'Minimize' })).toBeVisible();
-    await expect(component.getByRole('button', { name: 'Maximize' })).toBeVisible();
-    await expect(component.getByRole('button', { name: 'Close' })).toBeVisible();
+    await expect(
+      component.getByRole('button', { name: 'Minimize' })
+    ).toBeVisible();
+    await expect(
+      component.getByRole('button', { name: 'Maximize' })
+    ).toBeVisible();
+    await expect(
+      component.getByRole('button', { name: 'Close' })
+    ).toBeVisible();
   });
 });

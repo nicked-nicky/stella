@@ -18,7 +18,12 @@ interface ChoiceFieldProps {
  * view-switcher look, selection read via `Button`'s `active` state) or
  * a vertical `Radio` list (default).
  */
-export function ChoiceField({ categoryId, field, value, onChange }: ChoiceFieldProps) {
+export function ChoiceField({
+  categoryId,
+  field,
+  value,
+  onChange,
+}: ChoiceFieldProps) {
   const legend = (
     <legend style={{ padding: 0, marginBottom: 'var(--stella-space-1)' }}>
       <Text as="span" variant="body-strong">

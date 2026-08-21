@@ -21,19 +21,10 @@ type FlexAlign = 'start' | 'end' | 'center' | 'stretch' | 'baseline';
  * the design tokens, don't invent new scales ad hoc).
  */
 type FlexGap =
-  | '0'
-  | '1'
-  | '2'
-  | '3'
-  | '4'
-  | '5'
-  | '6'
-  | '8'
-  | '10'
-  | '12'
-  | '16';
+  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16';
 
-type FlexElement = 'div' | 'span' | 'section' | 'nav' | 'ul' | 'li' | 'header' | 'footer';
+type FlexElement =
+  'div' | 'span' | 'section' | 'nav' | 'ul' | 'li' | 'header' | 'footer';
 
 interface FlexContainerProps extends React.HTMLAttributes<HTMLElement> {
   /**

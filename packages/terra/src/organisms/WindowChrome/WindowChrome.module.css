@@ -87,7 +87,7 @@
 }
 
 .icon {
-	composes: icon from '../../styles/shared/controlIcon.module.css';
+	composes: icon from "../../styles/shared/controlIcon.module.css";
 }
 
 /* Always present and always `flex: 1` (the "free space" region 2 grows

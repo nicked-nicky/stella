@@ -52,7 +52,9 @@ function MenuHarness({
  */
 async function renderOpenMenu(children: ReactNode, onClose?: () => void) {
   const user = userEvent.setup();
-  render(<MenuHarness {...(onClose ? { onClose } : {})}>{children}</MenuHarness>);
+  render(
+    <MenuHarness {...(onClose ? { onClose } : {})}>{children}</MenuHarness>
+  );
   await user.click(screen.getByRole('button', { name: 'Trigger' }));
   await screen.findByRole('menu');
   return user;

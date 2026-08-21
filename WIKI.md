@@ -41,9 +41,9 @@ pnpm install
 pnpm dev   # runs terra-test, if you have it — see Orientation
 ```
 
-Terra's `src/` is consumed directly by `terra-test` through the pnpm workspace, so editing a component hot-reloads immediately — no build step in the loop. `pnpm dev` is where you'll do almost all component work, *when the showcase is present*; on a bare clone of this repo it's a no-op and the tests are your feedback loop instead.
+Terra's `src/` is consumed directly by `terra-test` through the pnpm workspace, so editing a component hot-reloads immediately — no build step in the loop. `pnpm dev` is where you'll do almost all component work, _when the showcase is present_; on a bare clone of this repo it's a no-op and the tests are your feedback loop instead.
 
-This works because `@stella/terra`'s `exports` point at `./src/index.ts`, and `publishConfig` overrides them to `./dist/` — pnpm swaps the two at publish time, so workspace consumers get live source and published consumers get compiled output, with no build step in between and no `dist/` needing to exist locally. (It previously pointed only at `dist/`, which meant `pnpm dev` failed with *"Failed to resolve entry for package @stella/terra"* on a clean checkout, since `dist/` is gitignored and never built in the dev loop.)
+This works because `@stella/terra`'s `exports` point at `./src/index.ts`, and `publishConfig` overrides them to `./dist/` — pnpm swaps the two at publish time, so workspace consumers get live source and published consumers get compiled output, with no build step in between and no `dist/` needing to exist locally. (It previously pointed only at `dist/`, which meant `pnpm dev` failed with _"Failed to resolve entry for package @stella/terra"_ on a clean checkout, since `dist/` is gitignored and never built in the dev loop.)
 
 **Build** (only needed to actually publish — not part of the dev loop):
 
@@ -94,80 +94,91 @@ pnpm add @stella/terra
 Import the design tokens once, at your app's entry point — everything else in Terra reads these as CSS custom properties, nothing works visually without them:
 
 ```tsx
-import '@stella/terra/styles/tokens.css';
+import "@stella/terra/styles/tokens.css";
 ```
 
 Wrap your app root in the providers you need — none are required for a component to render, but `ThemeProvider` is needed for runtime theme switching, `OverlayProvider` for `Dialog`/`Menu`/`Popover`, `NotificationProvider` for toasts:
 
 ```tsx
-import { ThemeProvider, OverlayProvider, NotificationProvider } from '@stella/terra';
+import {
+	ThemeProvider,
+	OverlayProvider,
+	NotificationProvider,
+} from "@stella/terra";
 
 function Root() {
-  return (
-    <ThemeProvider>
-      <OverlayProvider>
-        <NotificationProvider>
-          <App />
-        </NotificationProvider>
-      </OverlayProvider>
-    </ThemeProvider>
-  );
+	return (
+		<ThemeProvider>
+			<OverlayProvider>
+				<NotificationProvider>
+					<App />
+				</NotificationProvider>
+			</OverlayProvider>
+		</ThemeProvider>
+	);
 }
 ```
 
 Then use components directly:
 
 ```tsx
-import { ButtonIsland, Button } from '@stella/terra';
+import { ButtonIsland, Button } from "@stella/terra";
 
 <ButtonIsland size="sm">
-  <Button>Cancel</Button>
-  <Button active>Save</Button>
-</ButtonIsland>
+	<Button>Cancel</Button>
+	<Button active>Save</Button>
+</ButtonIsland>;
 ```
 
 **Worked example — `SettingsMenu`** (data-driven, schema in, changes out — it owns no state of its own beyond which category is selected):
 
 ```tsx
-import { useState } from 'react';
-import { SettingsMenu, type SettingsSchema, type SettingsValues } from '@stella/terra';
+import { useState } from "react";
+import {
+	SettingsMenu,
+	type SettingsSchema,
+	type SettingsValues,
+} from "@stella/terra";
 
 const schema: SettingsSchema = {
-  categories: [
-    {
-      id: 'general',
-      label: 'General',
-      fields: [
-        { key: 'displayName', type: 'text', label: 'Display name' },
-        { key: 'autoSave', type: 'boolean', label: 'Auto-save' },
-        {
-          key: 'startupView',
-          type: 'choice',
-          label: 'Startup view',
-          options: [
-            { value: 'dashboard', label: 'Dashboard' },
-            { value: 'last', label: 'Last opened' },
-          ],
-        },
-      ],
-    },
-  ],
+	categories: [
+		{
+			id: "general",
+			label: "General",
+			fields: [
+				{ key: "displayName", type: "text", label: "Display name" },
+				{ key: "autoSave", type: "boolean", label: "Auto-save" },
+				{
+					key: "startupView",
+					type: "choice",
+					label: "Startup view",
+					options: [
+						{ value: "dashboard", label: "Dashboard" },
+						{ value: "last", label: "Last opened" },
+					],
+				},
+			],
+		},
+	],
 };
 
 function Settings() {
-  const [values, setValues] = useState<SettingsValues>({
-    general: { displayName: 'Jane', autoSave: true, startupView: 'dashboard' },
-  });
+	const [values, setValues] = useState<SettingsValues>({
+		general: { displayName: "Jane", autoSave: true, startupView: "dashboard" },
+	});
 
-  return (
-    <SettingsMenu
-      schema={schema}
-      values={values}
-      onChange={(categoryId, key, value) =>
-        setValues((prev) => ({ ...prev, [categoryId]: { ...prev[categoryId], [key]: value } }))
-      }
-    />
-  );
+	return (
+		<SettingsMenu
+			schema={schema}
+			values={values}
+			onChange={(categoryId, key, value) =>
+				setValues((prev) => ({
+					...prev,
+					[categoryId]: { ...prev[categoryId], [key]: value },
+				}))
+			}
+		/>
+	);
 }
 ```
 
@@ -220,18 +231,18 @@ Deeper design reasoning that used to live as long inline comments scattered acro
 
 `ThemeManager` (framework-agnostic) writes CSS custom properties to the document root; `ThemeProvider`/`useTheme` is the React binding. Four independent axes, each backed by a scale token multiplier so changing one updates every component reading it with no re-render:
 
-| Axis | Token | Values |
-|---|---|---|
-| Color scheme | native `light-dark()` | `light` / `dark` / `system` |
-| Radius | `--stella-radius-scale` | `sharp` / `default` / `round` |
-| Density | `--stella-space-scale` | `compact` / `default` / `comfortable` |
+| Axis         | Token                   | Values                                |
+| ------------ | ----------------------- | ------------------------------------- |
+| Color scheme | native `light-dark()`   | `light` / `dark` / `system`           |
+| Radius       | `--stella-radius-scale` | `sharp` / `default` / `round`         |
+| Density      | `--stella-space-scale`  | `compact` / `default` / `comfortable` |
 | Border width | `--stella-border-width` | `none` / `thin` / `default` / `thick` |
 
 **Single radius token model:** every component reads `--stella-radius-panel` for its rounding — there is no per-component radius scale. This was a deliberate consolidation (there used to be `-xs/-sm/-lg/-full/-pill` variants); one token that everything shares means changing the kit's overall "roundedness" is a single edit, and every surface stays visually consistent with every other one at any radius setting.
 
-**State layers** (`--stella-state-hover` / `-active` / `-selected`) are a 3-step escalation ladder used as *background overlays* over whatever surface tone happens to be underneath (card, muted island, toolbar) — this is deliberate: a fixed opaque hover color previously baked in an assumption about what sat underneath it (`--stella-surface-hover` once equalled `--stella-surface-muted`, so hovering anything on a muted surface was invisible). The three steps mirror a hover → active → selected ladder where each is a clear step firmer than the last.
+**State layers** (`--stella-state-hover` / `-active` / `-selected`) are a 3-step escalation ladder used as _background overlays_ over whatever surface tone happens to be underneath (card, muted island, toolbar) — this is deliberate: a fixed opaque hover color previously baked in an assumption about what sat underneath it (`--stella-surface-hover` once equalled `--stella-surface-muted`, so hovering anything on a muted surface was invisible). The three steps mirror a hover → active → selected ladder where each is a clear step firmer than the last.
 
-This ladder is reused as a *border-color* escalation too (see Button/ButtonIsland below) — which surfaced a real bug worth recording: `--stella-state-hover` and `--stella-border-default` briefly resolved to the exact same raw neutral step, so anything using state-hover as a border-color escalation above border-default was changing color "to" the color it already rested at — invisible. Fixed by giving `--stella-state-hover` its own step (`neutral-300`/`600`) distinct from `--stella-border-default` (`neutral-200`/`700`) and below `--stella-state-active` (`neutral-400`/`500`). The lesson: a token being visually correct in one context (background wash over a surface) doesn't guarantee it's correct in another (border-color over a border-default resting state) — check the actual resting value it's escalating *from*, not just the token name.
+This ladder is reused as a _border-color_ escalation too (see Button/ButtonIsland below) — which surfaced a real bug worth recording: `--stella-state-hover` and `--stella-border-default` briefly resolved to the exact same raw neutral step, so anything using state-hover as a border-color escalation above border-default was changing color "to" the color it already rested at — invisible. Fixed by giving `--stella-state-hover` its own step (`neutral-300`/`600`) distinct from `--stella-border-default` (`neutral-200`/`700`) and below `--stella-state-active` (`neutral-400`/`500`). The lesson: a token being visually correct in one context (background wash over a surface) doesn't guarantee it's correct in another (border-color over a border-default resting state) — check the actual resting value it's escalating _from_, not just the token name.
 
 ### Island — the structural primitive
 
@@ -246,8 +257,12 @@ The hairline between adjacent buttons in a `ButtonIsland` is a **real `Divider` 
 Both the auto-inserted hairline and the outer `Island`'s own border react to a hovered/pressed `Button` child via CSS `:has()` — no JS state needed to coordinate a child's interaction with its parent's styling:
 
 ```css
-.root:has(.group > button:hover:not(:disabled)) { border-color: var(--stella-state-hover); }
-.root:has(.group > button:active:not(:disabled)) { border-color: var(--stella-state-active); }
+.root:has(.group > button:hover:not(:disabled)) {
+	border-color: var(--stella-state-hover);
+}
+.root:has(.group > button:active:not(:disabled)) {
+	border-color: var(--stella-state-active);
+}
 ```
 
 `Menu` mirrors this exact pattern for its own items: no border on `.item`, a real auto-inserted `Divider` between adjacent `Menu.Item`s (dimmed one shade via a scoped `.autoSeparator` class since it's a row boundary, not a group break — an explicit `Menu.Separator` stays at the louder default), same `:has()` escalation.
@@ -260,12 +275,12 @@ Inset rings (`outline-offset: -2px`), not outset, on any control that lives insi
 
 Terra targets **Baseline 2024**: Chrome 123+, Edge 123+, Safari 17.5+, Firefox 120+, and WebKitGTK 2.44+. That floor is not arbitrary — it's set by the specific modern CSS the kit leans on rather than by a support policy picked in advance:
 
-| Feature | Used for | Consequence if unsupported |
-|---|---|---|
-| `light-dark()` | Every theme-dependent token is declared once instead of duplicated across a media query and an attribute selector | Colours fall back to the unresolved declaration — the theme collapses |
-| `:has()` | `ButtonIsland`'s separator and Island border reacting to a hovered/pressed child with no JS | Interaction states stop escalating; everything still renders |
-| `color-scheme` | Native scrollbars, selection, caret and form chrome following the theme | Dark app with light native chrome |
-| `scrollbar-gutter` | `SettingsMenu`'s columns reserving their scrollbar gutter | Content reflows when a scrollbar appears |
+| Feature            | Used for                                                                                                          | Consequence if unsupported                                            |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `light-dark()`     | Every theme-dependent token is declared once instead of duplicated across a media query and an attribute selector | Colours fall back to the unresolved declaration — the theme collapses |
+| `:has()`           | `ButtonIsland`'s separator and Island border reacting to a hovered/pressed child with no JS                       | Interaction states stop escalating; everything still renders          |
+| `color-scheme`     | Native scrollbars, selection, caret and form chrome following the theme                                           | Dark app with light native chrome                                     |
+| `scrollbar-gutter` | `SettingsMenu`'s columns reserving their scrollbar gutter                                                         | Content reflows when a scrollbar appears                              |
 
 For desktop hosts this floor is easier than it looks: Tauri on macOS and Electron everywhere ship a modern engine you don't choose. The one to watch is **Tauri on Linux**, which uses the system WebKitGTK — an older distro can land below 2.44.
 
@@ -286,14 +301,14 @@ Two layers, deliberately not one — jsdom (what Vitest runs against) doesn't ev
 
 ### What's covered
 
-| Layer | Files | What they protect |
-|---|---|---|
-| Pure logic | `utils/positioning.test.ts`, `theme/ThemeManager.test.ts` | The anchored-positioning geometry (flip, cross-axis shift, alignment) and the four independent theme axes. No DOM, no React, no flake. |
-| Overlay behaviour | `OverlayProvider.test.tsx`, `Dialog.test.tsx`, `Menu.test.tsx` | Escape scoping across stacked layers, Dialog's focus trap and focus restore, Menu's full WAI-ARIA keyboard contract. |
-| State & timers | `NotificationProvider.test.tsx` | Queue ordering, auto-dismiss timing, pause-on-hover, the `aria-live` region. |
-| Form atoms | `Checkbox`, `Switch`, `Input`, `Radio` `.test.tsx` | Controlled/uncontrolled contracts, ARIA, disabled behaviour. |
-| Presentational | `atoms/atoms.smoke.test.tsx` | One file of thin smoke tests for Avatar/Badge/Divider/Spinner/Text/FlexContainer/WindowControls — semantics only. |
-| Computed CSS | `ButtonIsland.ct.tsx`, `Button.ct.tsx`, `SettingsMenu.ct.tsx`, `WindowChrome.ct.tsx` | The state-layer ladder resolving to distinct values, focus-ring visibility and inset, the transparent chrome strip, drag regions. |
+| Layer             | Files                                                                                | What they protect                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Pure logic        | `utils/positioning.test.ts`, `theme/ThemeManager.test.ts`                            | The anchored-positioning geometry (flip, cross-axis shift, alignment) and the four independent theme axes. No DOM, no React, no flake. |
+| Overlay behaviour | `OverlayProvider.test.tsx`, `Dialog.test.tsx`, `Menu.test.tsx`                       | Escape scoping across stacked layers, Dialog's focus trap and focus restore, Menu's full WAI-ARIA keyboard contract.                   |
+| State & timers    | `NotificationProvider.test.tsx`                                                      | Queue ordering, auto-dismiss timing, pause-on-hover, the `aria-live` region.                                                           |
+| Form atoms        | `Checkbox`, `Switch`, `Input`, `Radio` `.test.tsx`                                   | Controlled/uncontrolled contracts, ARIA, disabled behaviour.                                                                           |
+| Presentational    | `atoms/atoms.smoke.test.tsx`                                                         | One file of thin smoke tests for Avatar/Badge/Divider/Spinner/Text/FlexContainer/WindowControls — semantics only.                      |
+| Computed CSS      | `ButtonIsland.ct.tsx`, `Button.ct.tsx`, `SettingsMenu.ct.tsx`, `WindowChrome.ct.tsx` | The state-layer ladder resolving to distinct values, focus-ring visibility and inset, the transparent chrome strip, drag regions.      |
 
 Priority for anything new, given accessibility is non-negotiable: keyboard navigation, ARIA correctness, and controlled/uncontrolled state for every component that offers both. `Popover` and `Tooltip` are the notable remaining gaps — their positioning is covered indirectly through `positioning.test.ts`, but neither has a component test of its own yet.
 
@@ -311,7 +326,7 @@ Kept honest deliberately — an empty list here would mean nobody's looking, not
 ### Design debt
 
 - **`--stella-border-subtle` is identical to `--stella-border-default`.** Everything that opts into "subtle" — `Dialog`'s header/footer rules, `Menu`'s per-item hairline, `SettingsMenu`'s between-row rules — therefore draws at full strength while the CSS describes it as the faintest thing on the panel. `neutral-100/800` is the obvious step; left alone because it's a look decision, not a correctness one.
-- **`--stella-state-hover` and `--stella-state-selected` are the same value, on purpose.** A selected control is distinguished by holding its fill *at rest*, not by a third colour. This is pinned by an equality assertion in `Button.ct.tsx` so it reads as a decision rather than the collision it resembles — see the note in `tokens.css` before changing either.
+- **`--stella-state-hover` and `--stella-state-selected` are the same value, on purpose.** A selected control is distinguished by holding its fill _at rest_, not by a third colour. This is pinned by an equality assertion in `Button.ct.tsx` so it reads as a decision rather than the collision it resembles — see the note in `tokens.css` before changing either.
 - **A fragment wrapper silently disables auto-hairlines.** `Children.toArray` doesn't descend into fragments, so `<Menu>{cond && <><Item/><Item/></>}</Menu>` renders its items fine and quietly drops the separators between them. Same applies to `ButtonIsland`. Pinned by a test in `Menu.test.tsx` so the behaviour is at least documented.
 
 ### Tooling

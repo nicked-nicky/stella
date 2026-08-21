@@ -25,13 +25,13 @@
    enough to keep the line on top of the fill. See tokens.css.
    ============================================================================ */
 
-.group > button:hover:not(:disabled) + [role='separator'],
-.group > [role='separator']:has(+ button:hover:not(:disabled)) {
+.group > button:hover:not(:disabled) + [role="separator"],
+.group > [role="separator"]:has(+ button:hover:not(:disabled)) {
 	background-color: var(--stella-border-hover);
 }
 
-.group > button:active:not(:disabled) + [role='separator'],
-.group > [role='separator']:has(+ button:active:not(:disabled)) {
+.group > button:active:not(:disabled) + [role="separator"],
+.group > [role="separator"]:has(+ button:active:not(:disabled)) {
 	background-color: var(--stella-border-active);
 }
 

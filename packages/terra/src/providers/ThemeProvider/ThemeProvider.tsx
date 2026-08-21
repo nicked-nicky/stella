@@ -88,7 +88,10 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const managerRef = useRef<ThemeManager | null>(null);
   if (!managerRef.current) {
-    managerRef.current = new ThemeManager(document.documentElement, defaultConfig);
+    managerRef.current = new ThemeManager(
+      document.documentElement,
+      defaultConfig
+    );
   }
 
   const [config, setConfig] = useState<ThemeConfig>(() =>
@@ -110,10 +113,12 @@ export function ThemeProvider({
   const value = useMemo<ThemeContextValue>(
     () => ({
       config,
-      setColorScheme: (colorScheme) => managerRef.current!.setColorScheme(colorScheme),
+      setColorScheme: (colorScheme) =>
+        managerRef.current!.setColorScheme(colorScheme),
       setRadius: (radius) => managerRef.current!.setRadius(radius),
       setDensity: (density) => managerRef.current!.setDensity(density),
-      setBorderWidth: (borderWidth) => managerRef.current!.setBorderWidth(borderWidth),
+      setBorderWidth: (borderWidth) =>
+        managerRef.current!.setBorderWidth(borderWidth),
       getConfig: () => managerRef.current!.getConfig(),
       loadConfig: (c) => managerRef.current!.loadConfig(c),
     }),

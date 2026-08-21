@@ -37,7 +37,7 @@ What's solid:
 
 - 22 components across atoms, molecules, organisms and layout, plus three app-level providers.
 - 204 tests: 166 in Vitest for logic, ARIA and keyboard behaviour, 38 in Playwright for things only a real browser can answer (resolved CSS, computed geometry), with axe-core scanning the component tree.
-- Zero runtime dependencies. React and React DOM are peers; `lucide-react` is an *optional* peer, only if you use `Icon` with it.
+- Zero runtime dependencies. React and React DOM are peers; `lucide-react` is an _optional_ peer, only if you use `Icon` with it.
 - CI runs format, typecheck, both test layers and the build on every push.
 
 What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#known-gaps):
@@ -50,45 +50,45 @@ What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#kn
 
 ### Atoms
 
-| Component | What it is |
-|---|---|
-| `Avatar` | Circular user/entity representation — image with initials fallback. |
-| `Badge` | Compact status/label indicator. Non-interactive. |
-| `Button` | The primary interactive element. Carries no border, surface, or radius of its own — all come from the wrapping `ButtonIsland`. |
-| `Checkbox` | Native `<input type="checkbox">`, including indeterminate state. |
-| `Divider` | Visual separator between content groups (horizontal or vertical rule). |
-| `Icon` | Sizing/color wrapper around any icon element. Terra ships no icon set — bring your own (`lucide-react` is an optional peer dependency). |
-| `Input` | Bare text field atom. |
-| `Island` | The core structural container — panel, pill, or card surface with tone/shape variants everything else builds on. |
-| `Radio` | Native `<input type="radio">`, with roving arrow-key navigation between grouped radios for free. |
-| `Spinner` | Indeterminate loading indicator, inherits `currentColor`. |
-| `Switch` | GTK-style toggle — no native HTML switch element, so this is the one atom with custom keyboard/ARIA wiring on top of a `<button>`. |
-| `Text` | Typography primitive mapping directly to Terra's type scale. |
+| Component  | What it is                                                                                                                              |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `Avatar`   | Circular user/entity representation — image with initials fallback.                                                                     |
+| `Badge`    | Compact status/label indicator. Non-interactive.                                                                                        |
+| `Button`   | The primary interactive element. Carries no border, surface, or radius of its own — all come from the wrapping `ButtonIsland`.          |
+| `Checkbox` | Native `<input type="checkbox">`, including indeterminate state.                                                                        |
+| `Divider`  | Visual separator between content groups (horizontal or vertical rule).                                                                  |
+| `Icon`     | Sizing/color wrapper around any icon element. Terra ships no icon set — bring your own (`lucide-react` is an optional peer dependency). |
+| `Input`    | Bare text field atom.                                                                                                                   |
+| `Island`   | The core structural container — panel, pill, or card surface with tone/shape variants everything else builds on.                        |
+| `Radio`    | Native `<input type="radio">`, with roving arrow-key navigation between grouped radios for free.                                        |
+| `Spinner`  | Indeterminate loading indicator, inherits `currentColor`.                                                                               |
+| `Switch`   | GTK-style toggle — no native HTML switch element, so this is the one atom with custom keyboard/ARIA wiring on top of a `<button>`.      |
+| `Text`     | Typography primitive mapping directly to Terra's type scale.                                                                            |
 
 ### Layout
 
-| Component | What it is |
-|---|---|
+| Component       | What it is                                                                                                                                                        |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `FlexContainer` | Configurable flexbox wrapper — the layout primitive everything else composes with. One-dimensional only; reach for CSS Grid directly for two-dimensional layouts. |
 
 ### Molecules
 
-| Component | What it is |
-|---|---|
-| `ButtonIsland` | A row of related actions rendered as one pill-shaped toolbar cluster. Adjacent buttons get an automatic hairline (a real `Divider`, auto-inserted), and children fill the island's height so clusters of different `size` still line up. `ButtonIsland.Separator` is available for an explicit sub-cluster break. |
-| `Notification` | A single toast card — status color carried by the icon, not a colored border. Typically rendered for you by `NotificationProvider`. |
-| `Tooltip` | Anchored hover/focus label. |
-| `WindowControls` | Minimize/maximize/close cluster for a custom title bar. |
+| Component        | What it is                                                                                                                                                                                                                                                                                                        |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ButtonIsland`   | A row of related actions rendered as one pill-shaped toolbar cluster. Adjacent buttons get an automatic hairline (a real `Divider`, auto-inserted), and children fill the island's height so clusters of different `size` still line up. `ButtonIsland.Separator` is available for an explicit sub-cluster break. |
+| `Notification`   | A single toast card — status color carried by the icon, not a colored border. Typically rendered for you by `NotificationProvider`.                                                                                                                                                                               |
+| `Tooltip`        | Anchored hover/focus label.                                                                                                                                                                                                                                                                                       |
+| `WindowControls` | Minimize/maximize/close cluster for a custom title bar.                                                                                                                                                                                                                                                           |
 
 ### Organisms
 
-| Component | What it is |
-|---|---|
-| `Dialog` | GTK4/libadwaita-style modal. Compound component (`Dialog.Header` / `.Title` / `.Description` / `.Body` / `.Footer`), focus trap, Escape-to-close, backdrop click, fade-out exit animation. |
-| `Menu` | Anchored action list (dropdown or right-click context menu) with full keyboard navigation (arrow keys, typeahead, Home/End). |
-| `Popover` | Anchored floating content, same positioning/stacking machinery as `Menu`. |
-| `SettingsMenu` | Data-driven settings UI — categories on the left, schema-driven fields on the right. Feed it a `SettingsSchema`; it doesn't care where values come from. |
-| `WindowChrome` | Runtime-agnostic custom title bar (Tauri/Electron/web), draggable region, optional tabs/tools/system controls. |
+| Component      | What it is                                                                                                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Dialog`       | GTK4/libadwaita-style modal. Compound component (`Dialog.Header` / `.Title` / `.Description` / `.Body` / `.Footer`), focus trap, Escape-to-close, backdrop click, fade-out exit animation. |
+| `Menu`         | Anchored action list (dropdown or right-click context menu) with full keyboard navigation (arrow keys, typeahead, Home/End).                                                               |
+| `Popover`      | Anchored floating content, same positioning/stacking machinery as `Menu`.                                                                                                                  |
+| `SettingsMenu` | Data-driven settings UI — categories on the left, schema-driven fields on the right. Feed it a `SettingsSchema`; it doesn't care where values come from.                                   |
+| `WindowChrome` | Runtime-agnostic custom title bar (Tauri/Electron/web), draggable region, optional tabs/tools/system controls.                                                                             |
 
 ## Theming
 
@@ -96,22 +96,25 @@ What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#kn
 
 There is deliberately **no accent hue**. Stella has a single neutral colour scheme, and colour is reserved for exactly five status meanings (success / info / warning / error / debug) carried by `Badge` and `Notification`. A "checked" control inverts to the foreground tone rather than picking a brand colour.
 
-| Axis | Values |
-|---|---|
-| `colorScheme` | `light` / `dark` / `system` |
-| `radius` | `sharp` / `default` / `round` |
-| `density` | `compact` / `default` / `comfortable` |
+| Axis          | Values                                |
+| ------------- | ------------------------------------- |
+| `colorScheme` | `light` / `dark` / `system`           |
+| `radius`      | `sharp` / `default` / `round`         |
+| `density`     | `compact` / `default` / `comfortable` |
 | `borderWidth` | `none` / `thin` / `default` / `thick` |
 
 ```tsx
-import { ThemeProvider, useTheme } from '@stella/terra';
+import { ThemeProvider, useTheme } from "@stella/terra";
 
 function App() {
-  return (
-    <ThemeProvider defaultConfig={loadedFromDisk} onChange={(c) => saveToDisk(c)}>
-      <YourApp />
-    </ThemeProvider>
-  );
+	return (
+		<ThemeProvider
+			defaultConfig={loadedFromDisk}
+			onChange={(c) => saveToDisk(c)}
+		>
+			<YourApp />
+		</ThemeProvider>
+	);
 }
 ```
 
