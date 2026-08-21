@@ -49,6 +49,27 @@ function DialogHarness({
   );
 }
 
+/**
+ * Opens the dialog and waits for its own focus move to land.
+ *
+ * Dialog focuses the first focusable in the panel on open, inside a
+ * `requestAnimationFrame`. A test that sets focus itself before that
+ * frame runs will have it silently taken back a tick later — the
+ * assertion then reports wherever the *component* put focus, which is
+ * both confusing and timing-dependent. Two of these tests passed
+ * locally and failed in CI for exactly that reason.
+ *
+ * Returns the close button, which is the first focusable in the panel
+ * and therefore where opening leaves focus.
+ */
+async function openDialog(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+  await screen.findByRole('dialog');
+  const closeButton = screen.getByRole('button', { name: 'Close dialog' });
+  await waitFor(() => expect(closeButton).toHaveFocus());
+  return closeButton;
+}
+
 describe('Dialog — ARIA semantics', () => {
   it('exposes role="dialog" with aria-modal', async () => {
     renderDialog(
@@ -163,10 +184,7 @@ describe('Dialog — focus management', () => {
   it('traps Tab at the end of the panel, wrapping to the first focusable', async () => {
     const user = userEvent.setup();
     render(<DialogHarness />);
-    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
-    await screen.findByRole('dialog');
-
-    const closeButton = screen.getByRole('button', { name: 'Close dialog' });
+    const closeButton = await openDialog(user);
     const last = screen.getByRole('button', { name: 'Last' });
 
     last.focus();
@@ -180,10 +198,7 @@ describe('Dialog — focus management', () => {
   it('traps Shift+Tab at the start of the panel, wrapping to the last focusable', async () => {
     const user = userEvent.setup();
     render(<DialogHarness />);
-    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
-    await screen.findByRole('dialog');
-
-    const closeButton = screen.getByRole('button', { name: 'Close dialog' });
+    const closeButton = await openDialog(user);
     const last = screen.getByRole('button', { name: 'Last' });
 
     closeButton.focus();
@@ -195,8 +210,7 @@ describe('Dialog — focus management', () => {
   it('leaves Tab alone in the middle of the panel', async () => {
     const user = userEvent.setup();
     render(<DialogHarness />);
-    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
-    await screen.findByRole('dialog');
+    await openDialog(user);
 
     const first = screen.getByRole('button', { name: 'First' });
     first.focus();
