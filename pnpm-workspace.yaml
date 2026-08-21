@@ -1,4 +1,23 @@
 packages:
   - "packages/*"
+
 allowBuilds:
   esbuild: true
+
+# One copy of the React types across the whole workspace, always.
+#
+# TypeScript compares these structurally *and* nominally: two copies of
+# @types/react in one program produce types that are identical in shape
+# but not assignable to each other, and the errors point at neither
+# cause. The symptom is baffling — "'Menu' cannot be used as a JSX
+# component ... 'bigint' is not assignable to 'ReactNode'" — because the
+# bigint arrived with React 19's ReactNode while something else was still
+# resolving React 18's.
+#
+# It happened here the moment Terra moved to React 19 and the showcase
+# app stayed on 18. Terra peers `react >=18` so consumers may legitimately
+# be on either major; this pin only governs *this workspace*, not what
+# anyone installing the package gets.
+overrides:
+  "@types/react": "^19.2.18"
+  "@types/react-dom": "^19.2.3"
