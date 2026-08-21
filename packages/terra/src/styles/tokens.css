@@ -685,6 +685,17 @@
      of the unattended-content slow settle `stella-appear` is for. */
 	--stella-overlay-pop-animation: stella-overlay-pop var(--stella-motion-fast)
 		var(--stella-easing-spring) both;
+
+	/* "Commit pulse" — an expanding, fading ring Checkbox/Radio/Switch/
+     Slider each play once a value actually commits (a box checks, a
+     switch flips on, a slider value settles). One shared keyframe
+     instead of four near-identical copies; each component only adds
+     its own position/size/color on top (see styles/shared/
+     pulseRing.module.css) and gates *when* it plays via
+     utils/usePulse.ts, since the trigger has to be tied to a real
+     user event, not to the element simply rendering already "on". */
+	--stella-pulse-ring-animation: stella-pulse-ring 500ms
+		var(--stella-easing-out);
 }
 
 /* ============================================================================
@@ -793,6 +804,26 @@ code {
 }
 
 /* ============================================================================
+   PULSE RING KEYFRAMES — see --stella-pulse-ring-animation above. Scale
+   only, deliberately: every consumer positions its own ring via
+   `left`/`top`/margins rather than `transform`, specifically so this
+   keyframe's `transform: scale(...)` doesn't clobber a per-instance
+   translate each of them would otherwise need.
+   ============================================================================ */
+
+@keyframes stella-pulse-ring {
+	from {
+		opacity: 0.55;
+		transform: scale(1);
+	}
+
+	to {
+		opacity: 0;
+		transform: scale(1.8);
+	}
+}
+
+/* ============================================================================
    REDUCED MOTION
    Collapses every token-derived duration to (near) zero for users who
    prefer reduced motion — appearance animations and transitions become
@@ -808,4 +839,39 @@ code {
 		--stella-motion-slow: 0.01ms;
 		--stella-motion-slower: 0.01ms;
 	}
+}
+
+/* ============================================================================
+   EXPLICIT MOTION OVERRIDE — data-stella-motion, written by
+   ThemeManager.setMotion() (see MotionStyle's docblock). Two tiers on
+   top of the default ("system" — no attribute, the media query above
+   is the only thing deciding):
+
+   - "reduced": the same near-zero durations as the media query above,
+     forced regardless of the OS setting — for an in-app "reduce
+     motion" toggle that shouldn't have to wait on an OS setting.
+   - "off": a harder kill switch. Every animation/transition in the
+     kit is removed outright rather than sped to near-zero — a
+     near-zero *duration* is still a real transition, which is enough
+     to cost a frame on a low-power device or produce flaky
+     `transitionend` timing under screenshot/visual-regression
+     testing. `!important` + this rule's higher specificity than a
+     bare `*` selector is what lets Spinner's carve-out (see
+     Spinner.module.css) win back essential motion regardless of
+     stylesheet load order.
+   ============================================================================ */
+
+[data-stella-motion="reduced"] {
+	--stella-motion-instant: 0.01ms;
+	--stella-motion-fast: 0.01ms;
+	--stella-motion-base: 0.01ms;
+	--stella-motion-slow: 0.01ms;
+	--stella-motion-slower: 0.01ms;
+}
+
+[data-stella-motion="off"] *,
+[data-stella-motion="off"] *::before,
+[data-stella-motion="off"] *::after {
+	animation: none !important;
+	transition: none !important;
 }

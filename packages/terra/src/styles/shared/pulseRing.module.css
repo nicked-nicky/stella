@@ -1,0 +1,18 @@
+/**
+ * Shared base for the "commit pulse" ring — the expanding, fading
+ * circle Checkbox, Radio, and Switch each play once a toggle actually
+ * commits to "on" (see ../../utils/usePulse.ts for the trigger side,
+ * and tokens.css's `--stella-pulse-ring-animation` for the shared
+ * keyframe every one of them plays).
+ *
+ * Only the properties truly identical across all three live here —
+ * position/size/color stay local to each component, since a
+ * self-contained box (Checkbox's box, Radio's dot) and an offset thumb
+ * riding inside a track (Switch) don't share a positioning scheme.
+ */
+
+.pulseRing {
+	border-radius: var(--stella-radius-panel);
+	opacity: 0;
+	pointer-events: none;
+}
