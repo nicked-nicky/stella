@@ -1,7 +1,6 @@
 # Stella
 
-<!-- Replace OWNER in the CI badge below with the GitHub account this repo lives under. -->
-[![CI](https://github.com/OWNER/stella/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/OWNER/stella/actions/workflows/ci.yml)
+[![CI](https://github.com/nicked-nicky/stella/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/nicked-nicky/stella/actions/workflows/ci.yml)
 [![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](#project-status)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
