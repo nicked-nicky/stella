@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
 import { mergeRefs } from '../../utils/mergeRefs';
+import { usePulse } from '../../utils/usePulse';
 import styles from './Checkbox.module.css';
 
 // ============================================================================
@@ -52,7 +53,15 @@ interface CheckboxProps extends Omit<
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   (
-    { size = 'md', indeterminate = false, label, className, id, ...props },
+    {
+      size = 'md',
+      indeterminate = false,
+      label,
+      className,
+      id,
+      onChange,
+      ...props
+    },
     forwardedRef
   ) => {
     const innerRef = useRef<HTMLInputElement>(null);
@@ -69,6 +78,17 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const autoId = React.useId();
     const inputId = id ?? autoId;
 
+    // Commit pulse — see usePulse's docs. Only triggered from a real
+    // onChange event below, never derived from `checked` itself, so a
+    // Checkbox that simply *renders* pre-checked (a common demo/initial
+    // state) never fires it on mount.
+    const [pulsing, triggerPulse] = usePulse();
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.checked) triggerPulse();
+      onChange?.(event);
+    };
+
     const input = (
       <span className={[styles.wrapper, styles[`size-${size}`]].join(' ')}>
         <input
@@ -76,9 +96,19 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           type="checkbox"
           id={inputId}
           className={[styles.input, className].filter(Boolean).join(' ')}
+          onChange={handleChange}
           {...props}
         />
-        <span className={styles.box} aria-hidden="true">
+        <span
+          className={[styles.box, pulsing && styles.pulsing]
+            .filter(Boolean)
+            .join(' ')}
+          aria-hidden="true"
+        >
+          {/* Expanding ring played on every check-on, see
+              Checkbox.module.css's PULSE section. Sits behind the icons
+              (first in DOM = painted first) so the mark stays crisp on top. */}
+          <span className={styles.pulseRing} />
           <svg
             className={styles.checkIcon}
             viewBox="0 0 16 16"

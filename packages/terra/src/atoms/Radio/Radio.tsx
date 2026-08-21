@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { usePulse } from '../../utils/usePulse';
 import styles from './Radio.module.css';
 
 // ============================================================================
@@ -46,9 +47,20 @@ interface RadioProps extends Omit<
  * ```
  */
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(
-  ({ size = 'md', label, className, id, ...props }, ref) => {
+  ({ size = 'md', label, className, id, onChange, ...props }, ref) => {
     const autoId = React.useId();
     const inputId = id ?? autoId;
+
+    // Commit pulse — see usePulse's docs. Only triggered from a real
+    // onChange event below, never derived from `checked` itself, so a
+    // Radio that simply *renders* pre-checked (the group's initial
+    // selection) never fires it on mount.
+    const [pulsing, triggerPulse] = usePulse();
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.checked) triggerPulse();
+      onChange?.(event);
+    };
 
     const input = (
       <span className={[styles.wrapper, styles[`size-${size}`]].join(' ')}>
@@ -57,9 +69,19 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
           type="radio"
           id={inputId}
           className={[styles.input, className].filter(Boolean).join(' ')}
+          onChange={handleChange}
           {...props}
         />
-        <span className={styles.dot} aria-hidden="true" />
+        <span
+          className={[styles.dot, pulsing && styles.pulsing]
+            .filter(Boolean)
+            .join(' ')}
+          aria-hidden="true"
+        >
+          {/* Expanding ring played on every check-on, see
+              Radio.module.css's PULSE section. */}
+          <span className={styles.pulseRing} />
+        </span>
       </span>
     );
 

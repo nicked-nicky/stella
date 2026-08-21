@@ -44,6 +44,12 @@
 	border: var(--stella-border-width) solid var(--stella-border-default);
 	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-surface-card);
+	/* One scale var driving the whole box's hover/press feel, same
+	   technique as Slider's --slider-thumb-scale: hover and active each
+	   just set this one custom property, the transform declaration
+	   itself never changes. Kept deliberately subtle (1.03/0.94) — a
+	   loud squish read as noisy on a control this small. */
+	transform: scale(var(--checkbox-box-scale, 1));
 	transition:
 		background-color var(--stella-motion-fast) var(--stella-easing-out),
 		border-color var(--stella-motion-fast) var(--stella-easing-out),
@@ -91,6 +97,8 @@
 /* Hover (not disabled) */
 .input:hover:not(:disabled) + .box {
 	border-color: var(--stella-text-secondary);
+	/* Grow the whole box slightly, an affordance nudge. */
+	--checkbox-box-scale: 1.03;
 }
 
 /* Press feedback — the inner check mark squeezes on click; the box
@@ -98,6 +106,33 @@
 .input:active:not(:disabled) + .box .checkIcon,
 .input:active:not(:disabled) + .box .indeterminateIcon {
 	transform: scale(0.8);
+}
+
+/* The box itself shrinks slightly on press too (declared after hover
+   so it wins when both match: mouse down while hovering). */
+.input:active:not(:disabled) + .box {
+	--checkbox-box-scale: 0.94;
+}
+
+/* ============================================================================
+   COMMIT PULSE — a brief expanding, fading ring filling the box, played
+   whenever the checkbox actually *commits* to checked (see
+   ../../utils/usePulse.ts). Deliberately JS-gated rather than a pure
+   `:checked` CSS trigger: a `:checked` selector matches immediately on
+   first paint too, so a Checkbox that simply renders pre-checked would
+   pulse on mount with nothing having "just happened" — usePulse only
+   ever fires from a real onChange event.
+   ============================================================================ */
+
+.pulseRing {
+	composes: pulseRing from "../../styles/shared/pulseRing.module.css";
+	position: absolute;
+	inset: 0;
+	background-color: var(--stella-selected-bg);
+}
+
+.box.pulsing .pulseRing {
+	animation: var(--stella-pulse-ring-animation);
 }
 
 /* Focus ring */

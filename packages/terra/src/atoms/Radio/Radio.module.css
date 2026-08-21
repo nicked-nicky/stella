@@ -38,6 +38,9 @@
 	border: var(--stella-border-width) solid var(--stella-border-default);
 	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-surface-card);
+	/* Same one-variable scale technique as Checkbox/Slider. Kept subtle
+	   (1.03/0.94) — see Checkbox.module.css's box for the same call. */
+	transform: scale(var(--radio-dot-scale, 1));
 	transition:
 		background-color var(--stella-motion-fast) var(--stella-easing-out),
 		border-color var(--stella-motion-fast) var(--stella-easing-out),
@@ -69,6 +72,14 @@
 
 .input:hover:not(:disabled) + .dot {
 	border-color: var(--stella-text-secondary);
+	/* Grow the whole ring slightly, an affordance nudge. */
+	--radio-dot-scale: 1.03;
+}
+
+/* Shrink on press (declared after hover so it wins when both match:
+   mouse down while hovering). */
+.input:active:not(:disabled) + .dot {
+	--radio-dot-scale: 0.94;
 }
 
 .input:focus-visible + .dot {
@@ -79,6 +90,27 @@
 .input:disabled + .dot {
 	opacity: 0.5;
 	cursor: not-allowed;
+}
+
+/* ============================================================================
+   COMMIT PULSE — a brief expanding, fading ring, played whenever the
+   radio actually *commits* to checked (see ../../utils/usePulse.ts).
+   Deliberately JS-gated rather than a pure `:checked` CSS trigger: a
+   `:checked` selector matches immediately on first paint too, so a
+   Radio that renders as the group's initial selection would pulse on
+   mount with nothing having "just happened" — usePulse only ever fires
+   from a real onChange event.
+   ============================================================================ */
+
+.pulseRing {
+	composes: pulseRing from "../../styles/shared/pulseRing.module.css";
+	position: absolute;
+	inset: 0;
+	background-color: var(--stella-selected-bg);
+}
+
+.dot.pulsing .pulseRing {
+	animation: var(--stella-pulse-ring-animation);
 }
 
 /* ============================================================================

@@ -22,6 +22,7 @@
 	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
 	animation: var(--stella-appear-animation);
 
+	position: relative;
 	display: inline-flex;
 	align-items: center;
 	gap: var(--stella-space-2);
@@ -63,20 +64,33 @@
 	box-shadow: var(--stella-shadow-xs);
 }
 
-.default:hover:not(.disabled) {
-	background-image: linear-gradient(
-		var(--stella-state-hover),
-		var(--stella-state-hover)
-	);
+/* Hover/press tint via a real overlay, not a background-image swap.
+   Gradients aren't reliably interpolated by any engine (a discrete
+   "jump" value, not a tweenable one) even with a `transition` declared
+   on them, so a `::before` sized to match `.wrapper` handles this
+   instead — it only ever animates its own `opacity`, which *is* always
+   smoothly animatable. Painted before the icon/input children, so they
+   stay on top of it. */
+.wrapper::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity var(--stella-motion-fast) var(--stella-easing-out);
+}
+
+.default:hover:not(.disabled)::before {
+	background-color: var(--stella-state-hover);
+	opacity: 1;
 }
 
 /* Press feedback — the icon inside squeezes on click; the field chrome
    stays put (no whole-field scale). */
-.default:active:not(.disabled) {
-	background-image: linear-gradient(
-		var(--stella-state-active),
-		var(--stella-state-active)
-	);
+.default:active:not(.disabled)::before {
+	background-color: var(--stella-state-active);
+	opacity: 1;
 }
 
 .default:active:not(.disabled) .icon {

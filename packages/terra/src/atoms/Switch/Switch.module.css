@@ -72,6 +72,14 @@
 	border-radius: var(--stella-radius-panel);
 	background-color: var(--stella-text-on-fill);
 	box-shadow: var(--stella-shadow-xs);
+	position: relative;
+
+	/* One custom property for the slide offset, one for hover/press
+	   scale, combined into a single transform so each state only ever
+	   has to set the one variable it cares about (same technique as
+	   Slider's --slider-thumb-scale). */
+	transform: translateX(var(--switch-thumb-x, 0px))
+		scaleX(var(--switch-thumb-scale, 1));
 	transition: transform var(--stella-motion-base) var(--stella-easing-spring);
 }
 
@@ -81,10 +89,50 @@
    The thumb is square and sized to the content height (H-2b-2p), so
    travel = (W-2b-2p) - (H-2b-2p) = W - H. Clean: the border/padding
    cancel out, so the offset is simply width minus height. */
-.size-sm.checked .thumb {
-	transform: translateX(calc(32px - 18px));
+/* Set on `.switch` itself, not `.thumb` — `.pulseRing` is a sibling of
+   `.thumb`, not a descendant of it, so both need to inherit this from
+   a shared ancestor to stay aligned with each other. */
+.size-sm.checked {
+	--switch-thumb-x: calc(32px - 18px);
 }
 
-.size-md.checked .thumb {
-	transform: translateX(calc(40px - 22px));
+.size-md.checked {
+	--switch-thumb-x: calc(40px - 22px);
+}
+
+/* A GTK/iOS-style knob squish: slightly wider on hover (an affordance
+   nudge), narrower on press (the tactile squeeze). Only scaleX, not
+   the whole thumb, so it reads as the knob deforming against the track
+   rather than the track's own pointer target shrinking (which would
+   make it harder to hit). Kept subtle (1.04/0.92) — see Checkbox's box
+   for the same call on why. */
+.switch:hover:not(:disabled) .thumb {
+	--switch-thumb-scale: 1.04;
+}
+
+.switch:active:not(:disabled) .thumb {
+	--switch-thumb-scale: 0.92;
+}
+
+/* ============================================================================
+   COMMIT PULSE — a brief expanding, fading ring, played whenever the
+   switch actually turns *on* (see ../../utils/usePulse.ts). Deliberately
+   JS-gated — `.checked` alone can't tell "just switched on" apart from
+   "rendered pre-checked", and a plain `:checked`-style trigger would
+   pulse on mount for any Switch that starts on. Positioned via `left`
+   (not `transform`) so it stays anchored to the thumb's current side —
+   --switch-thumb-x is the same offset the thumb itself uses — while
+   leaving `transform` free for the shared scale-only pulse keyframe. */
+.pulseRing {
+	composes: pulseRing from "../../styles/shared/pulseRing.module.css";
+	position: absolute;
+	top: 2px;
+	bottom: 2px;
+	left: calc(2px + var(--switch-thumb-x, 0px));
+	aspect-ratio: 1;
+	background-color: var(--stella-text-on-fill);
+}
+
+.switch.pulsing .pulseRing {
+	animation: var(--stella-pulse-ring-animation);
 }

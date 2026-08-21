@@ -1,4 +1,5 @@
 import React, { forwardRef, useState } from 'react';
+import { usePulse } from '../../utils/usePulse';
 import styles from './Switch.module.css';
 
 // ============================================================================
@@ -66,11 +67,18 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     const [internalChecked, setInternalChecked] = useState(defaultChecked);
     const isChecked = isControlled ? checked : internalChecked;
 
+    // Commit pulse — see usePulse's docs. Only triggered from a real
+    // click that turns the switch ON, never derived from `checked`
+    // itself, so a Switch that simply *renders* pre-checked (a common
+    // demo/initial state) never fires it on mount.
+    const [pulsing, triggerPulse] = usePulse();
+
     const handleClick = () => {
       if (disabled) return;
       const next = !isChecked;
       if (!isControlled) setInternalChecked(next);
       onCheckedChange?.(next);
+      if (next) triggerPulse();
     };
 
     return (
@@ -85,12 +93,16 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           styles.switch,
           styles[`size-${size}`],
           isChecked && styles.checked,
+          pulsing && styles.pulsing,
           className,
         ]
           .filter(Boolean)
           .join(' ')}
         {...props}
       >
+        {/* Expanding ring played on every switch-on, see
+            Switch.module.css's PULSE section. */}
+        <span className={styles.pulseRing} aria-hidden="true" />
         <span className={styles.thumb} />
       </button>
     );
