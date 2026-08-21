@@ -107,6 +107,43 @@ test.describe('field controls', () => {
   });
 });
 
+test.describe('layout', () => {
+  test('holds a fixed height instead of sizing to its content', async ({
+    mount,
+    page,
+  }) => {
+    // The point of pinning it: switching category must not resize the
+    // panel, or the window jumps and the nav column's scroll position
+    // goes with it.
+    const component = await mount(<SettingsMenuFixture />);
+    const root = component.locator('> *').first();
+
+    const before = await root.boundingBox();
+    await component.getByRole('button', { name: /Appearance/ }).click();
+    await expect(component.getByText('Theme')).toBeVisible();
+    const after = await root.boundingBox();
+
+    expect(before).not.toBeNull();
+    expect(after!.height).toBeCloseTo(before!.height, 0);
+
+    // ...and that height tracks the viewport, not the content.
+    const viewport = page.viewportSize();
+    expect(after!.height).toBeCloseTo(viewport!.height * 0.8, -1);
+  });
+
+  test('both columns scroll independently rather than the page', async ({
+    mount,
+  }) => {
+    const component = await mount(<SettingsMenuFixture />);
+
+    const overflow = await component
+      .getByRole('navigation', { name: 'Settings categories' })
+      .evaluate((el) => getComputedStyle(el).overflowY);
+
+    expect(overflow).toBe('auto');
+  });
+});
+
 test.describe('accessibility', () => {
   test('the settings surface has no axe violations', async ({ mount, page }) => {
     await mount(<SettingsMenuFixture />);

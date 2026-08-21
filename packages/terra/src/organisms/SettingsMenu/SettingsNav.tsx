@@ -16,16 +16,7 @@ interface SettingsNavProps {
  */
 export function SettingsNav({ categories, activeId, onSelect }: SettingsNavProps) {
   return (
-    <nav
-      aria-label="Settings categories"
-      style={{
-        width: '220px',
-        flexShrink: 0,
-        overflowY: 'auto',
-        borderRight: 'var(--stella-border-width) solid var(--stella-border-default)',
-        padding: 'var(--stella-space-3)',
-      }}
-    >
+    <nav aria-label="Settings categories" className={styles.nav}>
       <FlexContainer direction="column" gap="1" style={{ width: '100%' }}>
         {categories.map((category) => (
           <button

@@ -14,6 +14,91 @@
  * @format
  */
 
+/* ============================================================================
+   LAYOUT — a fixed-height panel with two independently scrolling columns.
+
+   The height is deliberately not content-driven: a settings panel that
+   grows and shrinks as you move between categories makes the whole
+   window jump, and the nav column's scroll position resets with it.
+   Pinning it means switching category only ever scrolls the right-hand
+   pane.
+
+   `80vh` is the default rather than `80%` because a percentage silently
+   resolves to `auto` unless every ancestor has a definite height — which
+   is exactly the collapsed-to-content-height case this is meant to
+   prevent. Override with --stella-settings-height where the parent does
+   size itself (inside a Dialog, say: `--stella-settings-height: 100%`).
+
+   `min-height: 0` on the flex parent and both children is what actually
+   lets them scroll: a flex item's default `min-height: auto` refuses to
+   shrink below its content, so `overflow-y: auto` on a child of a
+   too-short flex container never engages.
+   ============================================================================ */
+
+.root {
+	height: var(--stella-settings-height, 80vh);
+	min-height: 0;
+}
+
+.nav,
+.panel {
+	overflow-y: auto;
+	min-height: 0;
+	/* Reserves the gutter up front, so a category whose fields happen to
+	   overflow doesn't reflow the column it appears in. */
+	scrollbar-gutter: stable;
+}
+
+.nav {
+	width: 220px;
+	flex-shrink: 0;
+	padding: var(--stella-space-3);
+	border-right: var(--stella-border-width) solid var(--stella-border-default);
+}
+
+.panel {
+	flex: 1;
+	min-width: 0;
+	padding: var(--stella-space-6);
+}
+
+/* Quiet scrollbars — the thumb only materialises once the pointer is in
+   the column (or something inside it has keyboard focus), so a settings
+   panel at rest shows no scroll furniture at all. The track stays
+   transparent either way; this only overrides the thumb colour from the
+   global rule in tokens.css, so width/radius/inset stay consistent with
+   every other scrollable surface in the kit.
+
+   Deliberately not `scrollbar-width: none` — hiding the scrollbar
+   outright would take the affordance away from pointer users who need
+   to drag it, and remove the only indication that there's more content. */
+.nav,
+.panel {
+	scrollbar-color: transparent transparent;
+	transition: scrollbar-color var(--stella-motion-fast) var(--stella-easing-out);
+}
+
+.nav:hover,
+.nav:focus-within,
+.panel:hover,
+.panel:focus-within {
+	scrollbar-color: var(--stella-border-default) transparent;
+}
+
+.nav::-webkit-scrollbar-thumb,
+.panel::-webkit-scrollbar-thumb {
+	background: transparent;
+	background-clip: padding-box;
+}
+
+.nav:hover::-webkit-scrollbar-thumb,
+.nav:focus-within::-webkit-scrollbar-thumb,
+.panel:hover::-webkit-scrollbar-thumb,
+.panel:focus-within::-webkit-scrollbar-thumb {
+	background: var(--stella-border-default);
+	background-clip: padding-box;
+}
+
 .navItem {
 	/* Mount fade-in — shared `stella-appear` keyframes in tokens.css. */
 	animation: var(--stella-appear-animation);

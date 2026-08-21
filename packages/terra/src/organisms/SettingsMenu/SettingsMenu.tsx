@@ -3,6 +3,7 @@ import { FlexContainer } from '../../layout/FlexContainer';
 import { SettingsNav } from './SettingsNav';
 import { SettingsCategoryPanel } from './SettingsCategoryPanel';
 import type { SettingsSchema, SettingsValues, SettingsFieldValue } from './types';
+import styles from './SettingsMenu.module.css';
 
 // ============================================================================
 // TYPES
@@ -65,9 +66,9 @@ export function SettingsMenu({
     schema.categories.find((c) => c.id === activeId) ?? schema.categories[0];
 
   return (
-    <FlexContainer align="stretch" style={{ height: '100%', minHeight: 0 }}>
+    <FlexContainer align="stretch" className={styles.root}>
       <SettingsNav categories={schema.categories} activeId={activeId} onSelect={handleSelect} />
-      <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: 'var(--stella-space-6)' }}>
+      <div className={styles.panel}>
         {activeCategory && (
           <SettingsCategoryPanel
             category={activeCategory}
