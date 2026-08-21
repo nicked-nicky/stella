@@ -1,15 +1,11 @@
 name: CI
 
-# Runs the same four checks the WIKI's development loop describes, so
-# "it works on my machine" and "it passes CI" mean the same thing. Until
-# this existed every check was manual, which is why the test
-# devDependencies could sit in package.json unlockfiled and unrun.
 on:
   push:
     branches: [main, alpha]
+    tags: ['v*']
   pull_request:
 
-# A new push to the same branch makes the previous run irrelevant.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -21,23 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # No `version:` here on purpose. package.json's `packageManager`
-      # field already pins pnpm, and action-setup treats declaring it in
-      # both places as a hard error rather than a preference — so the
-      # single source of truth is the one that also governs local installs
-      # and Corepack.
       - uses: pnpm/action-setup@v4
 
-      # Vite 8 requires ^20.19 || >=22.12; 22 keeps CI clear of that edge.
-      # (The runner's own Node-20 deprecation notice is about the runtime
-      # GitHub executes actions with, not this version.)
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      # --frozen-lockfile makes a stale lockfile a build failure rather
-      # than something that silently resolves differently in CI.
       - name: Install
         run: pnpm install --frozen-lockfile
 
@@ -50,8 +36,6 @@ jobs:
       - name: Unit tests (Vitest)
         run: pnpm test
 
-      # Cached separately from node_modules — browser binaries are large
-      # and change only when Playwright itself does.
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@v4
@@ -74,8 +58,5 @@ jobs:
           path: packages/terra/playwright-report/
           retention-days: 7
 
-      # Last, not first: a build that succeeds while the tests fail tells
-      # you nothing useful, and this also proves the publishConfig
-      # dist/ entrypoints actually get produced.
       - name: Build
         run: pnpm build
