@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { NotificationProvider, useNotifications } from './NotificationProvider';
 
 // Almost all of this provider's behaviour is timer-driven, which makes
@@ -41,19 +40,30 @@ async function advance(ms: number) {
 }
 
 /**
- * user-event under fake timers.
+ * Interactions here use `fireEvent`, not `user-event`, and that's a
+ * deliberate exception to the pattern the rest of the suite follows.
  *
- * Both options are required and for different reasons: `advanceTimers`
- * lets user-event drive vitest's clock, and `delay: null` stops it
- * awaiting real time between steps — without that, every interaction
- * hangs until the test times out, because nothing is advancing the fake
- * clock while it waits.
+ * user-event is the better default — it models a real user, firing the
+ * full event sequence a browser would. But it is asynchronous by design,
+ * and under fake timers its internal waits and vitest's frozen clock
+ * deadlock each other: the interaction waits for time that nothing is
+ * advancing. `advanceTimers` plus `delay: null` is the documented
+ * escape hatch and still wasn't enough here.
+ *
+ * Every test in this file is *about* timer behaviour, so fake timers are
+ * non-negotiable and the interaction is the part that gives. fireEvent
+ * is synchronous and has no timer interaction at all.
+ *
+ * mouseOver/mouseOut rather than mouseEnter/mouseLeave because React
+ * synthesises onMouseEnter/onMouseLeave from the delegated over/out
+ * events — dispatching a native `mouseenter` reaches no React handler.
  */
-function setupUser() {
-  return userEvent.setup({
-    advanceTimers: vi.advanceTimersByTime,
-    delay: null,
-  });
+function hover(element: HTMLElement) {
+  fireEvent.mouseOver(element);
+}
+
+function unhover(element: HTMLElement) {
+  fireEvent.mouseOut(element);
 }
 
 describe('NotificationProvider', () => {
@@ -192,29 +202,27 @@ describe('NotificationProvider', () => {
 
   describe('pause on hover', () => {
     it('suspends the auto-dismiss countdown while hovered', async () => {
-      const user = setupUser();
       renderProvider();
       await act(async () => {
         notify.info('Hover me', { duration: 1000 });
       });
 
-      await user.hover(screen.getByRole('status'));
+      hover(screen.getByRole('status'));
       await advance(5000);
 
       expect(screen.getByText('Hover me')).toBeInTheDocument();
     });
 
     it('restarts the countdown on unhover', async () => {
-      const user = setupUser();
       renderProvider();
       await act(async () => {
         notify.info('Hover me', { duration: 1000 });
       });
 
       const toast = screen.getByRole('status');
-      await user.hover(toast);
+      hover(toast);
       await advance(5000);
-      await user.unhover(toast);
+      unhover(toast);
 
       await advance(1000 + EXIT_DURATION);
       expect(screen.queryByText('Hover me')).toBeNull();
@@ -223,13 +231,14 @@ describe('NotificationProvider', () => {
 
   describe('manual dismiss', () => {
     it('the dismiss button removes the toast', async () => {
-      const user = setupUser();
       renderProvider();
       await act(async () => {
         notify.info('Close me');
       });
 
-      await user.click(screen.getByRole('button', { name: 'Dismiss notification' }));
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Dismiss notification' })
+      );
       await advance(EXIT_DURATION);
 
       expect(screen.queryByText('Close me')).toBeNull();

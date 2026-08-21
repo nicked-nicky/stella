@@ -65,14 +65,20 @@ async function waitForFocus(name: string) {
   );
 }
 
+/**
+ * Returned as an array, not a fragment, and that distinction is load-
+ * bearing: `Children.toArray` does not look inside a fragment, so
+ * wrapping items in one collapses them to a single child and Menu's
+ * auto-hairline pass finds no adjacent `Menu.Item` pairs to separate.
+ * See the fragment test at the end of this file, which pins that
+ * behaviour down rather than leaving it as a trap.
+ */
 function defaultItems() {
-  return (
-    <>
-      <Menu.Item>Copy</Menu.Item>
-      <Menu.Item>Paste</Menu.Item>
-      <Menu.Item>Delete</Menu.Item>
-    </>
-  );
+  return [
+    <Menu.Item key="copy">Copy</Menu.Item>,
+    <Menu.Item key="paste">Paste</Menu.Item>,
+    <Menu.Item key="delete">Delete</Menu.Item>,
+  ];
 }
 
 describe('Menu — structure and ARIA', () => {
@@ -98,15 +104,29 @@ describe('Menu — structure and ARIA', () => {
   });
 
   it('does not stack a second hairline next to an explicit Menu.Separator', async () => {
+    await renderOpenMenu([
+      <Menu.Item key="copy">Copy</Menu.Item>,
+      <Menu.Separator key="sep" />,
+      <Menu.Item key="delete">Delete</Menu.Item>,
+    ]);
+    const menu = screen.getByRole('menu');
+    expect(within(menu).getAllByRole('separator')).toHaveLength(1);
+  });
+
+  it('a fragment wrapper opts out of the auto-hairline', async () => {
+    // Not a bug being enshrined — a documented consequence of
+    // Children.toArray not descending into fragments. Worth pinning:
+    // the failure mode is silent (items render fine, hairlines just
+    // vanish), so without a test it reads as a styling regression.
     await renderOpenMenu(
       <>
         <Menu.Item>Copy</Menu.Item>
-        <Menu.Separator />
-        <Menu.Item>Delete</Menu.Item>
+        <Menu.Item>Paste</Menu.Item>
       </>
     );
     const menu = screen.getByRole('menu');
-    expect(within(menu).getAllByRole('separator')).toHaveLength(1);
+    expect(within(menu).getAllByRole('menuitem')).toHaveLength(2);
+    expect(within(menu).queryAllByRole('separator')).toHaveLength(0);
   });
 
   it('is absent from the document when closed', () => {
@@ -183,13 +203,13 @@ describe('Menu — keyboard navigation', () => {
   });
 
   it('skips disabled items when navigating', async () => {
-    const user = await renderOpenMenu(
-      <>
-        <Menu.Item>Copy</Menu.Item>
-        <Menu.Item disabled>Paste</Menu.Item>
-        <Menu.Item>Delete</Menu.Item>
-      </>
-    );
+    const user = await renderOpenMenu([
+      <Menu.Item key="copy">Copy</Menu.Item>,
+      <Menu.Item key="paste" disabled>
+        Paste
+      </Menu.Item>,
+      <Menu.Item key="delete">Delete</Menu.Item>,
+    ]);
     await waitForFocus('Copy');
 
     await user.keyboard('{ArrowDown}');
@@ -215,12 +235,10 @@ describe('Menu — typeahead', () => {
   });
 
   it('accumulates consecutive letters to disambiguate', async () => {
-    const user = await renderOpenMenu(
-      <>
-        <Menu.Item>Save</Menu.Item>
-        <Menu.Item>Select all</Menu.Item>
-      </>
-    );
+    const user = await renderOpenMenu([
+      <Menu.Item key="save">Save</Menu.Item>,
+      <Menu.Item key="select">Select all</Menu.Item>,
+    ]);
     await waitForFocus('Save');
 
     await user.keyboard('se');
@@ -229,12 +247,12 @@ describe('Menu — typeahead', () => {
 
   it('ignores whitespace so Space stays available for activation', async () => {
     const onSelect = vi.fn();
-    const user = await renderOpenMenu(
-      <>
-        <Menu.Item onSelect={onSelect}>Copy</Menu.Item>
-        <Menu.Item>Paste</Menu.Item>
-      </>
-    );
+    const user = await renderOpenMenu([
+      <Menu.Item key="copy" onSelect={onSelect}>
+        Copy
+      </Menu.Item>,
+      <Menu.Item key="paste">Paste</Menu.Item>,
+    ]);
     await waitForFocus('Copy');
 
     await user.keyboard(' ');
@@ -274,10 +292,12 @@ describe('Menu — dismissal', () => {
     const onSelect = vi.fn();
     const onClose = vi.fn();
     const user = await renderOpenMenu(
-      <>
-        <Menu.Item onSelect={onSelect}>Copy</Menu.Item>
-        <Menu.Item>Paste</Menu.Item>
-      </>,
+      [
+        <Menu.Item key="copy" onSelect={onSelect}>
+          Copy
+        </Menu.Item>,
+        <Menu.Item key="paste">Paste</Menu.Item>,
+      ],
       onClose
     );
     await waitForFocus('Copy');
@@ -291,12 +311,12 @@ describe('Menu — dismissal', () => {
     const onSelect = vi.fn();
     const onClose = vi.fn();
     const user = await renderOpenMenu(
-      <>
-        <Menu.Item onSelect={onSelect} closeOnSelect={false}>
+      [
+        <Menu.Item key="toggle" onSelect={onSelect} closeOnSelect={false}>
           Toggle
-        </Menu.Item>
-        <Menu.Item>Paste</Menu.Item>
-      </>,
+        </Menu.Item>,
+        <Menu.Item key="paste">Paste</Menu.Item>,
+      ],
       onClose
     );
     await waitForFocus('Toggle');
@@ -308,14 +328,12 @@ describe('Menu — dismissal', () => {
 
   it('a disabled item does not fire onSelect', async () => {
     const onSelect = vi.fn();
-    const user = await renderOpenMenu(
-      <>
-        <Menu.Item>Copy</Menu.Item>
-        <Menu.Item disabled onSelect={onSelect}>
-          Paste
-        </Menu.Item>
-      </>
-    );
+    const user = await renderOpenMenu([
+      <Menu.Item key="copy">Copy</Menu.Item>,
+      <Menu.Item key="paste" disabled onSelect={onSelect}>
+        Paste
+      </Menu.Item>,
+    ]);
     await waitForFocus('Copy');
 
     await user.click(screen.getByRole('menuitem', { name: 'Paste' }));
