@@ -7,7 +7,9 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"outDir": "./dist",
-		"rootDir": "./src"
+		"rootDir": "./src",
+		"inlineSources": true,
+		"removeComments": true
 	},
 	"include": ["src"],
 	// `.story.tsx` is here for the same reason as the test files: Playwright

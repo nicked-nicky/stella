@@ -1,6 +1,6 @@
 {
 	"name": "@stella-componente/terra",
-	"version": "0.1.0-alpha.0",
+	"version": "0.1.0-alpha.1",
 	"description": "Stella-Componente — Terra. Thin, optimized, GTK4/libadwaita-inspired base UI kit for React.",
 	"license": "MIT",
 	"keywords": [
@@ -50,28 +50,21 @@
 		}
 	},
 	"files": [
-		"dist",
-		"src",
-		"!src/**/*.test.ts",
-		"!src/**/*.test.tsx",
-		"!src/**/*.ct.tsx",
-		"!src/**/*.story.tsx"
+		"dist/**/*.js",
+		"dist/**/*.d.ts",
+		"dist/**/*.css",
+		"LICENSE",
+		"README.md"
 	],
 	"sideEffects": [
 		"**/*.css"
 	],
 	"peerDependencies": {
 		"react": ">=18",
-		"react-dom": ">=18",
-		"lucide-react": "^1.0.0"
+		"react-dom": ">=18"
 	},
 	"engines": {
 		"node": ">=20.19"
-	},
-	"peerDependenciesMeta": {
-		"lucide-react": {
-			"optional": true
-		}
 	},
 	"scripts": {
 		"build": "tsc && node scripts/copy-css.mjs",
@@ -94,7 +87,6 @@
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.5",
 		"jsdom": "^30.0.1",
-		"lucide-react": "^1.30.0",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
 		"typedoc": "^0.28.20",
