@@ -1,6 +1,7 @@
 # Stella
 
 [![CI](https://github.com/nicked-nicky/stella/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/nicked-nicky/stella/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@stella/terra/alpha.svg)](https://www.npmjs.com/package/@stella/terra)
 [![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](#project-status)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
@@ -27,7 +28,13 @@ Zero runtime dependencies and zero runtime CSS-in-JS. Theming is CSS custom prop
 
 **Terra never depends on Vidrio. Vidrio depends on Terra.** That direction is fixed.
 
-`@stella/terra` has a working component set (below) and is the package to reach for today. `@stella/vidrio` is scaffolded but empty — nothing has been built on top of Terra yet. Neither is published yet (`private: true`) — see [WIKI.md's publish checklist](./WIKI.md#how-to-develop).
+`@stella/terra` has a working component set (below) and is the package to reach for today. `@stella/vidrio` is scaffolded but empty — nothing has been built on top of Terra yet, so it stays unpublished (`private: true`) rather than squatting the name.
+
+```bash
+pnpm add @stella/terra@alpha
+```
+
+The `alpha` tag is required: `latest` is deliberately unset while the API can still move, so a bare `pnpm add @stella/terra` won't resolve. See [WIKI.md's publish checklist](./WIKI.md#how-to-develop) for how releases are cut.
 
 ## Project status
 
@@ -44,7 +51,7 @@ What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#kn
 
 - `@stella/vidrio` is an empty scaffold.
 - Component tests run in Chromium only, so the visual layer is unverified on WebKit.
-- No published package, no semver guarantees, no ESLint config.
+- Prerelease, so no semver guarantees yet — pin an exact version if that matters. No ESLint config.
 
 ## Components (`@stella/terra`)
 

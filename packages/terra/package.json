@@ -1,9 +1,31 @@
 {
 	"name": "@stella/terra",
-	"version": "0.1.0",
-	"private": true,
+	"version": "0.1.0-alpha.0",
 	"description": "Stella — Terra. Thin, optimized, GTK4/libadwaita-inspired base UI kit for React.",
 	"license": "MIT",
+	"keywords": [
+		"react",
+		"ui-kit",
+		"component-library",
+		"design-system",
+		"gtk",
+		"libadwaita",
+		"tauri",
+		"electron",
+		"desktop",
+		"css-modules",
+		"accessible",
+		"typescript"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nicked-nicky/stella.git",
+		"directory": "packages/terra"
+	},
+	"homepage": "https://github.com/nicked-nicky/stella#readme",
+	"bugs": {
+		"url": "https://github.com/nicked-nicky/stella/issues"
+	},
 	"type": "module",
 	"main": "./src/index.ts",
 	"module": "./src/index.ts",
@@ -49,6 +71,7 @@
 	"scripts": {
 		"build": "tsc && node scripts/copy-css.mjs",
 		"clean": "rm -rf dist",
+		"prepublishOnly": "pnpm run clean && pnpm run typecheck && pnpm run test && pnpm run build",
 		"typecheck": "tsc -p tsconfig.typecheck.json",
 		"test": "vitest run",
 		"test:watch": "vitest",

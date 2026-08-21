@@ -4,6 +4,13 @@ All notable changes to Stella are documented here. Format loosely follows [Keep 
 
 ## [Unreleased]
 
+## [0.1.0-alpha.0] — 2026-08-21
+
+First published release of `@stella/terra`, on the `alpha` dist-tag so it
+does not become `latest`. `@stella/vidrio` stays unpublished — it is still
+an empty scaffold, and shipping a package with no components would only
+squat the name.
+
 ### Added
 
 - **Test suite across every component directory**, split along the two-layer boundary the WIKI describes. Vitest covers logic, ARIA and keyboard behaviour (`OverlayProvider`'s Escape scoping, `Dialog`'s focus trap and focus restore, `Menu`'s full WAI-ARIA keyboard contract, `NotificationProvider`'s timer/queue behaviour, controlled-vs-uncontrolled for `Input`/`Radio`, plus thin smoke tests for the presentational atoms). Playwright CT covers anything whose correctness lives in resolved CSS (`Button`'s state-layer ladder and focus ring, `SettingsMenu`'s selected-vs-hovered nav row, `WindowChrome`'s transparent strip and drag regions).

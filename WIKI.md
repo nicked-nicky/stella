@@ -74,22 +74,38 @@ Prettier config: tabs + double quotes everywhere, **except** `*.{ts,tsx}` which 
 
 **Test:** see [Testing](#testing) below.
 
-**Publish checklist** (manual, no Changesets):
+**Publish checklist** (manual, no Changesets).
 
-1. Bump `version` in `packages/terra/package.json` — semver: patch for fixes, minor for new components/props, major for breaking API/behavior changes. Pre-1.0, minor can carry breaking changes too (standard semver-0.x reading).
-2. Add an entry to the root `CHANGELOG.md` under a new version heading, moving anything relevant out of `[Unreleased]`.
-3. `pnpm --filter @stella/terra build` — note this emits `dist/`, which `publishConfig` repoints `exports`/`main`/`types` at automatically. Nothing in `package.json` needs hand-editing for that; `pnpm publish` does the swap.
-4. Flip `"private": true` → remove it (or set `false`) in `packages/terra/package.json` when actually ready to publish — it's left `true` deliberately so `npm publish` can't happen by accident.
-5. `pnpm --filter @stella/terra publish --access public` (the `publishConfig.access: "public"` field already covers this, `--access public` is belt-and-suspenders for the scoped-package default).
-6. Tag the release in git.
+Only `@stella/terra` publishes. `@stella/vidrio` keeps `private: true` until it has an actual component — publishing an empty package would just squat the name.
+
+**One-time setup**
+
+1. The `@stella` scope has to belong to you before npm will accept the package. It maps to either your npm username or an org: create the org once with `npm org create stella` (free for public packages), or rename the packages to `@<your-username>/terra`.
+2. `npm login`, or put a granular automation token in `~/.npmrc`. Never commit either — there is no `.npmrc` in this repo on purpose.
+3. Enable 2FA on the npm account. For a package other people install, this is the difference between a leaked token being an inconvenience and being a supply-chain incident.
+
+**Each release**
+
+1. Bump `version` in `packages/terra/package.json`. Semver: patch for fixes, minor for new components/props, major for breaking API/behaviour changes. Pre-1.0, minor can carry breaking changes too (standard semver-0.x reading). Prereleases use `-alpha.N` / `-beta.N`.
+2. Move the relevant entries out of `[Unreleased]` in the root `CHANGELOG.md` under a new version heading.
+3. Verify locally: `pnpm typecheck && pnpm test && pnpm --filter @stella/terra test:ct`. `prepublishOnly` re-runs clean/typecheck/test/build during publish anyway, so a broken tree can't ship — but the component tests aren't in that hook (they need a browser), so run them yourself.
+4. `pnpm --filter @stella/terra publish --tag alpha --access public --dry-run` and **read the file list**. It should be `dist/**`, `package.json`, `README.md`, `LICENSE` and nothing else. Source, tests and configs must not appear.
+5. Drop `--dry-run` to publish for real.
+6. `git tag v0.1.0-alpha.0 && git push --tags`.
+
+**Why `--tag alpha` matters.** Without it npm sets the `latest` dist-tag, so `npm install @stella/terra` gives everyone a prerelease. With it, `latest` stays unset until a stable release and installing the alpha is opt-in via `@stella/terra@alpha`. Getting this wrong on the first publish is awkward to undo — `latest` can be repointed, but anyone who installed in between already has it pinned.
+
+**What `publishConfig` does for you.** The package points `main`/`types`/`exports` at `./src` so the workspace consumes TypeScript source directly; `publishConfig` overrides all of them to `./dist` at publish time. pnpm performs the swap — nothing in `package.json` needs hand-editing at release, and there is no state to remember to revert afterwards.
+
+**Unpublishing barely exists.** npm only allows it within 72 hours and only if nothing depends on the package; after that the version is permanent. `npm deprecate` is the realistic remedy. This is the reason for the dry-run step.
 
 ## How to use components
 
-Once published:
-
 ```bash
-pnpm add @stella/terra
+pnpm add @stella/terra@alpha
 ```
+
+The `alpha` tag is required while the package is pre-1.0 — `latest` is deliberately unset, so a bare `pnpm add @stella/terra` will not resolve.
 
 Import the design tokens once, at your app's entry point — everything else in Terra reads these as CSS custom properties, nothing works visually without them:
 
