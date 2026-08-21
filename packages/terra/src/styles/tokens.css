@@ -266,6 +266,12 @@
 		var(--stella-neutral-200),
 		var(--stella-neutral-700)
 	);
+	/* NOTE: identical to --stella-border-default today, so everything that
+     opts into "subtle" (Dialog's header/footer rules, Menu's per-item
+     hairline, SettingsMenu's between-row rules) actually draws at full
+     strength. Left alone deliberately — it's a look question, not a
+     correctness one. neutral-100/800 is the obvious step if the
+     distinction is ever wanted. */
 	--stella-border-subtle: light-dark(
 		var(--stella-neutral-200),
 		var(--stella-neutral-700)
@@ -371,15 +377,21 @@
 
 	/* ========================================================================
      STATE LAYERS — hover / press / selected escalation ladder, each a
-     clear step firmer than the last. See WIKI.md's Architecture
-     reference for the full reasoning, including the border-color
-     collision history: --stella-state-hover needs to stay a real step
-     above --stella-border-default (currently neutral-200/700) or any
-     border-color escalation reading it (ButtonIsland/Menu's separator,
-     Island's outer border via :has()) goes invisible on hover — same
-     value in, same value out. Current hover value below is back at
-     neutral-200/700, identical to --stella-border-default again; flag
-     before relying on the separator/border hover effect looking right.
+     clear step firmer than the last. Applied as a *fill* behind a
+     control (Button, Menu.Item, SettingsMenu's current row).
+
+     `hover` and `selected` are deliberately the same fill. A selected
+     button is distinguished by being lit *at rest* — persistence is the
+     signal, not a third colour — and hovering the current item lands it
+     back on the tone it already had, which is the intended calm. Only
+     `active` (the press) steps firmer. This is a visual-identity choice,
+     not the collision it looks like: Button.ct.tsx asserts the shape
+     explicitly so nobody "fixes" it later.
+
+     They deliberately no longer double as *hairline* colours. Escalating
+     a border to `--stella-state-hover` was a no-op while that token
+     equalled --stella-border-default; the border ladder is now its own
+     pair below, so the two can never silently converge again.
      ======================================================================== */
 
 	--stella-state-hover: light-dark(
@@ -393,6 +405,28 @@
 	--stella-state-selected: light-dark(
 		var(--stella-neutral-200),
 		var(--stella-neutral-700)
+	);
+
+	/* ========================================================================
+     BORDER LADDER — the hairline equivalent of the state layers, for
+     anything that escalates a *line* rather than a fill: ButtonIsland's
+     auto-separator and the Island's own outer border reacting to a
+     hovered/pressed child via :has().
+
+     Separate from the state layers on purpose. A hairline has to read as
+     firmer than its resting --stella-border-default, and the state
+     layers are tuned as fills over a surface — reusing them is exactly
+     how the escalation ended up invisible. Regression-tested by
+     ButtonIsland.ct.tsx.
+     ======================================================================== */
+
+	--stella-border-hover: light-dark(
+		var(--stella-neutral-300),
+		var(--stella-neutral-600)
+	);
+	--stella-border-active: light-dark(
+		var(--stella-neutral-400),
+		var(--stella-neutral-500)
 	);
 
 	/* ========================================================================

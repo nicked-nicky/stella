@@ -17,27 +17,30 @@
 
 .group > button:hover:not(:disabled) + [role='separator'],
 .group > [role='separator']:has(+ button:hover:not(:disabled)) {
-	background-color: var(--stella-state-hover);
+	background-color: var(--stella-border-hover);
 }
 
 .group > button:active:not(:disabled) + [role='separator'],
 .group > [role='separator']:has(+ button:active:not(:disabled)) {
-	background-color: var(--stella-state-active);
+	background-color: var(--stella-border-active);
 }
 
 /* ============================================================================
    BORDER ESCALATION — the outer Island's border reacts to a Button
    child's hover/press via `:has()` (same pattern as Checkbox's
-   `.label:has(.input:disabled)`) — no JS needed. Same tokens Button
-   escalates its own background/text through. See WIKI.md.
+   `.label:has(.input:disabled)`) — no JS needed. Reads the border
+   ladder, not the state layers: those are fills tuned to sit over a
+   surface, and while --stella-state-hover happened to equal
+   --stella-border-default this rule escalated the border to the colour
+   it was already painted. See WIKI.md.
    ============================================================================ */
 
 .root:has(.group > button:hover:not(:disabled)) {
-	border-color: var(--stella-state-hover);
+	border-color: var(--stella-border-hover);
 }
 
 .root:has(.group > button:active:not(:disabled)) {
-	border-color: var(--stella-state-active);
+	border-color: var(--stella-border-active);
 }
 
 /* Single-button mode — see ButtonIslandBase's `isSingleButton` check.
