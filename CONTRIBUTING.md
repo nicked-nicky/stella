@@ -13,10 +13,12 @@ Stella is a personal-identity project — the author uses it to build their own 
 
 ```bash
 pnpm install
-pnpm dev   # terra-test — live component showcase, hot-reloads on src/ changes
+pnpm typecheck
+pnpm test                                  # Vitest
+pnpm --filter @stella/terra test:ct        # Playwright (needs `playwright install chromium` once)
 ```
 
-Full dev workflow (build, test, format) is in [WIKI.md → How to develop](./WIKI.md#how-to-develop).
+The live showcase (`packages/terra-test`) is a **separate repository** and is gitignored here, so `pnpm dev` won't have anything to run on a fresh clone — the test suites are your feedback loop instead. Full dev workflow (build, test, format) is in [WIKI.md → How to develop](./WIKI.md#how-to-develop).
 
 ## Code style
 

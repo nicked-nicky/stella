@@ -25,7 +25,7 @@ All notable changes to Stella are documented here. Format loosely follows [Keep 
 - Letter-spacing tokens for every type-scale entry (`--stella-text-*-ls`), plus `text-wrap: balance` on the two largest sizes and `font-variant-numeric: tabular-nums` on `mono`.
 - `sidebar` tone on `Island`, giving the existing `--stella-surface-sidebar` token a reachable component API.
 - `.prettierrc` and `format` / `format:check` scripts.
-- `docs/` — `DEVELOPMENT.md` (authoring guide) and `WIKI.md` (architecture reference).
+- `WIKI.md` (orientation, development workflow, component conventions, architecture reference, browser support, testing, known gaps) and `CONTRIBUTING.md`.
 
 ### Changed
 

@@ -1,13 +1,23 @@
 # Stella
 
+<!-- Replace OWNER in the CI badge below with the GitHub account this repo lives under. -->
+[![CI](https://github.com/OWNER/stella/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/OWNER/stella/actions/workflows/ci.yml)
+[![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](#project-status)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+
+[![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20deps-0-success.svg)](./packages/terra/package.json)
+[![React](https://img.shields.io/badge/react-18%20%7C%2019-61dafb.svg)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg)](./tsconfig.base.json)
-[![Node](https://img.shields.io/badge/node-%3E%3D20-339933.svg)](https://nodejs.org)
+[![Node](https://img.shields.io/badge/node-%3E%3D20.19-339933.svg)](https://nodejs.org)
+
+[![Tests: 204](https://img.shields.io/badge/tests-166%20unit%20%2B%2038%20component-success.svg)](./WIKI.md#testing)
+[![Accessibility: axe-core](https://img.shields.io/badge/a11y-axe--core-6f42c1.svg)](./WIKI.md#testing)
+[![Code style: Prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)](./.prettierrc)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
 A React-first, runtime-agnostic UI kit with a GTK 4 / libadwaita-inspired visual identity — built for fast, native-feeling desktop apps (Tauri, Electron, or any webview), and just as usable on the web.
 
-Zero runtime CSS-in-JS. Theming is CSS custom properties, not JS-computed styles, so changing the accent, density, or rounding never forces a React re-render across the tree.
+Zero runtime dependencies and zero runtime CSS-in-JS. Theming is CSS custom properties, not JS-computed styles, so changing the colour scheme, density, rounding, or border weight never forces a React re-render across the tree.
 
 **[WIKI.md](./WIKI.md)** — how to develop, how to use components, component structure & conventions, architecture reference, testing. **[CONTRIBUTING.md](./CONTRIBUTING.md)** — how to send a change.
 
@@ -19,6 +29,23 @@ Zero runtime CSS-in-JS. Theming is CSS custom properties, not JS-computed styles
 **Terra never depends on Vidrio. Vidrio depends on Terra.** That direction is fixed.
 
 `@stella/terra` has a working component set (below) and is the package to reach for today. `@stella/vidrio` is scaffolded but empty — nothing has been built on top of Terra yet. Neither is published yet (`private: true`) — see [WIKI.md's publish checklist](./WIKI.md#how-to-develop).
+
+## Project status
+
+**Alpha, and honest about it.** Terra's component set is complete enough to build a real app against — the author uses it for exactly that — but it is pre-1.0, unpublished, and the API is still allowed to move.
+
+What's solid:
+
+- 22 components across atoms, molecules, organisms and layout, plus three app-level providers.
+- 204 tests: 166 in Vitest for logic, ARIA and keyboard behaviour, 38 in Playwright for things only a real browser can answer (resolved CSS, computed geometry), with axe-core scanning the component tree.
+- Zero runtime dependencies. React and React DOM are peers; `lucide-react` is an *optional* peer, only if you use `Icon` with it.
+- CI runs format, typecheck, both test layers and the build on every push.
+
+What isn't, yet — the full list lives in [WIKI.md → Known gaps](./WIKI.md#known-gaps):
+
+- `@stella/vidrio` is an empty scaffold.
+- Component tests run in Chromium only, so the visual layer is unverified on WebKit.
+- No published package, no semver guarantees, no ESLint config.
 
 ## Components (`@stella/terra`)
 
@@ -68,6 +95,8 @@ Zero runtime CSS-in-JS. Theming is CSS custom properties, not JS-computed styles
 
 `ThemeManager` writes CSS custom properties to the document root; `ThemeProvider`/`useTheme` is the React binding most consumers use. Four independent axes, each backed by a scale token — set one, everything reading it updates, no re-render required:
 
+There is deliberately **no accent hue**. Stella has a single neutral colour scheme, and colour is reserved for exactly five status meanings (success / info / warning / error / debug) carried by `Badge` and `Notification`. A "checked" control inverts to the foreground tone rather than picking a brand colour.
+
 | Axis | Values |
 |---|---|
 | `colorScheme` | `light` / `dark` / `system` |
@@ -101,8 +130,12 @@ Full example, provider list, and the `ThemeManager` API are in [WIKI.md → How 
 
 ```bash
 pnpm install
-pnpm dev   # runs packages/terra-test, a Vite app that consumes @stella/terra live via workspace:*
+pnpm typecheck
+pnpm test                                  # Vitest — logic, ARIA, keyboard
+pnpm --filter @stella/terra test:ct        # Playwright — resolved CSS, geometry, axe
 ```
+
+The component showcase used for day-to-day development (`packages/terra-test`) lives in its own repository and is **not** part of this one — it's gitignored here, so `pnpm dev` has nothing to run on a fresh clone. Drop a Vite app in at `packages/terra-test` and the pnpm workspace picks it up automatically, consuming `@stella/terra` straight from source with hot reload.
 
 See [WIKI.md → How to develop](./WIKI.md#how-to-develop) for the build, test, and publish workflow.
 

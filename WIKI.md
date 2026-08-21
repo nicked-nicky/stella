@@ -9,8 +9,9 @@ Everything about developing Stella, using its components, and why things are bui
 3. [How to use components](#how-to-use-components)
 4. [Component structure & conventions](#component-structure--conventions)
 5. [Architecture reference](#architecture-reference)
-6. [Testing](#testing)
-7. [Known gaps](#known-gaps)
+6. [Browser support](#browser-support)
+7. [Testing](#testing)
+8. [Known gaps](#known-gaps)
 
 ---
 
@@ -24,21 +25,23 @@ Repo layout:
 packages/
   terra/       @stella/terra  — the package you install
   vidrio/      @stella/vidrio — depends on @stella/terra via workspace:*
-  terra-test/  Vite + React app: local dev loop + living component showcase
+  terra-test/  (not in this repo — see below)
 ```
+
+`terra-test` is the Vite + React showcase used for day-to-day component work. It lives in a **separate repository** and is gitignored here, so a fresh clone of this repo won't have it and `pnpm dev` will find nothing to run. The pnpm workspace globs `packages/*`, so dropping it back in at that path is all it takes to restore the dev loop — no config change needed.
 
 Every component follows atomic design: `src/atoms/`, `src/molecules/`, `src/organisms/`, `src/layout/`, plus `src/providers/` and `src/theme/` for app-level systems.
 
 ## How to develop
 
-**Prerequisites:** Node ≥ 20, pnpm.
+**Prerequisites:** Node ≥ 20.19 (Vite 8's floor), pnpm 11.
 
 ```bash
 pnpm install
-pnpm dev   # runs terra-test — a Vite app consuming @stella/terra live via workspace:*
+pnpm dev   # runs terra-test, if you have it — see Orientation
 ```
 
-Terra's `src/` is consumed directly by `terra-test` through the pnpm workspace, so editing a component hot-reloads immediately — no build step in the loop. `pnpm dev` is where you'll do almost all component work.
+Terra's `src/` is consumed directly by `terra-test` through the pnpm workspace, so editing a component hot-reloads immediately — no build step in the loop. `pnpm dev` is where you'll do almost all component work, *when the showcase is present*; on a bare clone of this repo it's a no-op and the tests are your feedback loop instead.
 
 This works because `@stella/terra`'s `exports` point at `./src/index.ts`, and `publishConfig` overrides them to `./dist/` — pnpm swaps the two at publish time, so workspace consumers get live source and published consumers get compiled output, with no build step in between and no `dist/` needing to exist locally. (It previously pointed only at `dist/`, which meant `pnpm dev` failed with *"Failed to resolve entry for package @stella/terra"* on a clean checkout, since `dist/` is gitignored and never built in the dev loop.)
 
@@ -253,6 +256,24 @@ Both the auto-inserted hairline and the outer `Island`'s own border react to a h
 
 Inset rings (`outline-offset: -2px`), not outset, on any control that lives inside a `clip`-on `Island` — an outset ring would be clipped by the wrapping pill's `overflow: hidden` and effectively invisible. `Checkbox`/`Radio`/`Switch` (never inside a clipping Island) use outset rings instead.
 
+## Browser support
+
+Terra targets **Baseline 2024**: Chrome 123+, Edge 123+, Safari 17.5+, Firefox 120+, and WebKitGTK 2.44+. That floor is not arbitrary — it's set by the specific modern CSS the kit leans on rather than by a support policy picked in advance:
+
+| Feature | Used for | Consequence if unsupported |
+|---|---|---|
+| `light-dark()` | Every theme-dependent token is declared once instead of duplicated across a media query and an attribute selector | Colours fall back to the unresolved declaration — the theme collapses |
+| `:has()` | `ButtonIsland`'s separator and Island border reacting to a hovered/pressed child with no JS | Interaction states stop escalating; everything still renders |
+| `color-scheme` | Native scrollbars, selection, caret and form chrome following the theme | Dark app with light native chrome |
+| `scrollbar-gutter` | `SettingsMenu`'s columns reserving their scrollbar gutter | Content reflows when a scrollbar appears |
+
+For desktop hosts this floor is easier than it looks: Tauri on macOS and Electron everywhere ship a modern engine you don't choose. The one to watch is **Tauri on Linux**, which uses the system WebKitGTK — an older distro can land below 2.44.
+
+Two host-specific integrations are worth knowing about, both in `WindowChrome`:
+
+- **Dragging** is declared twice, unconditionally — `data-tauri-drag-region` for Tauri and `-webkit-app-region: drag` for Electron — because Terra is runtime-agnostic and can't know which shell wraps it. Electron additionally needs every interactive child marked `no-drag` or the buttons swallow their own clicks; that's handled for you.
+- **Window controls** are neutral by design, with no red close button, because colour in Stella means status and nothing else.
+
 ## Testing
 
 Two layers, deliberately not one — jsdom (what Vitest runs against) doesn't evaluate real CSS: no `:has()`, no `light-dark()`, no real computed-style cascade. A whole class of real bug (the `--stella-state-hover`/`--stella-border-default` collision above) is invisible to a jsdom-based test no matter how thorough, because jsdom never actually paints anything.
@@ -278,8 +299,23 @@ Priority for anything new, given accessibility is non-negotiable: keyboard navig
 
 ## Known gaps
 
-- `@stella/vidrio` is scaffolded, nothing built on top of Terra yet.
-- `Popover` and `Tooltip` have no tests of their own — their positioning math is covered by `utils/positioning.test.ts`, but their open/close/anchor behaviour isn't.
-- Comment condensing (moving deep design reasoning here, shrinking source docblocks to terse summaries) is in progress, not complete across every component.
-- No ESLint config — Prettier only.
-- No coverage thresholds enforced in CI. The suite is real now, but nothing stops it from silently getting thinner.
+Kept honest deliberately — an empty list here would mean nobody's looking, not that nothing's missing.
+
+### Coverage
+
+- **Component tests run in Chromium only.** `playwright-ct.config.ts` defines a single project. Everything the CT layer proves about resolved CSS — the state and border ladders, `light-dark()`, `:has()`, computed geometry — is proven in Blink and nowhere else. For a kit that claims "any webview" this is the most significant gap on the list, and WebKit is the one that matters: it's where `:has()` and `light-dark()` support is newest, and it's what Tauri uses on Linux and macOS. Adding a `webkit` project to the config is the fix.
+- **`Popover` and `Tooltip` have no tests of their own.** Their positioning math is covered by `utils/positioning.test.ts` and their overlay plumbing indirectly through `Menu`, but nothing exercises their own open/close/anchor behaviour.
+- **No coverage thresholds in CI.** The suite is real, but nothing stops it from silently getting thinner.
+- **`@stella/vidrio` is an empty scaffold** — directories and a `workspace:*` dependency on Terra, no components.
+
+### Design debt
+
+- **`--stella-border-subtle` is identical to `--stella-border-default`.** Everything that opts into "subtle" — `Dialog`'s header/footer rules, `Menu`'s per-item hairline, `SettingsMenu`'s between-row rules — therefore draws at full strength while the CSS describes it as the faintest thing on the panel. `neutral-100/800` is the obvious step; left alone because it's a look decision, not a correctness one.
+- **`--stella-state-hover` and `--stella-state-selected` are the same value, on purpose.** A selected control is distinguished by holding its fill *at rest*, not by a third colour. This is pinned by an equality assertion in `Button.ct.tsx` so it reads as a decision rather than the collision it resembles — see the note in `tokens.css` before changing either.
+- **A fragment wrapper silently disables auto-hairlines.** `Children.toArray` doesn't descend into fragments, so `<Menu>{cond && <><Item/><Item/></>}</Menu>` renders its items fine and quietly drops the separators between them. Same applies to `ButtonIsland`. Pinned by a test in `Menu.test.tsx` so the behaviour is at least documented.
+
+### Tooling
+
+- **No ESLint config** — Prettier only, so nothing catches unused variables, exhaustive-deps violations, or accidental `any`. The hooks in `src/hooks/` already carry `eslint-disable` comments for a rule that isn't currently running.
+- **Comment condensing is partial.** The plan is for deep design reasoning to live here and source docblocks to stay terse; a good number of components still carry the long-form version inline.
+- **Nothing is published.** Both packages are `private: true`, there are no semver guarantees, and the release path is the manual checklist in [How to develop](#how-to-develop) rather than an automated one.
